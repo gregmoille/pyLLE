@@ -1,6 +1,0 @@
-# exclude everything except directory foo/bar
-    pyLLE.egg-info*
-    .gitignore
-    Icon?
-    .DS_Store
-    Stable
