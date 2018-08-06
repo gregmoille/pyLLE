@@ -1,6 +1,6 @@
-print("\nAdding HDF5 pakcage to julia\n")
+print("\nAdding HDF5 package to julia\n")
 Pkg.add("HDF5")
 Pkg.update("HDF5")
-print("\nAdding ProgressMeter pakcage to julia\n")
+print("\nAdding ProgressMeter package to julia\n")
 Pkg.add("ProgressMeter")
 Pkg.update("ProgressMeter")
