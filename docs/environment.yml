@@ -10,7 +10,6 @@ dependencies:
     - numpy
     - matplotlib
     - h5py
-    - pickle
     - logging
     - time
     - sys
