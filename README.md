@@ -60,7 +60,7 @@ sim = {'Pin': 100e-3, #input power in W
        'δω_end': 10, # stop frequency of detuning ramp in Hz
        'μ_sim': [-70,170], # limit of the mode on the left and right side of the pump to simulate
        'μ_fit': [-60, 160], # limit of the mode on the left and right side of the pump to fit the dispersion with
-       'dispfile': 'h770RW1560.mat' # name of the dispersion file
+       'dispfile': 'ExampleQing.mat' # name of the dispersion file
         }
 ```
 
@@ -161,7 +161,7 @@ sim = {'Pin': 100e-3,
        'δω_end': 10, 
        'μ_sim': [-70,170],
        'μ_fit': [-70, 170],
-       'dispfile': 'h770RW1560.mat'
+       'dispfile': 'ExampleQing.mat'
         }
 
 solver = pyLLE.LLEsovler(sim=sim,
