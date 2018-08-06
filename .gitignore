@@ -1,6 +1,6 @@
 # exclude everything except directory foo/bar
-    pyLLE.egg-info*
-    .gitignore
-    Icon?
-    .DS_Store
-    Stable
+pyLLE.egg-info*
+.gitignore
+Icon?
+.DS_Store
+Stable
