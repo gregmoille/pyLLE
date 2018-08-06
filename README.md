@@ -3,7 +3,7 @@
 ![](https://readthedocs.org/projects/pylle/badge/?version=latest) 
 [![](https://img.shields.io/github/license/mashape/apistatus.svg)](licence.txt)
 
-pyLLE is a tool to solver the Lugiato Lefever Equations (LLE)<sup>[1](#ref1)</sup><sup>,</sup><sup>[2](#ref2)</sup><sup>,</sup><sup>[3](#ref3)</sup>in a fast an easy way. Thanks to a user-friendly front-end (and a future UI) in python and a efficient back end in Julia, solving this problem becomes easy and fast. 
+pyLLE is a tool to solve the Lugiato Lefever Equations (LLE)<sup>[1](#ref1)</sup><sup>,</sup><sup>[2](#ref2)</sup><sup>,</sup><sup>[3](#ref3)</sup>in a fast and easy way. Thanks to a user-friendly front-end (and a future UI) in python and a efficient back end in Julia, solving this problem becomes easy and fast. 
 
 For a complete documentation of the package, please visit the [readthedocs page](http://pylle.readthedocs.io/en/latest/index.html)
 
@@ -178,6 +178,9 @@ ind = 600
 solver.PlotCombSpectra(ind)
 ```
 
+## How to Cite Us?
+
+Soon you will be. For the moment, please provide the name of the package, the authors (Gregory Moille, Qing Li, Xiyuan Lu and Kartik Srinivasan) as a full url to the repository
 
 ## Further work
 
