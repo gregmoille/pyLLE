@@ -1,0 +1,14 @@
+CHANGES.txt
+MANIFEST.in
+README.txt
+setup.py
+LLE/__init__.py
+LLE/analyzedisp.py
+LLE/llesolver.py
+LLE.egg-info/Icon
+LLE.egg-info/PKG-INFO
+LLE.egg-info/SOURCES.txt
+LLE.egg-info/dependency_links.txt
+LLE.egg-info/not-zip-safe
+LLE.egg-info/requires.txt
+LLE.egg-info/top_level.txt
