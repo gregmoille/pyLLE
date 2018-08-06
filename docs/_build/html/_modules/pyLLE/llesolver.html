@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>LLE.llesolver &mdash; pyLLE 1.0 documentation</title>
+  <title>pyLLE.llesolver &mdash; pyLLE 1.0 documentation</title>
   
 
   
@@ -134,7 +134,7 @@
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
-      <li>LLE.llesolver</li>
+      <li>pyLLE.llesolver</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -149,7 +149,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for LLE.llesolver</h1><div class="highlight"><pre>
+  <h1>Source code for pyLLE.llesolver</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">.analyzedisp</span> <span class="k">import</span> <span class="n">AnalyzeDisp</span>
 <span class="kn">import</span> <span class="nn">scipy.interpolate</span> <span class="k">as</span> <span class="nn">itp</span>
@@ -177,7 +177,7 @@
 <span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span>
 
 
-<div class="viewcode-block" id="LLEsovler"><a class="viewcode-back" href="../../source/LLE.html#LLE.llesolver.LLEsovler">[docs]</a><span class="k">class</span> <span class="nc">LLEsovler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="LLEsovler"><a class="viewcode-back" href="../../pyLLE.html#pyLLE.llesolver.LLEsovler">[docs]</a><span class="k">class</span> <span class="nc">LLEsovler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Class to solver the Lugiato Lefever Equation</span>
 <span class="sd">    Initialization input ([]=facultative):</span>
@@ -272,7 +272,7 @@
             <span class="n">Dnew</span><span class="p">[</span><span class="n">new_k</span><span class="p">]</span> <span class="o">=</span> <span class="n">D</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">Dnew</span>
 
-<div class="viewcode-block" id="LLEsovler.Analyze"><a class="viewcode-back" href="../../source/LLE.html#LLE.llesolver.LLEsovler.Analyze">[docs]</a>    <span class="k">def</span> <span class="nf">Analyze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plottype</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">zero_lines</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="LLEsovler.Analyze"><a class="viewcode-back" href="../../pyLLE.html#pyLLE.llesolver.LLEsovler.Analyze">[docs]</a>    <span class="k">def</span> <span class="nf">Analyze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plottype</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">zero_lines</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
         <span class="k">elif</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span><span class="p">(</span><span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
@@ -335,7 +335,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">axDint</span> <span class="o">=</span> <span class="n">ax</span>
         <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> </div>
 
-<div class="viewcode-block" id="LLEsovler.Setup"><a class="viewcode-back" href="../../source/LLE.html#LLE.llesolver.LLEsovler.Setup">[docs]</a>    <span class="k">def</span> <span class="nf">Setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="LLEsovler.Setup"><a class="viewcode-back" href="../../pyLLE.html#pyLLE.llesolver.LLEsovler.Setup">[docs]</a>    <span class="k">def</span> <span class="nf">Setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># -- Make the hdf5 file --</span>
         <span class="c1"># ------------------------------------------------------------</span>
         <span class="k">try</span><span class="p">:</span>
@@ -538,7 +538,7 @@
 
             <span class="n">h5f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="LLEsovler.Solve"><a class="viewcode-back" href="../../source/LLE.html#LLE.llesolver.LLEsovler.Solve">[docs]</a>    <span class="k">def</span> <span class="nf">Solve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="LLEsovler.Solve"><a class="viewcode-back" href="../../pyLLE.html#pyLLE.llesolver.LLEsovler.Solve">[docs]</a>    <span class="k">def</span> <span class="nf">Solve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Solving LLE with Julia....&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">70</span><span class="p">)</span>
@@ -570,7 +570,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="n">time_taken</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">70</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="LLEsovler.RetrieveData"><a class="viewcode-back" href="../../source/LLE.html#LLE.llesolver.LLEsovler.RetrieveData">[docs]</a>    <span class="k">def</span> <span class="nf">RetrieveData</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="LLEsovler.RetrieveData"><a class="viewcode-back" href="../../pyLLE.html#pyLLE.llesolver.LLEsovler.RetrieveData">[docs]</a>    <span class="k">def</span> <span class="nf">RetrieveData</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">drct</span> <span class="o">=</span> <span class="n">tmp_dir</span>
         <span class="n">S</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">tmp_dir</span> <span class="o">+</span> <span class="s1">&#39;ResultsJulia.h5&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span><span class="p">:</span>
@@ -616,7 +616,7 @@
         <span class="c1"># sol[&#39;u_probe&#39;] = np.conj(sol[&#39;u_probe&#39;])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sol</span> <span class="o">=</span> <span class="n">sol</span></div>
 
-<div class="viewcode-block" id="LLEsovler.PlotCombPower"><a class="viewcode-back" href="../../source/LLE.html#LLE.llesolver.LLEsovler.PlotCombPower">[docs]</a>    <span class="k">def</span> <span class="nf">PlotCombPower</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="LLEsovler.PlotCombPower"><a class="viewcode-back" href="../../pyLLE.html#pyLLE.llesolver.LLEsovler.PlotCombPower">[docs]</a>    <span class="k">def</span> <span class="nf">PlotCombPower</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;tab10&quot;</span><span class="p">)</span>
         <span class="n">freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sol</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-12</span>
         <span class="n">Epb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sol</span><span class="p">[</span><span class="s1">&#39;Ewg&#39;</span><span class="p">]</span>
@@ -650,7 +650,7 @@
 
         <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">ax</span></div>
 
-<div class="viewcode-block" id="LLEsovler.PlotCombSpectra"><a class="viewcode-back" href="../../source/LLE.html#LLE.llesolver.LLEsovler.PlotCombSpectra">[docs]</a>    <span class="k">def</span> <span class="nf">PlotCombSpectra</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pwr</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="LLEsovler.PlotCombSpectra"><a class="viewcode-back" href="../../pyLLE.html#pyLLE.llesolver.LLEsovler.PlotCombSpectra">[docs]</a>    <span class="k">def</span> <span class="nf">PlotCombSpectra</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pwr</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">):</span>
         <span class="n">freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sol</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-12</span>
         <span class="k">if</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
@@ -691,10 +691,10 @@
 
         <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">Sout</span><span class="p">,</span> <span class="n">Sring</span></div>
 
-<div class="viewcode-block" id="LLEsovler.PlotSolitonTime"><a class="viewcode-back" href="../../source/LLE.html#LLE.llesolver.LLEsovler.PlotSolitonTime">[docs]</a>    <span class="k">def</span> <span class="nf">PlotSolitonTime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ind</span><span class="p">):</span>
+<div class="viewcode-block" id="LLEsovler.PlotSolitonTime"><a class="viewcode-back" href="../../pyLLE.html#pyLLE.llesolver.LLEsovler.PlotSolitonTime">[docs]</a>    <span class="k">def</span> <span class="nf">PlotSolitonTime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ind</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="LLEsovler.SaveResults"><a class="viewcode-back" href="../../source/LLE.html#LLE.llesolver.LLEsovler.SaveResults">[docs]</a>    <span class="k">def</span> <span class="nf">SaveResults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;./&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="LLEsovler.SaveResults"><a class="viewcode-back" href="../../pyLLE.html#pyLLE.llesolver.LLEsovler.SaveResults">[docs]</a>    <span class="k">def</span> <span class="nf">SaveResults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;./&#39;</span><span class="p">):</span>
         <span class="n">to_save</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">to_save</span><span class="o">.</span><span class="n">sim_norm</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;domega_disp&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">to_save</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;domega_disp&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>

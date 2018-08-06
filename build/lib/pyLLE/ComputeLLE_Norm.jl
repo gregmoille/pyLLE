@@ -2,7 +2,8 @@ using HDF5
 using Base
 using ProgressMeter
 # using FFTW
-# using Debug
+
+
 function Loadh5Param(dir)
     h5file = dir * "ParamLLEJulia.h5"
     sim = Dict()
@@ -32,6 +33,9 @@ end
 
 print("\n")
 print("Starting Julia\n")
+
+
+
 tmp_dir = ARGS[1]
 sim = Loadh5Param(tmp_dir)
 # -- Collect Data ---
@@ -42,7 +46,7 @@ c0 = 299792458;
 
 # -- sim parameters --
 # ---------------------------------------------------
-δω_tot = sim["δω_tot"][1]
+δω_tot0 = sim["δω_tot"][1]
 δω_ext = sim["δω_ext"][1]
 δω_disp = sim["δω_disp_val"][1]
 α_init = sim["α_init"][1]
@@ -57,8 +61,12 @@ tR = sim["tR"][1]
 fact_normE = sim["fact_normE"][1]
 F2 = sim["F2"][1]
 
-dβ =  -2 * Dint/(δω_tot)
-
+δω_in = δω_tot0 - δω_ext
+# print("δω_in\n")
+# print(δω_in)
+# print("\n")
+δω_tot = δω_ext.*δω_disp + δω_in
+dβ =  -2 * Dint./(δω_tot0)
 μ = collect(μ_sim[1]:μ_sim[2])
 pmp_sim = find(μ .== 0)[1]
 
@@ -85,7 +93,7 @@ t1=0;
 
 # -- Pump -- 
 Ein= 1im.*zeros(size(μ));
-Ein[pmp_sim]=sqrt.(F2)*length(μ)
+Ein[pmp_sim]=sqrt.(F2).*length(μ)
 # Ein_couple=Ein
 
 
@@ -127,7 +135,7 @@ for it = 1:1:Nt
     α =  dω_pmp[Int(it)];
     u0 = ifft_step*(fft_step*(u0) + Ein*dt);
     u1 = u0;
-    cβ = - (δω_disp +1im*α) + 1im*dβ/2 ;
+    cβ = -(1 +1im*α) + 1im.*dβ ;
     halfprop = exp.(cβ.*dt/2)
     uhalf = ifft_step*(halfprop.*(fft_step*(u0)));
     half0 = ifft_step*(1.*(fft_step*( abs.(u0).^2.*u0) ) )
@@ -164,8 +172,9 @@ for it = 1:1:Nt
 end
 S["Ewg"] = 1im*zeros(size(S["Em_probe"]))
 for ii=1:size(S["Em_probe"],1)
-    S["Ewg"][ii,:] = Ein./length(μ)-(S["Em_probe"][ii,:].*sqrt.(δω_ext/δω_tot.*tR/2))
+    S["Ewg"][ii,:] = Ein./length(μ)-(S["Em_probe"][ii,:].*sqrt.(δω_disp.*δω_ext./δω_tot0 .*tR))
 end
+S["ω"] = ω
 # S["freq"] = (w0 + dw)/(2*pi)
 
 SaveResults(tmp_dir, S)

@@ -10,15 +10,9 @@ Welcome to pyLLE's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   installation
    tutorial
    getting_started
    team
-   LLE
+   pyLLE
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

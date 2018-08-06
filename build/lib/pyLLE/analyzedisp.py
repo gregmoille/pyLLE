@@ -20,7 +20,7 @@ class AnalyzeDisp(object):
         self.ax =kwargs.get('ax', None)
         self.label =kwargs.get('label', None)
         self.plottype = kwargs.get('plottype', 'all')
-
+        self._logger = kwargs.get('logger', None)
         assert type(self.dispfile) is str, 'Please provide a file'
         assert len(self.rM_fit) > 1, 'Please the modes to fit'
 
@@ -69,9 +69,9 @@ class AnalyzeDisp(object):
         # drf = rf - rf[pump_index]
         # Dfit = np.polyfit(dm, drf[pump_index+dm], 2)
         # FSR_p = Dfit[1]
-        # ring_beta2 = -self.ng/self.c*(2*Dfit[0])/Dfit[1]**2/2/np.pi
+        ring_beta2 = -self.ng/self.c*(2*Dfit[0])/Dfit[1]**2/2/np.pi
 
-        # dphi = -(drf-(rM-rM[pump_index])*FSR_p)/FSR_p*2*np.pi
+        dφ = -(drf-(rM-rM[pump_index])*FSR_p)/FSR_p*2*np.pi
 
         ind_M = np.arange(
             pump_index+rM_fit[0], pump_index+rM_fit[1]+1, dtype=int)
@@ -82,9 +82,12 @@ class AnalyzeDisp(object):
 
         M2fit = rM[ind_M] - rM[pump_index]
         Dint2fit = Dint[ind_M]
+        dφ2fit = dφ[ind_M]
         PrM_fit = itp.splrep(M2fit, Dint2fit)
+        Prφ_fit = itp.splrep(M2fit, dφ2fit)
         Dint_fit1 = itp.splev(ind_fit, PrM_fit)
         Dint_fit2 = itp.splev(ind_sim, PrM_fit)
+        dφ_fitted = itp.splev(ind_sim, Prφ_fit)
         # ipdb.set_trace()
         
 
@@ -120,7 +123,7 @@ class AnalyzeDisp(object):
                 # ipdb.set_trace()
                 ax.plot(rf[ind_M]*1e-12, Dint_fit1*1e-9/(2*np.pi),lw = 2)
                 ax.plot(rf_fit*1e-12, Dint_fit2*1e-9/(2*np.pi), '--', lw = 2)
-                ax.plot(rf*1e-12, Dint*1e-9/(2*np.pi), '+', ms=2)
+                ax.plot(rf*1e-12, Dint*1e-9/(2*np.pi), '.', ms=2)
             if self.plottype.lower() == 'sim':
                 ax.plot(rf_fit*1e-12, Dint_fit2*1e-9/(2*np.pi),label = self.label)
                 ax.legend()
@@ -145,12 +148,21 @@ class AnalyzeDisp(object):
             # f, ax = plt.subplots()
             # ax.plot([ind_sim[0], ind_sim[-1]], [0, 0], 'k--')
             
-            # f.show()
+        # f.show()
+        Info = '-- Dispersion Analysis --\n'
+        Info += '\tPump index: {}\n'.format(pump_index)
+        Info += '\tCenter Pump: {:.3f} THz\n'.format(rf[pump_index]*1e-12)
+        Info += '\tFSR: {:.2f} GHz\n'.format(FSR_p*1e-9)
+        Info += '\tD2: {:.2f} MHz\n'.format(D2*1e-6)
+        print(Info)
 
-            print('Pump index: {}'.format(pump_index))
-            print('Center Pump: {:.3f} THz'.format(rf[pump_index]*1e-12))
-            print('FSR: {:.2f}GHz'.format(FSR_p*1e-9))
-            print('D2: {:.2f}MHz'.format(D2*1e-6))
+        if self._logger:
+            Info += '\t mu_fit: [{:.0f}, {:.0f}]\n'.format(self.rM_fit[0],
+                                                        self.rM_fit[1])
+            Info += '\t mu_sim: [{:.0f}, {:.0f}]\n'.format(self.rM_sim[0],
+                                                        self.rM_sim[1])
+
+            self._logger.info(Info)
 
 
         self.PrM_fit = PrM_fit
@@ -165,6 +177,7 @@ class AnalyzeDisp(object):
         self.Dint_fit = Dint_fit2
         self.ind_M = ind_M
         self.pump_index = pump_index
+        self.dφ = dφ_fitted
 
         return PrM_fit, Dint_fit2, self.neff_pmp, self.ng_pmp
 

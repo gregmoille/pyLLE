@@ -6,17 +6,17 @@ import os
 class MyInstall(install):
     def run(self):
         install.run(self)
-        # sub.call(['julia', 'InstallPkg.jl'])
+        sub.call(['julia', 'InstallPkg.jl'])
         
 
-setup(name='LLE',
+setup(name='pyLLE',
       version='0.1',
       description='LLE Solver',
       url='',
       author='Greg Moille',
       author_email='gregory.moille@nist.gov',
       license='MIT',
-      packages=['LLE'],
+      packages=['pyLLE'],
       install_requires=[
           'numpy',
           'scipy',
@@ -27,4 +27,4 @@ setup(name='LLE',
       package_data={'': ['*.jl']},
       include_package_data=True,
       zip_safe=False)
-      # cmdclass={'install': MyInstall},)
+      cmdclass={'install': MyInstall},)

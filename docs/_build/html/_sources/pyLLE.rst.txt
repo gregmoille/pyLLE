@@ -1,21 +1,21 @@
 pyLLE package
-===========
+=============
 
 Submodules
 ----------
 
-LLE\.analyzedisp module
------------------------
+pyLLE\.analyzedisp module
+-------------------------
 
-.. automodule:: LLE.analyzedisp
+.. automodule:: pyLLE.analyzedisp
     :members:
     :undoc-members:
     :show-inheritance:
 
-LLE\.llesolver module
----------------------
+pyLLE\.llesolver module
+-----------------------
 
-.. automodule:: LLE.llesolver
+.. automodule:: pyLLE.llesolver
     :members:
     :undoc-members:
     :show-inheritance:
@@ -24,7 +24,7 @@ LLE\.llesolver module
 Module contents
 ---------------
 
-.. automodule:: LLE
+.. automodule:: pyLLE
     :members:
     :undoc-members:
     :show-inheritance:

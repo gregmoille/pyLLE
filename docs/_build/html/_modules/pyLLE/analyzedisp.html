@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>LLE.analyzedisp &mdash; pyLLE 1.0 documentation</title>
+  <title>pyLLE.analyzedisp &mdash; pyLLE 1.0 documentation</title>
   
 
   
@@ -134,7 +134,7 @@
         
           <li><a href="../index.html">Module code</a> &raquo;</li>
         
-      <li>LLE.analyzedisp</li>
+      <li>pyLLE.analyzedisp</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -149,14 +149,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for LLE.analyzedisp</h1><div class="highlight"><pre>
+  <h1>Source code for pyLLE.analyzedisp</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.io</span> <span class="k">as</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">scipy.interpolate</span> <span class="k">as</span> <span class="nn">itp</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">ipdb</span>
 
-<div class="viewcode-block" id="AnalyzeDisp"><a class="viewcode-back" href="../../source/LLE.html#LLE.analyzedisp.AnalyzeDisp">[docs]</a><span class="k">class</span> <span class="nc">AnalyzeDisp</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="AnalyzeDisp"><a class="viewcode-back" href="../../pyLLE.html#pyLLE.analyzedisp.AnalyzeDisp">[docs]</a><span class="k">class</span> <span class="nc">AnalyzeDisp</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="n">c</span> <span class="o">=</span> <span class="mi">299792458</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -176,7 +176,7 @@
         <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dispfile</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Please provide a file&#39;</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rM_fit</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Please the modes to fit&#39;</span>
 
-<div class="viewcode-block" id="AnalyzeDisp.GetDint"><a class="viewcode-back" href="../../source/LLE.html#LLE.analyzedisp.AnalyzeDisp.GetDint">[docs]</a>    <span class="k">def</span> <span class="nf">GetDint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AnalyzeDisp.GetDint"><a class="viewcode-back" href="../../pyLLE.html#pyLLE.analyzedisp.AnalyzeDisp.GetDint">[docs]</a>    <span class="k">def</span> <span class="nf">GetDint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># -- Get Parameters -- </span>
         <span class="n">FSR0</span> <span class="o">=</span> <span class="mf">1e12</span><span class="o">*</span><span class="mf">23e-6</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">R</span>
         <span class="n">R</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span>
