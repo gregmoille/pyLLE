@@ -14,5 +14,5 @@ Welcome to pyLLE's documentation!
    tutorial
    getting_started
    team
-   pyLLE
+   source/pyLLE
 

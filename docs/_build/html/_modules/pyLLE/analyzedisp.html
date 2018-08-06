@@ -86,7 +86,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Quick Tutorial to simulate a ring resonator</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../team.html">pyLLE Team</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../pyLLE.html">pyLLE package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/pyLLE.html">pyLLE package</a></li>
 </ul>
 
             
@@ -156,7 +156,7 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
 
-<div class="viewcode-block" id="AnalyzeDisp"><a class="viewcode-back" href="../../pyLLE.html#pyLLE.analyzedisp.AnalyzeDisp">[docs]</a><span class="k">class</span> <span class="nc">AnalyzeDisp</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="AnalyzeDisp"><a class="viewcode-back" href="../../source/pyLLE.html#pyLLE.analyzedisp.AnalyzeDisp">[docs]</a><span class="k">class</span> <span class="nc">AnalyzeDisp</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Calls to analyze the dispersion of a simulated resonator</span>
 <span class="sd">    Initialization input. Everything is in SI ([]=facultative):</span>
@@ -191,7 +191,7 @@
         <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dispfile</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Please provide a file&#39;</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rM_fit</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Please the modes to fit&#39;</span>
 
-<div class="viewcode-block" id="AnalyzeDisp.GetDint"><a class="viewcode-back" href="../../pyLLE.html#pyLLE.analyzedisp.AnalyzeDisp.GetDint">[docs]</a>    <span class="k">def</span> <span class="nf">GetDint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AnalyzeDisp.GetDint"><a class="viewcode-back" href="../../source/pyLLE.html#pyLLE.analyzedisp.AnalyzeDisp.GetDint">[docs]</a>    <span class="k">def</span> <span class="nf">GetDint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Retrieve the dispersion of a resonator based on the frequency of </span>
 <span class="sd">        resonance and azimuthal mode order. The data are fit using a cubic spline method</span>
