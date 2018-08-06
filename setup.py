@@ -6,7 +6,7 @@ import os
 class MyInstall(install):
     def run(self):
         install.run(self)
-        # sub.call(['julia', 'InstallPkg.jl'])
+        sub.call(['julia', 'InstallPkg.jl'])
         
 
 setup(name='pyLLE',
