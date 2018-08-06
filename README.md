@@ -37,7 +37,7 @@ Import the pyLLE module, and the different utility modules
 import pyLLE
 ```
 
-Define the resonator properties. Here we will simulate the ring resonator made of Si3N4 from Li et al<sup>[4](#ref4)</sup>. Hence the resonator dictionary should look like
+Define the resonator properties. Here we will simulate the ring resonator made of Si3N4 from Li et al<sup>[4](#ref4)</sup>. Hence the _res_ dictionary should look like
 
 ```python
 res = {'R': 23e-6, # ring radius
@@ -47,6 +47,21 @@ res = {'R': 23e-6, # ring radius
        }
 ```
 
+Now, we should define the simulation parameters through the _sim_ dictionary
+
+
+```python
+sim = {'Pin': 100e-3, #input power in W
+       'Tscan': 0.6e5, # Total time for the simulation in unit of round trip
+       'δω_stop': "None", # if we want to stop the detuning at a given frequency
+       'f_pmp': 191e12, # frequency of the pump in Hz
+       'δω_init': -4, # start frequency of detuning ramp in Hz
+       'δω_end': 10, # stop frequency of detuning ramp in Hz
+       'μ_sim': [-70,170], # limit of the mode on the left and right side of the pump to simulate
+       'μ_fit': [-60, 160], # limit of the mode on the left and right side of the pump to fit the dispersion with
+       'dispfile': 'h770RW1560.mat' # name of the dispersion file
+        }
+```
 
 
 
@@ -58,4 +73,4 @@ res = {'R': 23e-6, # ring radius
 
 <a name="ref1">3</a>: Stéphane Coen, Hamish G. Randle, Thibaut Sylvestre, and Miro Erkintalo. "Modeling of octave-spanning Kerr frequency combs using a generalized mean-field Lugiato–Lefever model." Optics letters 38, no. 1 (2013): 37-39.
 
-<a name="ref1">4</a>:
+<a name="ref1">4</a>: Qing Li, Travis C. Briles, Daron A. Westly, Tara E. Drake, Jordan R. Stone, B. Robert Ilic, Scott A. Diddams, Scott B. Papp, and Kartik Srinivasan. "Stably accessing octave-spanning microresonator frequency combs in the soliton regime." Optica 4, no. 2 (2017): 193-203.
