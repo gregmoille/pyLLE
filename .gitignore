@@ -1,5 +1,5 @@
 # exclude everything except directory foo/bar
-    LLE.egg-info
+    pyLLE.egg-info
     .gitignore
     Icon?
     .DS_Store
