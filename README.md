@@ -1,5 +1,7 @@
 # pyLLE ![NIST logo](images/NISTlogo32x32.jpg)
 
+![](https://readthedocs.org/projects/pylle/badge/?version=latest)
+
 pyLLE is a tool to solver the Lugiato Lefever Equations (LLE)<sup>[1](#ref1)</sup><sup>,</sup><sup>[2](#ref2)</sup><sup>,</sup><sup>[3](#ref3)</sup>in a fast an easy way. Thanks to a user-friendly front-end (and a future UI) in python and a efficient back end in Julia, solving this problem becomes easy and fast. 
 
 For a complete documentation of the package, please visit the [readthedocs page](http://pylle.readthedocs.io/en/latest/index.html)
