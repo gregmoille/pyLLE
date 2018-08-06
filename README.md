@@ -183,7 +183,7 @@ solver.PlotCombSpectra(ind)
 
 - [ ] Add a steady state solver through Newton Method
 - [ ] Add normalized formalism
-- [ ] 
+
 
 ## References
 
