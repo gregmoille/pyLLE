@@ -1,0 +1,893 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyLLE.llesolver &mdash; pyLLE 1.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyLLE
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorial.html">Quick Tutorial to simulate a ring resonator</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../team.html">pyLLE Team</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/pyLLE.html">pyLLE package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyLLE</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyLLE.llesolver</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyLLE.llesolver</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">.analyzedisp</span> <span class="k">import</span> <span class="n">AnalyzeDisp</span>
+<span class="kn">import</span> <span class="nn">scipy.interpolate</span> <span class="k">as</span> <span class="nn">itp</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">import</span> <span class="nn">subprocess</span> <span class="k">as</span> <span class="nn">sub</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">copy</span>
+<span class="kn">import</span> <span class="nn">pickle</span> <span class="k">as</span> <span class="nn">pkl</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span> <span class="nn">prettytable</span> <span class="k">import</span> <span class="n">PrettyTable</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">matplotlib.font_manager</span> <span class="k">as</span> <span class="nn">font_manager</span>
+<span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">FutureWarning</span><span class="p">)</span>
+    <span class="kn">import</span> <span class="nn">h5py</span>
+<span class="kn">import</span> <span class="nn">ipdb</span>
+<span class="n">path_juliaScript</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span>
+<span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span>
+
+
+<div class="viewcode-block" id="LLEsovler"><a class="viewcode-back" href="../../source/pyLLE.html#pyLLE.llesolver.LLEsovler">[docs]</a><span class="k">class</span> <span class="nc">LLEsovler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Class to solver the Lugiato Lefever Equation</span>
+<span class="sd">    Initialization input ([]=facultative):</span>
+
+<span class="sd">    **res &lt;dict&gt;**</span>
+
+<span class="sd">        - Qi &lt;float&gt;: intrinisic Q of the resonator</span>
+<span class="sd">        - Qc &lt;float&gt;: coupling Q of the resonator</span>
+<span class="sd">        - R &lt;float&gt;: ring radius</span>
+<span class="sd">        - gamma &lt;float&gt;: Non linear index of the material</span>
+
+<span class="sd">    **sim &lt;dict&gt;**</span>
+
+<span class="sd">        - Tscan &lt;float&gt;: length of the simulation (in unit of round trip)</span>
+<span class="sd">        - mu_fit &lt;list&gt;: number of mode to fit</span>
+<span class="sd">        - mu_sim &lt;list&gt;: number of mode to simulate</span>
+<span class="sd">        - dispfile &lt;str&gt; : str pointing to a .mat file where the resonances and corresponding azimuthal mode orders are saved</span>
+<span class="sd">        - domega_init &lt;float&gt;: initial detuning of the pump </span>
+<span class="sd">        - domega_end &lt;float&gt;: final detuning of the pump </span>
+<span class="sd">        - [domga_stop] &lt;float&gt;: where to stop the scan in detuning but keep doing the simulation</span>
+<span class="sd">    </span>
+<span class="sd">    **debug &lt;bool&gt;**: Save a trace in a logfile in the working directory of the different action pyLLE perform (default = True)</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">_c0</span> <span class="o">=</span> <span class="mi">299792458</span>
+    <span class="n">_ħ</span> <span class="o">=</span> <span class="mf">6.634e-34</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Gregory Moille&quot;</span>
+    <span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2018, NIST&quot;</span>
+    <span class="n">__credits__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Gregory Moille&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Qing Li&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;Xiyuan Lu&quot;</span><span class="p">,</span>
+                   <span class="s2">&quot;Kartik Srinivasan&quot;</span><span class="p">]</span>
+    <span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;GPL&quot;</span>
+    <span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;1.0.0&quot;</span>
+    <span class="n">__maintainer__</span> <span class="o">=</span> <span class="s2">&quot;Gregory Moille&quot;</span>
+    <span class="n">__email__</span> <span class="o">=</span> <span class="s2">&quot;gregory.moille@nist.gov&quot;</span>
+    <span class="n">__status__</span> <span class="o">=</span> <span class="s2">&quot;Development&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">res</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;res&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sim&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sim_norm&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># find all the needed parameters</span>
+        <span class="k">assert</span> <span class="s1">&#39;Qi&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s1">&#39;Please provide Qi&#39;</span>
+        <span class="k">assert</span> <span class="s1">&#39;Qc&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s1">&#39;Please provide Qc&#39;</span>
+        <span class="k">assert</span> <span class="s1">&#39;R&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s1">&#39;Please provide R&#39;</span>
+        <span class="k">assert</span> <span class="s1">&#39;Tscan&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s1">&#39;Please provide Tscan&#39;</span>
+        <span class="k">assert</span> <span class="s1">&#39;dispfile&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s1">&#39;Please provide dispfile&#39;</span>
+
+        <span class="c1"># -- Setup the Logger ---</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span><span class="p">:</span> 
+            <span class="n">FORMATTER</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%(asctime)s</span><span class="s2"> — LLEsovler.</span><span class="si">%(funcName)s</span><span class="s2"> — </span><span class="si">%(levelname)s</span><span class="s2">] </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">LOG_FILE</span> <span class="o">=</span> <span class="s2">&quot;LLE.log&quot;</span>
+            <span class="nb">open</span><span class="p">(</span><span class="n">LOG_FILE</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">75</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">handlers</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">_loghdl</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">LOG_FILE</span><span class="p">)</span>
+            <span class="n">_loghdl</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">FORMATTER</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">_loghdl</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;New LLE&#39;</span><span class="p">)</span>
+            <span class="nb">open</span><span class="p">(</span><span class="n">LOG_FILE</span> <span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">75</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_Translator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">D</span><span class="p">):</span>
+        <span class="n">Dnew</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">greek</span> <span class="o">=</span><span class="p">{</span><span class="s1">&#39;α&#39;</span><span class="p">:</span> <span class="s1">&#39;alpha&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;β&#39;</span><span class="p">:</span><span class="s1">&#39;beta&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;γ&#39;</span><span class="p">:</span> <span class="s1">&#39;gamma&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;ω&#39;</span><span class="p">:</span> <span class="s1">&#39;omega&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;δ&#39;</span><span class="p">:</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Δ&#39;</span><span class="p">:</span> <span class="s1">&#39;D&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;μ&#39;</span><span class="p">:</span> <span class="s1">&#39;mu&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;λ&#39;</span><span class="p">:</span> <span class="s1">&#39;lambda&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;ε&#39;</span><span class="p">:</span> <span class="s1">&#39;epsilon&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;φ&#39;</span><span class="p">:</span> <span class="s1">&#39;phi&#39;</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">D</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">new_k</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">char</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">greek</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                    <span class="n">new_k</span> <span class="o">+=</span> <span class="n">greek</span><span class="p">[</span><span class="n">char</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">new_k</span> <span class="o">+=</span> <span class="n">char</span>
+            <span class="n">Dnew</span><span class="p">[</span><span class="n">new_k</span><span class="p">]</span> <span class="o">=</span> <span class="n">D</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">Dnew</span>
+
+<div class="viewcode-block" id="LLEsovler.Analyze"><a class="viewcode-back" href="../../source/pyLLE.html#pyLLE.llesolver.LLEsovler.Analyze">[docs]</a>    <span class="k">def</span> <span class="nf">Analyze</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">plottype</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">zero_lines</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Call pyLLE.analyzedisp.AnalyzeDisp to get the dispersion of the resonator we want to </span>
+<span class="sd">        simulate</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+
+        <span class="k">if</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span><span class="p">(</span><span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">figure</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Only 1 subplots supported, created a new figure&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span><span class="p">(</span><span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+                <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="s1">&#39;f_pmp&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;f_pmp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c0</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;lbd_pmp&#39;</span><span class="p">]</span>
+
+        <span class="n">do_plot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span> <span class="ow">or</span> <span class="n">plot</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span><span class="p">:</span>
+            <span class="n">Info</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">Filename: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;dispfile&#39;</span><span class="p">])</span>
+            <span class="n">Info</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">f_pmp: </span><span class="si">{:.3f}</span><span class="s1"> THz&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;f_pmp&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-12</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Analyzing dispersion file&quot;</span> <span class="o">+</span> <span class="n">Info</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Translator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Translator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_analyze</span> <span class="o">=</span> <span class="n">AnalyzeDisp</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;dispfile&#39;</span><span class="p">],</span>
+                                    <span class="n">f_center</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;f_pmp&#39;</span><span class="p">],</span>
+                                    <span class="n">rM_fit</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;mu_fit&#39;</span><span class="p">],</span>
+                                    <span class="n">rM_sim</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;mu_sim&#39;</span><span class="p">],</span>
+                                    <span class="n">R</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">],</span>
+                                    <span class="n">debug</span><span class="o">=</span><span class="n">do_plot</span><span class="p">,</span>
+                                    <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">,</span>
+                                    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                                    <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+                                    <span class="n">plottype</span><span class="o">=</span><span class="n">plottype</span><span class="p">,</span>
+                                    <span class="n">zero_lines</span> <span class="o">=</span> <span class="n">zero_lines</span><span class="p">,</span>
+                                    <span class="n">logger</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">PrM_fit</span><span class="p">,</span> <span class="n">Dint_fit</span><span class="p">,</span> <span class="n">neff_pmp</span><span class="p">,</span> <span class="n">ng_pmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze</span><span class="o">.</span><span class="n">GetDint</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_PrM_fit</span> <span class="o">=</span> <span class="n">PrM_fit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;Dint&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Dint_fit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;ng&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ng_pmp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;neff&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">neff_pmp</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">disp</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disp</span><span class="p">[</span><span class="s1">&#39;rf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze</span><span class="o">.</span><span class="n">rf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disp</span><span class="p">[</span><span class="s1">&#39;ng&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze</span><span class="o">.</span><span class="n">ng</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disp</span><span class="p">[</span><span class="s1">&#39;neff&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze</span><span class="o">.</span><span class="n">neff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disp</span><span class="p">[</span><span class="s1">&#39;D&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze</span><span class="o">.</span><span class="n">D</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disp</span><span class="p">[</span><span class="s1">&#39;Dint&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze</span><span class="o">.</span><span class="n">Dint</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">disp</span><span class="p">[</span><span class="s1">&#39;dphi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze</span><span class="o">.</span><span class="n">dφ</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;dphi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze</span><span class="o">.</span><span class="n">dφ</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fDint</span> <span class="o">=</span> <span class="n">f</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axDint</span> <span class="o">=</span> <span class="n">ax</span>
+        <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> </div>
+
+<div class="viewcode-block" id="LLEsovler.Setup"><a class="viewcode-back" href="../../source/pyLLE.html#pyLLE.llesolver.LLEsovler.Setup">[docs]</a>    <span class="k">def</span> <span class="nf">Setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Setup the simulation for the Julia backend. </span>
+<span class="sd">        Save the two main dictionary self.sim and self.res into a readable hdf5 file for Julia in the </span>
+<span class="sd">        temporary location define by the os</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+
+        <span class="c1"># -- Make the hdf5 file --</span>
+        <span class="c1"># ------------------------------------------------------------</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">tmp_dir</span> <span class="o">+</span> <span class="s1">&#39;ParamLLEJulia.h5&#39;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">tmp_dir</span> <span class="o">+</span> <span class="s1">&#39;ResultsJulia.h5&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="c1"># Check if normalisation or not</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">dic_sim</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Pin&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Pin&#39;</span><span class="p">,</span><span class="mf">1e3</span><span class="p">,</span> <span class="s1">&#39;mW&#39;</span><span class="p">),</span>
+                        <span class="s1">&#39;Tscan&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Tscan&#39;</span><span class="p">,</span><span class="mf">1e-6</span><span class="p">,</span> <span class="s1">&#39;x1e6 Round Trip&#39;</span><span class="p">),</span>
+                        <span class="s1">&#39;f_pmp&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;f_pmp&#39;</span><span class="p">,</span><span class="mf">1e-12</span><span class="p">,</span> <span class="s1">&#39;THz&#39;</span><span class="p">),</span>
+                        <span class="s1">&#39;domega_init&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;δω_init&#39;</span><span class="p">,</span><span class="mf">1e-9</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span> <span class="s1">&#39;x2π GHz&#39;</span><span class="p">),</span>
+                        <span class="s1">&#39;domega_end&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;δω_end&#39;</span><span class="p">,</span><span class="mf">1e-9</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span> <span class="s1">&#39;x2π GHz&#39;</span><span class="p">),</span>
+                        <span class="s1">&#39;mu_sim&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;μ_sim&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+                        <span class="s1">&#39;mu_fit&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;μ_fit&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),}</span>
+                        
+            <span class="n">dic_res</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;R&#39;</span><span class="p">,</span><span class="mf">1e6</span><span class="p">,</span> <span class="s1">&#39;µm&#39;</span><span class="p">),</span>
+                        <span class="s1">&#39;Qi&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Qi&#39;</span><span class="p">,</span><span class="mf">1e-6</span><span class="p">,</span> <span class="s1">&#39;M&#39;</span><span class="p">),</span>
+                        <span class="s1">&#39;Qc&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;Qc&#39;</span><span class="p">,</span><span class="mf">1e-6</span><span class="p">,</span> <span class="s1">&#39;M&#39;</span><span class="p">),</span>
+                        <span class="s1">&#39;gamma&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;γ&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),}</span>
+                    
+
+        
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;debug&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_debug</span><span class="p">)</span>
+            <span class="n">Info</span> <span class="o">=</span> <span class="s1">&#39;-- Solving standard LLE --</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">Info</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Simulation Parameters</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">it</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dic_res</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">Info</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\t\t</span><span class="si">{}</span><span class="s1"> = </span><span class="si">{:.2f}</span><span class="s1"> </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dic_res</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">it</span><span class="o">*</span><span class="n">dic_res</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span><span class="n">dic_res</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+
+
+            <span class="n">Info</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Simulation Parameters</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">it</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">dic_sim</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+                        <span class="n">Info</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t\t</span><span class="si">{}</span><span class="s1"> = [</span><span class="si">{:.2f}</span><span class="s1">,</span><span class="si">{:.2f}</span><span class="s1">] </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dic_sim</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> 
+                                                                <span class="n">it</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">dic_sim</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                                                                <span class="n">it</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">dic_sim</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                                                                <span class="n">dic_sim</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">Info</span> <span class="o">+=</span><span class="s1">&#39;</span><span class="se">\t\t</span><span class="si">{}</span><span class="s1"> = </span><span class="si">{:.2f}</span><span class="s1"> </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dic_sim</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">it</span><span class="o">*</span><span class="n">dic_sim</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span><span class="n">dic_sim</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">2</span><span class="p">])</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="n">Info</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">Info</span><span class="p">)</span>
+                
+
+            <span class="c1"># -- create h5file --</span>
+            <span class="c1"># ipdb.set_trace()</span>
+            <span class="n">h5f</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">tmp_dir</span> <span class="o">+</span> <span class="s1">&#39;ParamLLEJulia.h5&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Saving parameters in: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tmp_dir</span> <span class="o">+</span> <span class="s1">&#39;ParamLLEJulia.h5&#39;</span><span class="p">))</span>
+
+
+            <span class="n">h5f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;sim&#39;</span><span class="p">)</span>
+            <span class="n">h5f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;res&#39;</span><span class="p">)</span>
+            <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
+            
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">it</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>    
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;δω_disp&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+                        <span class="n">it</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">string_</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+                    <span class="n">h5f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;sim/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">it</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">it</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>    
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;δω_disp&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+                        <span class="n">it</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">string_</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+                    <span class="n">h5f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;res/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">it</span><span class="p">])</span>
+
+            <span class="n">h5f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># -- Normalize parameters --</span>
+            <span class="c1"># ------------------------------------------------------------</span>
+            <span class="n">ω0</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;f_pmp&#39;</span><span class="p">]</span>
+            <span class="n">ħ</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ħ</span>
+            <span class="n">μ_sim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;μ_sim&#39;</span><span class="p">]</span>
+            <span class="n">c0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_c0</span>
+            <span class="n">ng</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;ng&#39;</span><span class="p">]</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="n">μ</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">μ_sim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">μ_sim</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">pmp_ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">μ</span><span class="o">==</span><span class="mi">0</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># -- Normalized coupling losses --</span>
+            <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="s1">&#39;δω_ext&#39;</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">):</span>
+                <span class="n">Qc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;Qc&#39;</span><span class="p">]</span>
+                <span class="n">Q0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;Qi&#39;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;δω_ext&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ω0</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">Qc</span><span class="p">)</span>
+
+            <span class="c1"># -- Normalized total losses --</span>
+            <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="s1">&#39;δω_tot&#39;</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">):</span>
+                <span class="n">Qc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;Qc&#39;</span><span class="p">]</span>
+                <span class="n">Q0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;Qi&#39;</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;δω_tot&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ω0</span> <span class="o">*</span> \
+                    <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;Qc&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;Qi&#39;</span><span class="p">])</span>
+
+            <span class="c1"># -- Normalized Pump Power --</span>
+            <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="s1">&#39;F2&#39;</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">):</span>
+                <span class="n">n2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">]</span>
+                <span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">]</span>
+                <span class="n">Pin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;Pin&#39;</span><span class="p">]</span>
+                <span class="n">δω_ext</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;δω_ext&#39;</span><span class="p">]</span>
+                <span class="n">δω_tot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;δω_tot&#39;</span><span class="p">]</span>
+                <span class="n">g0</span> <span class="o">=</span> <span class="n">n2</span> <span class="o">*</span> <span class="n">c0</span> <span class="o">*</span> <span class="n">ħ</span> <span class="o">*</span> <span class="n">ω0</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="n">ng</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">V</span><span class="p">)</span>
+                <span class="n">fact_normE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span><span class="o">*</span><span class="n">g0</span><span class="o">*</span><span class="n">δω_ext</span><span class="o">/</span><span class="p">(</span><span class="n">δω_tot</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="n">ħ</span> <span class="o">*</span> <span class="n">ω0</span><span class="p">))</span>
+                <span class="n">F2</span> <span class="o">=</span> <span class="n">Pin</span> <span class="o">*</span> <span class="n">fact_normE</span><span class="o">**</span><span class="mi">2</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;g0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">g0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;fact_normE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fact_normE</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;F2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">F2</span>
+            
+                
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="s1">&#39;fact_normE&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">):</span>
+                    <span class="n">n2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">]</span>
+                    <span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">]</span>
+
+                    <span class="n">δω_ext</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;δω_ext&#39;</span><span class="p">]</span>
+                    <span class="n">δω_tot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;δω_tot&#39;</span><span class="p">]</span>
+                    <span class="n">g0</span> <span class="o">=</span> <span class="n">n2</span> <span class="o">*</span> <span class="n">c0</span> <span class="o">*</span> <span class="n">ħ</span> <span class="o">*</span> <span class="n">ω0</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="n">ng</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">V</span><span class="p">)</span>
+                    <span class="n">fact_normE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span><span class="o">*</span><span class="n">g0</span><span class="o">*</span><span class="n">δω_ext</span><span class="o">/</span><span class="p">(</span><span class="n">δω_tot</span><span class="o">**</span><span class="mi">3</span> <span class="o">*</span> <span class="n">ħ</span> <span class="o">*</span> <span class="n">ω0</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;fact_normE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fact_normE</span>
+                <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="s1">&#39;g0&#39;</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">):</span>
+                    <span class="n">n2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">]</span>
+                    <span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;V&#39;</span><span class="p">]</span>
+                    <span class="n">g0</span> <span class="o">=</span> <span class="n">n2</span> <span class="o">*</span> <span class="n">c0</span> <span class="o">*</span> <span class="n">ħ</span> <span class="o">*</span> <span class="n">ω0</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="n">ng</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">V</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;g0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">g0</span>
+
+            <span class="c1"># -- Normalized Detunning --</span>
+            <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="s1">&#39;α_init&#39;</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;α_init&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;δω_init&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">δω_tot</span>
+            <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="s1">&#39;α_end&#39;</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;α_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;δω_end&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">δω_tot</span>
+            <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="s1">&#39;α_stop&#39;</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="s1">&#39;δω_stop&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;α_stop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;α_stop&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;δω_stop&#39;</span><span class="p">]</span>
+            
+            <span class="c1"># -- Coupling Dispersion -- </span>
+            <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="s1">&#39;δω_disp&#39;</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="s1">&#39;dQc&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                    <span class="n">δω_disp</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">μ</span><span class="p">:</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">0</span><span class="o">*</span><span class="n">μ</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">δω_disp</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">μ</span><span class="p">:</span> <span class="mi">1</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">dQc</span><span class="p">(</span><span class="n">μ</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">δω_disp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;δω_disp&#39;</span><span class="p">]</span>
+            
+            <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;δω_disp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">δω_disp</span>
+            <span class="n">δω_disp_val</span> <span class="o">=</span> <span class="n">δω_disp</span><span class="p">(</span><span class="n">μ</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;δω_disp_val&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">δω_disp_val</span>
+            <span class="c1"># -- Misc --</span>
+            <span class="n">L</span> <span class="o">=</span>  <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;Tscan&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;Tscan&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;μ_sim&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;μ_sim&#39;</span><span class="p">]</span>
+            <span class="n">tR</span> <span class="o">=</span> <span class="n">L</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;ng&#39;</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_c0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;tR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tR</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;δω_tot&#39;</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;Dint&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;Dint&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;t_end&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;Tscan&#39;</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;tR&#39;</span><span class="p">]</span>
+            <span class="n">ω</span> <span class="o">=</span> <span class="n">ω0</span> <span class="o">+</span> <span class="n">μ</span> <span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="n">tR</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;ω&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ω</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="s1">&#39;μ&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">μ</span>
+            <span class="c1"># -- Print the Normalized Parameters --</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;F2&#39;</span><span class="p">,</span><span class="s1">&#39;μ_sim&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;α_init&#39;</span><span class="p">,</span> <span class="s1">&#39;α_end&#39;</span><span class="p">,</span> <span class="s1">&#39;α_stop&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;δω_ext&#39;</span><span class="p">,</span> <span class="s1">&#39;δω_tot&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;fact_normE&#39;</span><span class="p">,</span> <span class="s1">&#39;g0&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;Tscan&#39;</span><span class="p">,</span><span class="s1">&#39;tR&#39;</span><span class="p">,</span><span class="s1">&#39;t_end&#39;</span><span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;– Solving Normalized LLE -&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Normalized Parameters:&#39;</span><span class="p">)</span>
+            <span class="c1"># for k, it in self.sim_norm.items():</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+                <span class="n">it</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{}</span><span class="s1"> = </span><span class="si">{:.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">it</span><span class="p">))</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{}</span><span class="s1"> = </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">it</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{}</span><span class="s1"> = </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">it</span><span class="p">))</span>
+
+            <span class="c1"># -- create h5file --</span>
+            <span class="c1"># ipdb.set_trace()</span>
+            <span class="n">h5f</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">tmp_dir</span> <span class="o">+</span> <span class="s1">&#39;ParamLLEJulia.h5&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+            <span class="n">h5f</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="s1">&#39;sim_norm&#39;</span><span class="p">)</span>
+            <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
+
+
+            
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">it</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;δω_disp&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">it</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+                        <span class="n">it</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">string_</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+                    <span class="c1"># print(&#39;sim_norm/{}&#39;.format(key))</span>
+                    <span class="n">h5f</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;sim_norm/</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">it</span><span class="p">])</span>
+            <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="n">h5f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="LLEsovler.Solve"><a class="viewcode-back" href="../../source/pyLLE.html#pyLLE.llesolver.LLEsovler.Solve">[docs]</a>    <span class="k">def</span> <span class="nf">Solve</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Call Julia to solver the LLE</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Solving LLE with Julia....&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">70</span><span class="p">)</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">()</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">-</span><span class="si">{:0&gt;2}</span><span class="s2">-</span><span class="si">{:0&gt;2}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">tm_year</span><span class="p">,</span>
+                                          <span class="n">date</span><span class="o">.</span><span class="n">tm_mon</span><span class="p">,</span>
+                                          <span class="n">date</span><span class="o">.</span><span class="n">tm_mday</span><span class="p">)</span> <span class="o">+</span>\
+            <span class="s2">&quot;</span><span class="si">{:0&gt;2}</span><span class="s2">:</span><span class="si">{:0&gt;2}</span><span class="s2">:</span><span class="si">{:0&gt;2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">tm_hour</span><span class="p">,</span>
+                                          <span class="n">date</span><span class="o">.</span><span class="n">tm_min</span><span class="p">,</span>
+                                          <span class="n">date</span><span class="o">.</span><span class="n">tm_sec</span><span class="p">)</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">date</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim_norm</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sub</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s2">&quot;julia&quot;</span><span class="p">,</span>
+                      <span class="n">path_juliaScript</span> <span class="o">+</span> <span class="s2">&quot;ComputeLLE.jl&quot;</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sub</span><span class="o">.</span><span class="n">call</span><span class="p">([</span><span class="s2">&quot;julia&quot;</span><span class="p">,</span>
+                      <span class="n">path_juliaScript</span> <span class="o">+</span> <span class="s2">&quot;ComputeLLE_Norm.jl&quot;</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">])</span>
+        <span class="n">time_taken</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">hours</span><span class="p">,</span> <span class="n">rem</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">end</span><span class="o">-</span><span class="n">start</span><span class="p">,</span> <span class="mi">3600</span><span class="p">)</span>
+        <span class="n">minutes</span><span class="p">,</span> <span class="n">seconds</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">rem</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="n">time_taken</span> <span class="o">=</span> <span class="s2">&quot;Simulation Time &quot;</span> <span class="o">+</span> \
+            <span class="s2">&quot;</span><span class="si">{:0&gt;2}</span><span class="s2">h:</span><span class="si">{:0&gt;2}</span><span class="s2">min:</span><span class="si">{:0&gt;4.1f}</span><span class="s2">s&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">hours</span><span class="p">),</span>
+                                                  <span class="nb">int</span><span class="p">(</span><span class="n">minutes</span><span class="p">),</span>
+                                                  <span class="n">seconds</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">time_taken</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="o">*</span><span class="mi">70</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LLEsovler.RetrieveData"><a class="viewcode-back" href="../../source/pyLLE.html#pyLLE.llesolver.LLEsovler.RetrieveData">[docs]</a>    <span class="k">def</span> <span class="nf">RetrieveData</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Load the output hdf5 save by julia and transform it in a user-friendly dictionary to be more pyhtonistic </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+
+        <span class="n">drct</span> <span class="o">=</span> <span class="n">tmp_dir</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">tmp_dir</span> <span class="o">+</span> <span class="s1">&#39;ResultsJulia.h5&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_debug</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Retrieving results from Julia in </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tmp_dir</span> <span class="o">+</span> <span class="s1">&#39;ResultsJulia.h5&#39;</span><span class="p">))</span>
+        <span class="n">sol</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;u_probe&#39;</span><span class="p">,</span><span class="s1">&#39;Em_probe&#39;</span><span class="p">,</span> <span class="s1">&#39;Ewg&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="n">rl</span> <span class="o">=</span> <span class="s1">&#39;Results/</span><span class="si">{}</span><span class="s1">Real&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">im</span> <span class="o">=</span> <span class="s1">&#39;Results/</span><span class="si">{}</span><span class="s1">Imag&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="n">sol</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="n">rl</span><span class="p">][:]</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">S</span><span class="p">[</span><span class="n">im</span><span class="p">][:]</span>
+        <span class="n">sol</span><span class="p">[</span><span class="s1">&#39;ω&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="s1">&#39;Results/ωReal&#39;</span><span class="p">][:]</span>
+        <span class="n">sol</span><span class="p">[</span><span class="s1">&#39;comb_power&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="s1">&#39;Results/comb_powerReal&#39;</span><span class="p">][:]</span>
+        <span class="n">sol</span><span class="p">[</span><span class="s1">&#39;detuning&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">S</span><span class="p">[</span><span class="s2">&quot;Results/detuningReal&quot;</span><span class="p">][:]</span>
+        <span class="n">S</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">tmp_dir</span> <span class="o">+</span> <span class="s1">&#39;ParamLLEJulia.h5&#39;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">tmp_dir</span> <span class="o">+</span> <span class="s1">&#39;ResultsJulia.h5&#39;</span><span class="p">)</span>
+        <span class="n">sol</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sol</span><span class="p">[</span><span class="s1">&#39;ω&#39;</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+
+        <span class="c1"># Normalize to SI</span>
+        <span class="c1"># g0 = self.sim_norm[&#39;g0&#39;] </span>
+        <span class="c1"># δω_tot = self.sim_norm[&#39;δω_tot&#39;] </span>
+        <span class="c1"># # normE = np.sqrt(2*g0/δω_tot)</span>
+        <span class="c1"># normE = self.sim_norm[&#39;fact_normE&#39;]</span>
+        <span class="c1"># beta = self.sim_norm[&#39;Dint&#39;]/δω_tot</span>
+        <span class="c1"># Nprobe = sol[&#39;Em_probe&#39;].shape[1]</span>
+        <span class="c1"># t_end = self.sim_norm[&#39;t_end&#39;]</span>
+        <span class="c1"># μ_sim = self.sim[&#39;μ_sim&#39;]</span>
+
+        <span class="c1"># tau = np.linspace(0,t_end, Nprobe)</span>
+
+        <span class="c1"># μ = np.arange(μ_sim[0], μ_sim[-1]+1)</span>
+
+
+        <span class="c1"># cnt = 0</span>
+        <span class="c1"># for tt in tau: </span>
+        <span class="c1">#     phi = np.exp(-1j*beta*tt)</span>
+        <span class="c1">#     Epb = sol[&#39;Em_probe&#39;][:,cnt]</span>
+        <span class="c1">#     Ewg = sol[&#39;Ewg&#39;][:,cnt]</span>
+        <span class="c1">#     sol[&#39;Em_probe&#39;][:,cnt] = phi*np.conj(Epb)/normE</span>
+        <span class="c1">#     sol[&#39;Ewg&#39;][:,cnt] = phi*np.conj(Ewg)/normE</span>
+        <span class="c1">#     th_cnt = 0</span>
+        <span class="n">sol</span><span class="p">[</span><span class="s1">&#39;theta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">sol</span><span class="p">[</span><span class="s1">&#39;u_probe&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="c1"># sol[&#39;u_probe&#39;] = np.conj(sol[&#39;u_probe&#39;])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sol</span> <span class="o">=</span> <span class="n">sol</span></div>
+
+<div class="viewcode-block" id="LLEsovler.PlotCombPower"><a class="viewcode-back" href="../../source/pyLLE.html#pyLLE.llesolver.LLEsovler.PlotCombPower">[docs]</a>    <span class="k">def</span> <span class="nf">PlotCombPower</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Plot a figure with 3 subplots. </span>
+
+<span class="sd">        - Top subplot = map of the spectra for the steps taken by the LLE (step sub-sampled to be 1000)</span>
+<span class="sd">        - middle subplot = temporal map of the intensity inside the resonator for the steps of the LLE</span>
+<span class="sd">        - bottom subplot = normalized comb power</span>
+
+<span class="sd">        **Output**</span>
+
+<span class="sd">            - f, ax handle of figure and axes of the matplotlib figure displayed</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">cmap</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;tab10&quot;</span><span class="p">)</span>
+        <span class="n">freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sol</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-12</span>
+        <span class="n">Epb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sol</span><span class="p">[</span><span class="s1">&#39;Ewg&#39;</span><span class="p">]</span>
+        <span class="n">Epb</span><span class="p">[</span><span class="n">Epb</span><span class="o">==</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-20</span>
+        <span class="n">Epb</span> <span class="o">=</span> <span class="mi">10</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">Epb</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">Epb</span> <span class="o">=</span> <span class="n">Epb</span> <span class="o">-</span> <span class="n">Epb</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="c1"># Epb[Epb&lt;=0] = 1e-100</span>
+        <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">),</span> <span class="n">freq</span><span class="p">,</span><span class="n">Epb</span><span class="p">,</span>
+                         <span class="n">rasterized</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                         <span class="n">vmin</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sol</span><span class="p">[</span><span class="s1">&#39;theta&#39;</span><span class="p">]</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pcolormesh</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">),</span> <span class="n">theta</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span>
+                         <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sol</span><span class="p">[</span><span class="s1">&#39;u_probe&#39;</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">),</span>
+                         <span class="n">rasterized</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">sol</span><span class="p">[</span><span class="s1">&#39;comb_power&#39;</span><span class="p">]</span> <span class="o">/</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">sol</span><span class="p">[</span><span class="s1">&#39;comb_power&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">twinx</span><span class="p">())</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">sol</span><span class="p">[</span><span class="s1">&#39;detuning&#39;</span><span class="p">],</span>
+                    <span class="n">c</span> <span class="o">=</span> <span class="n">cmap</span><span class="o">.</span><span class="n">colors</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Frequency (THz)&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Angle (x π)&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;LLE Step (sub-sampled)&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Norm. Comb Pwr&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Norm. Detuning&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1000</span><span class="p">])</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fPcomb</span> <span class="o">=</span> <span class="n">f</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axPcomb</span> <span class="o">=</span> <span class="n">ax</span>
+
+        <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">ax</span></div>
+
+<div class="viewcode-block" id="LLEsovler.PlotCombSpectra"><a class="viewcode-back" href="../../source/pyLLE.html#pyLLE.llesolver.LLEsovler.PlotCombSpectra">[docs]</a>    <span class="k">def</span> <span class="nf">PlotCombSpectra</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ind</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pwr</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Plot the spectra for a given index in the 1000 sub-sampled LLE step </span>
+
+<span class="sd">        **Input** </span>
+
+<span class="sd">            - ind &lt;ind&gt;: index in the LLE step to plot the spectra</span>
+<span class="sd">            - f &lt;obj&gt;:  matplotlib figure handle (if None, new figure)</span>
+<span class="sd">            - ax &lt;obj&gt;: matplotlib axe handle </span>
+<span class="sd">            - label &lt;str&gt;: label for the legend</span>
+<span class="sd">            - pwr &lt;str&gt;: &#39;both&#39;, &#39;ring&#39;, &#39;wg&#39; depending on the spectra wanted (inside the ring, the waveguide or both)</span>
+
+<span class="sd">        **Output**</span>
+
+<span class="sd">            - f &lt;obj&gt;:  matplotlib figure handle</span>
+<span class="sd">            - ax &lt;obj&gt;: matplotlib axe handle</span>
+<span class="sd">            - freq &lt;numpy.array&gt;: frequency in Hz</span>
+<span class="sd">            - Sout &lt;numpy.array&gt;: spectral density of power in the waveguide (dBm)</span>
+<span class="sd">            - Sring &lt;numpy.array&gt;: spectral density of power in the ring (dBm)</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">freq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sol</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-12</span>
+        <span class="k">if</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span><span class="p">(</span><span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">figure</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Only 1 subplots supported, created a new figure&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span><span class="p">(</span><span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+                <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+        <span class="n">Sring</span> <span class="o">=</span> <span class="mi">10</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mf">1e3</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sol</span><span class="p">[</span><span class="s1">&#39;Em_probe&#39;</span><span class="p">][:,</span> <span class="n">ind</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">Sout</span> <span class="o">=</span> <span class="mi">10</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mf">1e3</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sol</span><span class="p">[</span><span class="s1">&#39;Ewg&#39;</span><span class="p">][:,</span> <span class="n">ind</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">pwr</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;both&#39;</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">Sout</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Output P&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">Sring</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;In ring P&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pwr</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;ring&#39;</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">Sring</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pwr</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;wg&#39;</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">Sout</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Power (dBm)&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Frequency (THz)&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+        <span class="n">f</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fSpectra</span> <span class="o">=</span> <span class="n">f</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axSpectra</span> <span class="o">=</span> <span class="n">ax</span>
+
+        <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">freq</span><span class="p">,</span> <span class="n">Sout</span><span class="p">,</span> <span class="n">Sring</span></div>
+
+    <span class="k">def</span> <span class="nf">_PlotSolitonTime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ind</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="LLEsovler.SaveResults"><a class="viewcode-back" href="../../source/pyLLE.html#pyLLE.llesolver.LLEsovler.SaveResults">[docs]</a>    <span class="k">def</span> <span class="nf">SaveResults</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;./&#39;</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Save the whole class with pickle to be able to easilly call it back or retrieve the results after saving</span>
+
+<span class="sd">        **Input**</span>
+
+<span class="sd">            - fname &lt;str&gt;: name to save. The &#39;.pkl&#39; extension will be added</span>
+<span class="sd">            - path &lt;str&gt;: path to save the results (defaults &#39;./&#39;)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+
+        <span class="n">to_save</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">to_save</span><span class="o">.</span><span class="n">sim_norm</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;domega_disp&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">to_save</span><span class="o">.</span><span class="n">sim</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;domega_disp&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">path</span> <span class="o">+</span> <span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39;.pkl&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+        <span class="n">pkl</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">to_save</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span><span class="s1">&#39;bw&#39;</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">to_print</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">to_print</span> <span class="o">=</span> <span class="s1">&#39;Dispersion load from:</span><span class="se">\t</span><span class="si">{}</span><span class="se">\n\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;dispfile&#39;</span><span class="p">])</span> 
+        <span class="n">to_print</span> <span class="o">+=</span> <span class="s1">&#39;Resonator Parameters:</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">res_table</span> <span class="o">=</span> <span class="n">PrettyTable</span><span class="p">([</span><span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;Value&#39;</span><span class="p">,</span> <span class="s1">&#39;Units&#39;</span><span class="p">])</span>
+        <span class="n">res_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">([</span><span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;R&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">1e6</span><span class="p">),</span><span class="s1">&#39;µm&#39;</span><span class="p">])</span>
+        <span class="n">res_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">([</span><span class="s1">&#39;Qi&#39;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;Qi&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-6</span><span class="p">),</span><span class="s1">&#39;x1e6&#39;</span><span class="p">])</span>
+        <span class="n">res_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">([</span><span class="s1">&#39;Qc&#39;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;Qc&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-6</span><span class="p">),</span><span class="s1">&#39;x1e6&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s1">&#39;gamma&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">:</span>
+            <span class="n">res_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">([</span><span class="s1">&#39;γ&#39;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;gamma&#39;</span><span class="p">]),</span><span class="s1">&#39;&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s1">&#39;n2&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">:</span>
+            <span class="n">res_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">([</span><span class="s1">&#39;n2&#39;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;n2&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">1e19</span><span class="p">),</span><span class="s1">&#39;x1e-19 m2/W&#39;</span><span class="p">])</span>
+        <span class="n">to_print</span> <span class="o">+=</span> <span class="n">res_table</span><span class="o">.</span><span class="n">get_string</span><span class="p">()</span>
+        <span class="n">to_print</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+        <span class="n">to_print</span> <span class="o">+=</span> <span class="s1">&#39;Simulation Parameters:</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">sim_table</span> <span class="o">=</span> <span class="n">PrettyTable</span><span class="p">([</span><span class="s1">&#39;Parameters&#39;</span><span class="p">,</span> <span class="s1">&#39;Value&#39;</span><span class="p">,</span> <span class="s1">&#39;Units&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="s1">&#39;Pin&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">:</span>
+            <span class="n">sim_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">([</span><span class="s1">&#39;Pin&#39;</span><span class="p">,</span><span class="s2">&quot;</span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;Pin&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">1e3</span><span class="p">),</span><span class="s1">&#39;mW&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s1">&#39;f_pmp&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">:</span>
+            <span class="n">sim_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">([</span><span class="s1">&#39;f_pmp&#39;</span><span class="p">,</span><span class="s2">&quot;</span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;f_pmp&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-12</span><span class="p">),</span><span class="s1">&#39;THz&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s1">&#39;μ_sim&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">:</span>
+            <span class="n">sim_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">([</span><span class="s1">&#39;μ_sim&#39;</span><span class="p">,</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;mu_sim&#39;</span><span class="p">]),</span><span class="s1">&#39;&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s1">&#39;Tscan&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">:</span>
+            <span class="n">sim_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">([</span><span class="s1">&#39;Tscan&#39;</span><span class="p">,</span><span class="s2">&quot;</span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;Tscan&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-5</span><span class="p">),</span><span class="s1">&#39;x1e5 tR&#39;</span><span class="p">])</span>        
+        <span class="k">if</span> <span class="s1">&#39;domega_init&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">:</span>
+            <span class="n">sim_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">([</span><span class="s1">&#39;δω_init&#39;</span><span class="p">,</span><span class="s2">&quot;</span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;domega_init&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-9</span><span class="p">),</span><span class="s1">&#39;GHz&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s1">&#39;domega_end&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">:</span>
+            <span class="n">sim_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">([</span><span class="s1">&#39;δω_end&#39;</span><span class="p">,</span><span class="s2">&quot;</span><span class="si">{:.3f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sim</span><span class="p">[</span><span class="s1">&#39;domega_end&#39;</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-9</span><span class="p">),</span><span class="s1">&#39;GHz&#39;</span><span class="p">])</span>
+        <span class="n">to_print</span> <span class="o">+=</span> <span class="n">sim_table</span><span class="o">.</span><span class="n">get_string</span><span class="p">()</span>
+        <span class="n">to_print</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+        <span class="c1"># to_print += &#39;Normalized Simulation Parameters:\n&#39;</span>
+        <span class="c1"># aa = self.sim_norm[&#39;δω_disp&#39;]</span>
+        <span class="c1"># fun = str(inspect.getsourcelines(aa)[0]).split(&#39;lambda&#39;)[-1].split(&#39;:&#39;)[-1].strip(&#39;[&quot;\\n&quot;]&#39;)[1::]</span>
+        <span class="c1"># sim_norm_table = PrettyTable([&#39;Parameters&#39;, &#39;Value&#39;])</span>
+        <span class="c1"># sim_norm_table.add_row([&#39;F2&#39;,&quot;{:.3f}&quot;.format(self.sim_norm[&#39;F2&#39;])])</span>
+        <span class="c1"># sim_norm_table.add_row([&#39;α_init&#39;,&quot;{:.3f}&quot;.format(self.sim_norm[&#39;α_init&#39;])])</span>
+        <span class="c1"># sim_norm_table.add_row([&#39;α_end&#39;,&quot;{:.3f}&quot;.format(self.sim_norm[&#39;α_end&#39;])])</span>
+        <span class="c1"># sim_norm_table.add_row([&#39;α_stop&#39;,&quot;{}&quot;.format(self.sim_norm[&#39;α_stop&#39;])])</span>
+        <span class="c1"># sim_norm_table.add_row([&#39;δω_disp&#39;,&quot;{}&quot;.format(fun)])</span>
+        <span class="c1"># to_print += sim_norm_table.get_string()</span>
+        <span class="c1"># to_print += &#39;\n&#39;</span>
+        
+        <span class="k">return</span> <span class="n">to_print</span></div>
+
+<span class="c1"># if __name__ == &#39;__main__&#39;:</span>
+<span class="c1">#     plt.close(&#39;all&#39;)</span>
+<span class="c1">#     sim = {&#39;Pin&#39;: 200e-3,</span>
+<span class="c1">#            &#39;Tscan&#39;: 1e5,</span>
+<span class="c1">#            &#39;dphi_init&#39;: -10,</span>
+<span class="c1">#            &#39;dphi_end&#39;: [5, 1],</span>
+<span class="c1">#            &#39;lbd_pmp&#39;: 1069.5e-9,</span>
+<span class="c1">#            &#39;μ_sim&#39;: [-150, 170],</span>
+<span class="c1">#            &#39;μ_fit&#39;: [-100, 100],</span>
+<span class="c1">#            &#39;dispfile&#39;: &#39;Data/AcesRingBoulder.mat&#39;}</span>
+<span class="c1">#     res = {&#39;R&#39;: 23e-6,</span>
+<span class="c1">#            &#39;Qi&#39;: 1e6,</span>
+<span class="c1">#            &#39;Qc&#39;: 1e6,</span>
+<span class="c1">#            &#39;gamma&#39;: 2, }</span>
+
+<span class="c1">#     solver = SolveLLE(sim=sim, res=res, debug=False)</span>
+<span class="c1">#     solver.Analyze(plot=True)</span>
+<span class="c1">#     # plt.pause(0.15)</span>
+<span class="c1">#     solver.Setup()</span>
+<span class="c1">#     solver.Solve()</span>
+<span class="c1">#     solver.RetrieveData()</span>
+<span class="c1">#     solver.PlotCombPower()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Gregory Moille.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
