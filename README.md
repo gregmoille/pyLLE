@@ -14,6 +14,14 @@ For a automatic install, just
 pip install pyLLE
 ```
 
+For a manual install, download the .zip of the reposotory or clone it and install with the setup.py script 
+
+```bash
+git clone https://github.com/gregmoille/pyLLE.git
+cd pyLLE
+python setup.py install
+```
+
 
 
 ## Example
