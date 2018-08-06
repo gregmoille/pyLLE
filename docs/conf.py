@@ -34,7 +34,7 @@ from pygame.locals import *
 from mock import Mock
 sys.modules['pygame'] = Mock()
 sys.modules['pygame.constants'] = Mock()
-sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('../pyLLE'))
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
