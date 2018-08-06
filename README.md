@@ -1,4 +1,4 @@
-# pyLLE ![NIST logo](image/NISTlogo.png)
+# pyLLE ![NIST logo](images/NISTlogo32x32.png)
 
 
 
