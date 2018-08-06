@@ -21,7 +21,12 @@
 
 import os
 import sys
-# sys.path.insert(0, os.path.abspath('../pyLLE'))
+path = os.path.abspath('../')
+print('-'*50)
+print(path)
+print('-'*50)
+sys.path.insert(0, path)
+
 
 
 # -- General configuration ------------------------------------------------
