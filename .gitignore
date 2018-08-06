@@ -1,0 +1,5 @@
+# exclude everything except directory foo/bar
+    LLE.egg-info
+    .gitignore
+    Icon?
+    .DS_Store
