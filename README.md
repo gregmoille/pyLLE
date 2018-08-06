@@ -64,6 +64,111 @@ sim = {'Pin': 100e-3, #input power in W
 ```
 
 
+Here, the dict keys can be defined with greek letters for a nicer script (in my opinion) or with latin letter such that the translator dictionary is defined by:
+
+```python
+greek ={'α': 'alpha',
+        'β':'beta',
+        'γ': 'gamma',
+        'ω': 'omega',
+        'δ': 'd',
+        'Δ': 'D',
+        'μ': 'mu',
+        'λ': 'lambda',
+        'ε': 'epsilon',
+        'φ': 'phi'}
+```
+Hence, instead of providing *δω_init * in the sim dictioannry, one could provice *domega_init*.
+
+We can now setup the pyLLE class: 
+
+```python 
+solver = pyLLE.LLEsovler(sim=sim,
+                       res=res,
+                       debug=True)
+```
+
+To analyse the dispersion just the *Anlayze* method with the correct parameters listed in the [docs](http://pylle.readthedocs.io/en/latest/source/pyLLE.html)
+
+```python
+solver.Analyze(plot=True,
+               plottype='all')
+```
+
+To start the simulation, first we need to setup an hdf5 file which makes the bridge between python and julia 
+
+```python
+solver.Setup()
+```
+
+Then we can start the simulation 
+
+```python 
+solver.Solve()
+```
+
+To retrieve the data computed by julia, we call the *RetrieveData* method
+
+```python
+solver.RetrieveData()
+```
+
+We can finally start to plot the result of the simulation. One can start with a complete overview of the simulation, were a spectral and a temporal map Vs the LLE step is displayed in addition to the comb power Vs the LLE step
+
+```python
+solver.PlotCombPower()
+```
+
+From there, we can find the step of the LLE where we want to see the spectra:
+
+```python
+ind = 600
+solver.PlotCombSpectra(ind)
+```
+
+
+
+The complete script is: 
+
+```python
+import matplotlib.pyplot as plt
+import pyLLE
+
+
+plt.close('all')
+
+# -- Define Parameters for Sim -- 
+# --------------------------------------------------------
+res = {'R': 23e-6,
+       'Qi': 1e6,
+       'Qc': 1e6,
+       # 'n2': 2e-19,
+       'γ': 2}
+
+sim = {'Pin': 100e-3,
+       'Tscan': 0.6e5,
+       'δω_stop': "None",
+       'f_pmp': 191e12,
+       'δω_init': -4, 
+       'δω_end': 10, 
+       'μ_sim': [-70,170],
+       'μ_fit': [-70, 170],
+       'dispfile': 'h770RW1560.mat'
+        }
+
+solver = pyLLE.LLEsovler(sim=sim,
+                       res=res,
+                       debug=True)
+solver.Analyze(plot=True,
+               plottype='all')
+
+solver.Setup()
+solver.Solve()
+solver.RetrieveData()
+solver.PlotCombPower()
+ind = 600
+solver.PlotCombSpectra(ind)
+```
 
 ## References
 
