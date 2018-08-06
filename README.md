@@ -25,6 +25,7 @@ cd pyLLE
 python setup.py install
 ```
 
+Just a heads up, the installation can vary in time, especially because of Julia that might rebuilds the cache
 
 ## Example
 
@@ -90,8 +91,6 @@ solver = pyLLE.LLEsovler(sim=sim,
 
 The debug input allows the script to generate a log file in the working directory with useful information on the simulation. The authors highly encourage to keep this key to True, unless some loops are run which could create an issue with the read/write access to the file. 
 
-<\br>
-
 
 To analyse the dispersion just the *Anlayze* method with the correct parameters listed in the [docs](http://pylle.readthedocs.io/en/latest/source/pyLLE.html)
 
@@ -149,12 +148,9 @@ import pyLLE
 
 plt.close('all')
 
-# -- Define Parameters for Sim -- 
-# --------------------------------------------------------
 res = {'R': 23e-6,
        'Qi': 1e6,
        'Qc': 1e6,
-       # 'n2': 2e-19,
        'γ': 2}
 
 sim = {'Pin': 100e-3,
@@ -181,6 +177,13 @@ solver.PlotCombPower()
 ind = 600
 solver.PlotCombSpectra(ind)
 ```
+
+
+## Further work
+
+- [ ] Add a steady state solver through Newton Method
+- [ ] Add normalized formalism
+- [ ] 
 
 ## References
 
