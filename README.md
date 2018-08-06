@@ -78,7 +78,7 @@ greek ={'α': 'alpha',
         'ε': 'epsilon',
         'φ': 'phi'}
 ```
-Hence, instead of providing *δω_init * in the sim dictioannry, one could provice *domega_init*.
+Hence, instead of providing *δω_init* in the sim dictionary, one could provice *domega_init*.
 
 We can now setup the pyLLE class: 
 
@@ -87,6 +87,11 @@ solver = pyLLE.LLEsovler(sim=sim,
                        res=res,
                        debug=True)
 ```
+
+The debug input allows the script to generate a log file in the working directory with useful information on the simulation. The authors highly encourage to keep this key to True, unless some loops are run which could create an issue with the read/write access to the file. 
+
+<\br>
+
 
 To analyse the dispersion just the *Anlayze* method with the correct parameters listed in the [docs](http://pylle.readthedocs.io/en/latest/source/pyLLE.html)
 
@@ -100,6 +105,13 @@ To start the simulation, first we need to setup an hdf5 file which makes the bri
 ```python
 solver.Setup()
 ```
+For the sake of simplicity and to retrieve the difference parameter, all keys of the sim and res dictionary are translated with the previously described translator dictionary and cannot be access anymore with the greek alphabet. Hence, in an ipython consol, one can retrieve the parameter with, for example 
+
+```python
+IN [1]: solver.sim['mu_sim']
+OUT [1]: [-70,170]
+```
+
 
 Then we can start the simulation 
 
