@@ -29,3 +29,31 @@ Download the .zip `repository <https://github.com/gregmoille/pyLLE/archive/maste
     git clone https://github.com/gregmoille/pyLLE.git
     cd pyLLE
     python setup.py install
+
+Python Dependencies
+--------------------
+
+- scipy
+- numpy
+- matplotlib
+- h5py
+- pickle
+- logging
+- time
+- sys
+- subprocess
+- os
+- inspect
+- copy
+- shutil
+- tempfile
+- prettytable
+- warnings
+- matplotlib
+- logging
+
+Julia Dependencies
+--------------------
+
+- HDF5
+- ProgressMeter

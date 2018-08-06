@@ -2,12 +2,12 @@ import numpy as np
 import scipy.io as io
 import scipy.interpolate as itp
 import matplotlib.pyplot as plt
-import ipdb
 
 class AnalyzeDisp(object):
-    c = 299792458
+    
 
     def __init__(self, **kwargs):
+        self.c = 299792458
         self.dispfile = kwargs.get('file', None)
         self.R = kwargs.get('R', 23e-6)
         # self.n0 = kwargs.get('n0', 2)
