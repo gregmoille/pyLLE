@@ -421,8 +421,14 @@ class LLEsovler(object):
         start = time.time()
         print(date)
 
+
+        if sys.platform == 'darwin':
+            julia = 'julia'
+        if sys.platform == 'win32'
+            julia = os.path.expanduser('~') + '\\AppData\\Local\\Julia-0.6.4\\bin\\julia.exe'
+
         if self.sim_norm == None:
-            sub.call(["julia",
+            sub.call([julia,
                       path_juliaScript + "ComputeLLE.jl", tmp_dir])
         else:
             sub.call(["julia",
