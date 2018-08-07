@@ -12,6 +12,8 @@ class MyInstall(install):
             print('-'*10)
         if sys.platform == 'darwin':
             julia = 'julia'
+        if sys.platform == 'linux2':
+            julia = 'julia'
         if sys.platform == 'win32':
             julia = os.path.expanduser('~') + '\\AppData\\Local\\Julia-0.6.4\\bin\\julia.exe'
         sub.call([julia, 'InstallPkg.jl'])
@@ -30,7 +32,7 @@ with open("README.rst", "r") as fh:
     long_description = fh.read()
 
 setup(name='pyLLE',
-      version='0.0.14',
+      version='0.0.17',
       description='LLE Solver',
       url='https://github.com/gregmoille/pyLLE',
       author='Greg Moille',

@@ -424,7 +424,9 @@ class LLEsovler(object):
 
         if sys.platform == 'darwin':
             julia = 'julia'
-        if sys.platform == 'win32'
+        if sys.platform == 'linux2':
+            julia = 'julia'
+        if sys.platform == 'win32':
             julia = os.path.expanduser('~') + '\\AppData\\Local\\Julia-0.6.4\\bin\\julia.exe'
 
         if self.sim_norm == None:
