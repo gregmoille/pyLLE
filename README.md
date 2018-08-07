@@ -3,7 +3,7 @@
 ![](https://readthedocs.org/projects/pylle/badge/?version=latest) 
 [![](https://img.shields.io/github/license/mashape/apistatus.svg)](licence.txt)
 
-pyLLE is a tool to solve the Lugiato Lefever Equations (LLE)<sup>[1](#ref1)</sup><sup>,</sup><sup>[2](#ref2)</sup><sup>,</sup><sup>[3](#ref3)</sup>in a fast and easy way. Thanks to a user-friendly front-end (and a future UI) in python and a efficient back end in Julia, solving this problem becomes easy and fast. 
+pyLLE is a tool to solve the Lugiato Lefever Equations (LLE)<sup>[1](#ref1)</sup><sup>,</sup><sup>[2](#ref2)</sup><sup>,</sup><sup>[3](#ref3)</sup>in a fast and easy way. Thanks to an user-friendly front-end in python and a efficient back end in Julia, solving this problem becomes easy and fast. 
 
 For a complete documentation of the package, please visit the [readthedocs page](http://pylle.readthedocs.io/en/latest/index.html)
 
@@ -138,15 +138,24 @@ solver.PlotCombSpectra(ind)
 ```
 
 
+One can also solver quickly the LLE through a steady state method finding the root of the LLE
+
+```python
+sim['δω'] =  -10e9,
+Ering, Ewg, f, ax = solver.SolveSteadySteate()
+```
+
+
 
 The complete script is: 
 
 ```python
 import matplotlib.pyplot as plt
+import numpy as np
 import pyLLE
 
-
 plt.close('all')
+
 
 res = {'R': 23e-6,
        'Qi': 1e6,
@@ -154,28 +163,34 @@ res = {'R': 23e-6,
        'γ': 2}
 
 sim = {'Pin': 100e-3,
-       'Tscan': 0.6e5,
+       'Tscan': 2e5,
        'δω_stop': "None",
        'f_pmp': 191e12,
-       'δω_init': -4, 
-       'δω_end': 10, 
+       'δω_init': 1e9*2*np.pi, 
+       'δω': -10e9,
+       'δω_end': -5e9*2*np.pi, 
        'μ_sim': [-70,170],
-       'μ_fit': [-70, 170],
-       'dispfile': 'ExampleQing.mat'
+       'μ_fit': [-71, 170],
+       'dispfile': 'TestDispersion.mat'
         }
 
+# --  Setup thte Solver --
 solver = pyLLE.LLEsovler(sim=sim,
                        res=res,
                        debug=True)
 solver.Analyze(plot=True,
                plottype='all')
-
 solver.Setup()
-solver.Solve()
+
+# --  Solver the Steady State LLE --
+Ering, Ewg, f, ax = solver.SolveSteadySteate()
+
+# --  Solver the Temporal LLE --
+solver.SolveTemporal()
 solver.RetrieveData()
 solver.PlotCombPower()
-ind = 600
-solver.PlotCombSpectra(ind)
+freq, Sout, Sring, fS, axS = solver.PlotCombSpectra(600)
+t, U, ft, axt = solver.PlotSolitonTime(600)
 ```
 
 ## How to Cite Us?

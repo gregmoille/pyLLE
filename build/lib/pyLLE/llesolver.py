@@ -123,20 +123,20 @@ class LLEsovler(object):
         simulate
         '''
 
-
-        if f is None and ax is None:
-            f, ax = plt.subplots()
-        elif f is None and not(ax is None):
-            if not type(ax) is list:
-                f = ax.figure
+        if plot:
+            if f is None and ax is None:
+                f, ax = plt.subplots()
+            elif f is None and not(ax is None):
+                if not type(ax) is list:
+                    f = ax.figure
+                else:
+                    f, ax = plt.subplots()
+                    print('Only 1 subplots supported, created a new figure')
+            elif not(f is None) and ax is None:
+                ax = f.axes[0]
             else:
-                f, ax = plt.subplots()
-                print('Only 1 subplots supported, created a new figure')
-        elif not(f is None) and ax is None:
-            ax = f.axes[0]
-        else:
-            if type(ax) is list:
-                f, ax = plt.subplots()
+                if type(ax) is list:
+                    f, ax = plt.subplots()
 
         if not('f_pmp' in self.sim.keys()):
             self.sim['f_pmp'] = self._c0/self.sim['lbd_pmp']
@@ -683,10 +683,20 @@ class LLEsovler(object):
         self.fSpectra = f
         self.axSpectra = ax
 
-        return f, ax, freq, Sout, Sring
+        return freq, Sout, Sring, f, ax
 
-    def _PlotSolitonTime(self, ind):
-        pass
+    def PlotSolitonTime(self, ind):
+        freq = self.sol['freq']
+        tR = 2*np.pi*self.res['R']*self.res['ng']/self._c0
+        f, ax = plt.subplots()
+        τ = np.linspace(-0.5, 0.5, freq.size) * tR
+        U = np.abs(self.sol['u_probe'][:,ind])**2
+        ax.plot(τ*1e12 , U/U.max())
+        ax.set_xlabel('Time (ps)')
+        ax.set_ylabel('Soliton Energy (a.u)')
+        f.show()
+
+        return τ, U, f, ax
 
     def SaveResults(self, fname, path='./'):
         '''
