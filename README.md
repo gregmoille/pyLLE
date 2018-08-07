@@ -9,7 +9,7 @@ For a complete documentation of the package, please visit the [readthedocs page]
 
 ## Instalation
 
-As pyLLE relies on a Julia v0.6.4 back-end, please prior to install this package be sure that Julia is installed on your machine or visit the julia [package downloader page](https://julialang.org/downloads/) to install it. Please, keep julia in the default directory during the installation (i.e. ~\AppData\Local\Julia-0.6.4\). If not, please go to the manual installation.Once Julia installed, the different packages needed to run pyLLE, either python or julia related, will be automatically downloaded and installed 
+As pyLLE relies on a Julia v0.6.4 back-end, please prior to install this package be sure that Julia is installed on your machine or visit the julia [package downloader page](https://julialang.org/downloads/) to install it. Please, keep julia in the default directory during the installation (i.e. ~\AppData\Local\Julia-0.6.4\). If not, please go to the manual installation. Once Julia installed, the different packages needed to run pyLLE, either python or julia related, will be automatically downloaded and installed 
 
 For a automatic install, just
 
