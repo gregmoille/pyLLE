@@ -21,7 +21,7 @@ import matplotlib.font_manager as font_manager
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=FutureWarning)
     import h5py
-import ipdb
+
 path_juliaScript = '/'.join(os.path.realpath(__file__).split('/')[:-1]) + '/'
 tmp_dir = tempfile.gettempdir() + '/'
 

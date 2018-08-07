@@ -19,9 +19,9 @@ class MyInstall(install):
 
 class MyBuild(build_py):
     def run(self):
-        build_py.run(self)
         for ii in range(20):
             print('-'*10)
+        build_py.run(self)
         # sub.call(['julia', 'InstallPkg.jl'])
         
         
@@ -30,7 +30,7 @@ with open("README.rst", "r") as fh:
     long_description = fh.read()
 
 setup(name='pyLLE',
-      version='0.0.11',
+      version='0.0.12',
       description='LLE Solver',
       url='https://github.com/gregmoille/pyLLE',
       author='Greg Moille',
