@@ -645,12 +645,11 @@ class LLEsovler(object):
 
         **Output**
 
-            - f <obj>:  matplotlib figure handle
-            - ax <obj>: matplotlib axe handle
             - freq <numpy.array>: frequency in Hz
             - Sout <numpy.array>: spectral density of power in the waveguide (dBm)
             - Sring <numpy.array>: spectral density of power in the ring (dBm)
-
+            - f <obj>:  matplotlib figure handle
+            - ax <obj>: matplotlib axe handle
         '''
 
         freq = self.sol['freq']*1e-12
@@ -693,7 +692,25 @@ class LLEsovler(object):
 
         return freq, Sout, Sring, f, ax
 
-    def PlotSolitonTime(self, ind):
+    def PlotSolitonTime(self, ind, f=None, ax=None, label=None):
+         '''
+        Plot the spectra for a given index in the 1000 sub-sampled LLE step 
+
+        **Input** 
+
+            - ind <ind>: index in the LLE step to plot the spectra
+            - f <obj>:  matplotlib figure handle (if None, new figure)
+            - ax <obj>: matplotlib axe handle 
+            - label <str>: label for the legend
+
+        **Output**
+
+            - τ <obj>: Time in the resonator
+            - U <numpy.array>: Temporal Electric field for the given step of the LLE
+            - f <obj>: matplotlib figure handle
+            - ax <obj>: matplotlib axe handle
+        '''
+
         freq = self.sol['freq']
         tR = 2*np.pi*self.res['R']*self.res['ng']/self._c0
         f, ax = plt.subplots()
