@@ -57,7 +57,8 @@ Qc = res["Qc"][1]
 
 # -- sim parameters --
 debug = Bool(sim["debug"][1])
-dω_init = sim["domega_init"][1]
+δω_init = sim["domega_init"][1]
+δω_end = sim["domega_end"][1]
 t_end = sim["Tscan"][1]
 fpmp = sim["f_pmp"][1]
 ω0 = 2*pi*fpmp
@@ -79,11 +80,8 @@ T = 1*tR
 dω = collect(μ_sim[1]:μ_sim[end])*2*pi/T
 Qc_disp=Qc*ones(size(dω))
 Qi_disp=Q0*ones(size(dω))
-# α_disp=1/2* ((ω0+0*dω)./Qi_disp + (ω0+0*dω)./Qc_disp) * tR
-# γ_disp=gamm*(1+0*dω/ω0)
 
 # -- Dispersion -- 
-# θ_disp=(ω0+0*dω)./Qc_disp*tR
 dβ=dφ/L
 dβ=dβ-dβ[pmp_sim]
 dφ_Kerr=θ*Pin*γ*L/α^2
@@ -101,10 +99,8 @@ Enoise=array'.*sqrt.(Ephoton/2/tR).*exp.(1im*phase') .*length(μ)
 
 
 dt=0.1/(sqrt(Pin)) 
-dω_init = dω_init* α
-delta_phi = pi^2/8*θ*Pin*γ*L/α^2
-dω_end = sim["domega_end"][1]*α + 1*delta_phi
-
+δω_init = δω_init * tR
+δω_end = δω_end * tR
 
 t_end = t_end*tR
 t_ramp=t_end
@@ -128,7 +124,7 @@ t1=0
 
 # -- Detuning ramp -- 
 xx = collect(1:Nt)
-dω_pmp = dω_init+ xx/Nt * (dω_end- dω_init)
+Δω_pmp = δω_init+ xx/Nt * (δω_end- δω_init)
 
 # -- Initiial State -- 
 u0=ifft_plan*Enoise 
@@ -152,7 +148,7 @@ for it = 1:1:Nt
     update!(pb, Int(it))
     u0=ifft_plan*(fft_plan*(u0) + Ein_couple*dt)
     u1=u0
-    cbeta = -α -1im*dω_pmp[Int(it)] +  1im*L*dβ
+    cbeta = -α  + 1im*Δω_pmp[Int(it)] +  1im*L*dβ
     halfprop = exp.(cbeta*dt/2)
     cnt = 0
     uhalf = ifft_plan*(halfprop.*(fft_plan*(u0)))
@@ -183,7 +179,7 @@ for it = 1:1:Nt
         S["Em_probe"][probe,:]= Em_probe
         deleteat!(Em_probe,pmp_sim)
         S["comb_power"][probe]=(sum(abs.(Em_probe).^2))/Pin
-        S["detuning"][probe] = delta_phi
+        S["detuning"][probe] = Δω_pmp[Int(it)]/tR
    end
    
 end

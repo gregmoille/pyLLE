@@ -1,10 +1,11 @@
 import numpy as np
 from .analyzedisp import AnalyzeDisp
 import scipy.interpolate as itp
+import scipy.optimize as optm
+import scipy.fftpack as fft
 import matplotlib.pyplot as plt
 import time
 import sys
-import scipy
 import subprocess as sub
 import os
 import inspect
@@ -20,7 +21,7 @@ import matplotlib.font_manager as font_manager
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=FutureWarning)
     import h5py
-
+import ipdb
 path_juliaScript = '/'.join(os.path.realpath(__file__).split('/')[:-1]) + '/'
 tmp_dir = tempfile.gettempdir() + '/'
 
@@ -116,7 +117,7 @@ class LLEsovler(object):
             Dnew[new_k] = D[k]
         return Dnew
 
-    def Analyze(self, plot=False, f=None, ax=None, label=None, plottype='all', zero_lines = True):
+    def Analyze(self, plot=False, f=None, ax=None, label=None, plottype='all', zero_lines = True, mu_sim = None):
         '''
         Call pyLLE.analyzedisp.AnalyzeDisp to get the dispersion of the resonator we want to 
         simulate
@@ -140,7 +141,7 @@ class LLEsovler(object):
         if not('f_pmp' in self.sim.keys()):
             self.sim['f_pmp'] = self._c0/self.sim['lbd_pmp']
 
-        do_plot = self._debug or plot
+        do_plot = plot
 
         if self._debug:
             Info = '\n\tFilename: {}\n'.format(self.sim['dispfile'])
@@ -150,10 +151,15 @@ class LLEsovler(object):
         self.sim = self._Translator(self.sim)
         self.res = self._Translator(self.res)
 
+        if mu_sim is None:
+            μsim = self.sim['mu_sim']
+        else: 
+            μsim = mu_sim
+
         self._analyze = AnalyzeDisp(file=self.sim['dispfile'],
                                     f_center=self.sim['f_pmp'],
                                     rM_fit=self.sim['mu_fit'],
-                                    rM_sim=self.sim['mu_sim'],
+                                    rM_sim=μsim,
                                     R=self.res['R'],
                                     debug=do_plot,
                                     f=f,
@@ -162,9 +168,10 @@ class LLEsovler(object):
                                     plottype=plottype,
                                     zero_lines = zero_lines,
                                     logger = self._logger)
-        f.canvas.draw()
-        plt.pause(0.25)
-        f.show()
+        if do_plot:
+            f.canvas.draw()
+            plt.pause(0.25)
+            f.show()
         PrM_fit, Dint_fit, neff_pmp, ng_pmp = self._analyze.GetDint()
         self._PrM_fit = PrM_fit
         self.sim['Dint'] = Dint_fit
@@ -395,14 +402,14 @@ class LLEsovler(object):
 
             h5f.close()
 
-    def Solve(self):
+    def SolveTemporal(self):
         '''
         Call Julia to solver the LLE
         '''
-
+        self._solver = 'temporal'
 
         if self._debug:
-            self._logger.info('Solving LLE with Julia....')
+            self._logger.info('Solving Temporal LLE with Julia....')
         print('-'*70)
         date = time.localtime()
         date = "{}-{:0>2}-{:0>2} ".format(date.tm_year,
@@ -431,6 +438,94 @@ class LLEsovler(object):
         print('\n')
         print(time_taken)
         print('-'*70)
+
+    def SolveSteadySteate(self):
+        '''
+        Newton Method to find the root of the steady state equation
+        '''
+
+        self._solver = 'steady'
+        if self._debug:
+            self._logger.info('Solving Steady State LLE with Python....')
+        print('-'*70)
+        date = time.localtime()
+        date = "{}-{:0>2}-{:0>2} ".format(date.tm_year,
+                                          date.tm_mon,
+                                          date.tm_mday) +\
+            "{:0>2}:{:0>2}:{:0>2}".format(date.tm_hour,
+                                          date.tm_min,
+                                          date.tm_sec)
+        start = time.time()
+        print(date)
+
+        # -- CHeck Parity of the µ --
+        μ_sim = self.sim['mu_sim']
+        ind = 0
+        if not μ_sim[0] == -μ_sim[1]:
+            μ_sim = [-np.max(np.abs(μ_sim)), np.max(np.abs(μ_sim))]
+            INFO = 'Not symmetric mode calculation -> switching to it with µ_sim = {}\n'.format(μ_sim)
+            print(INFO)
+            if self._debug:
+                self._logger.info(INFO)
+            self.Analyze(mu_sim = μ_sim)
+
+
+        # -- setting up parameters -- 
+        β2 = self._analyze.β2
+        Pin = self.sim['Pin']
+        γ = self.res['gamma']
+        L = 2*np.pi*self.res['R']
+        ω0 = self.sim['f_pmp']*2*np.pi
+        Q0 = self.res['Qi']
+        Qc = self.res['Qc']
+        tR = L*self.res['ng']/self._c0
+        α = 1/2 * (ω0/Q0 + ω0/Qc) * tR
+        θ = ω0/Qc*tR 
+        δω = -self.sim['domega']* tR
+        
+        nlc = -1j*γ*L
+        μ = np.arange(μ_sim[0], μ_sim[1]+1)
+        pmp_ind = np.where(μ == 0)[0][0]
+        ω = μ*2*np.pi/tR + ω0
+        ν = ω/(2*np.pi)
+        # -- setting up input power -- 
+        Ein = np.zeros(μ.size)
+        Ein[pmp_ind] = np.sqrt(Pin) * μ.size
+        Ein_couple = np.sqrt(θ)*Ein
+    
+        # -- Define Initial Guess --
+        sech = lambda x: 1/np.cosh(x)
+        η = δω/α # need to be fixed
+        B0 = np.sqrt(2*η)
+        f = np.sqrt(θ* Pin* γ* L/α**3)
+        φ0 = np.arccos(np.sqrt(8*η)/np.pi/f)
+        τ = np.linspace(-0.5,0.5, μ.size)*tR
+        Φ0 =  f/η**2 -1j* f/η
+        ut0 = np.sqrt(α/γ/L) * (Φ0+ B0 * np.exp(1j*φ0) * sech(B0*np.sqrt(α/(np.abs(β2)*L))*τ))
+        Em0 = fft.fftshift(fft.fft(ut0))
+        x_init = np.concatenate((Em0.real, -Em0.imag))
+        
+        # -- Define the Steady State LLE Equation --
+        φ = -α + 1j*δω - 1j*self.sim["dphi"]
+        Em= lambda xx:  xx[0:int(xx.shape[0]/2)] + 1j*xx[int(xx.shape[0]/2)]
+        Ut=  lambda xx:  fft.ifft(Em(xx));
+        fm= lambda xx: φ*Em(xx) + nlc*fft.fft(np.abs(Ut(xx))**2*Ut(xx)) + Ein_couple;
+        fvec= lambda xx: np.concatenate((fm(xx).real, fm(xx).imag))
+
+        # -- Solver the Steady State -- 
+        out = optm.root(fvec, x_init, method='lm', jac=None, tol=1e-20)
+        Ering = Em(out.x)/μ.size
+        Ewg = Ein/μ.size -Ering*np.sqrt(θ)
+
+
+        
+        f, ax = plt.subplots()
+        ax.plot(1e-12*ν, 20*np.log10(np.abs(Ering)), label='Ring')
+        ax.plot(1e-12*ν, 20*np.log10(np.abs(Ewg)), label='Waveguide')
+        ax.legend()
+        f.show()
+
+        return Ering, Ewg, f, ax
 
     def RetrieveData(self):
         '''
@@ -513,13 +608,13 @@ class LLEsovler(object):
         ax[2].plot(np.arange(0, 1000), self.sol['comb_power'] /
                    self.sol['comb_power'].max())
         ax = np.append(ax, ax[2].twinx())
-        ax[3].plot(np.arange(0, 1000),self.sol['detuning'],
+        ax[3].plot(np.arange(0, 1000),self.sol['detuning']*1e-9/(2*np.pi),
                     c = cmap.colors[1])
         ax[0].set_ylabel('Frequency (THz)')
         ax[1].set_ylabel('Angle (x π)')
         ax[2].set_xlabel('LLE Step (sub-sampled)')
         ax[2].set_ylabel('Norm. Comb Pwr')
-        ax[3].set_ylabel('Norm. Detuning')
+        ax[3].set_ylabel('Detuning (GHz)')
         ax[0].set_xlim([0,1000])
         f.show()
 
@@ -565,8 +660,8 @@ class LLEsovler(object):
             if type(ax) is list:
                 f, ax = plt.subplots()
 
-        Sring = 10*np.log10(1e3*np.abs(self.sol['Em_probe'][:, ind])**2)
-        Sout = 10*np.log10(1e3*np.abs(self.sol['Ewg'][:, ind])**2)
+        Sring = 10*np.log10(np.abs(self.sol['Em_probe'][:, ind])**2)
+        Sout = 10*np.log10(np.abs(self.sol['Ewg'][:, ind])**2)
 
         if pwr.lower() == 'both':
             ax.plot(freq, Sout, label='Output P')

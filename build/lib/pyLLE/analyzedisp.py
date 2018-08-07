@@ -3,7 +3,6 @@ import scipy.io as io
 import scipy.interpolate as itp
 import matplotlib.pyplot as plt
 
-
 class AnalyzeDisp(object):
     '''
     Calls to analyze the dispersion of a simulated resonator
@@ -96,8 +95,7 @@ class AnalyzeDisp(object):
         # drf = rf - rf[pump_index]
         # Dfit = np.polyfit(dm, drf[pump_index+dm], 2)
         # FSR_p = Dfit[1]
-        ring_beta2 = -self.ng/self.c*(2*Dfit[0])/Dfit[1]**2/2/np.pi
-
+        β2 = -self.ng_pmp/self.c*(2*Dfit[0])/Dfit[1]**2/2/np.pi
         dφ = -(drf-(rM-rM[pump_index])*FSR_p)/FSR_p*2*np.pi
 
         ind_M = np.arange(
@@ -190,7 +188,7 @@ class AnalyzeDisp(object):
             self._logger.info(Info)
 
         self.PrM_fit = PrM_fit
-        # self.ring_beta2 = ring_beta2
+        self.β2 = β2
         self.rf = rf[ind_M]
         self.rM = rM[ind_M]
         self.mu = mu[ind_M]
