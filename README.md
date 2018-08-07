@@ -9,15 +9,15 @@ For a complete documentation of the package, please visit the [readthedocs page]
 
 ## Instalation
 
-As pyLLE relies on a Julia back-end, please prior to install this package be sure that Julia is installed on your machine or visit the julia [package downloader page](https://julialang.org/downloads/) to install it. Once Julia installed, the different packages needed to run pyLLE, either python or julia related, will be automatically dowlnloaded and installed 
+As pyLLE relies on a Julia back-end, please prior to install this package be sure that Julia is installed on your machine or visit the julia [package downloader page](https://julialang.org/downloads/) to install it. Once Julia installed, the different packages needed to run pyLLE, either python or julia related, will be automatically downloaded and installed 
 
-For a automatic install, just 
+For a automatic install, just
 
 ```bash
 pip install pyLLE
 ```
 
-For a manual install, download the .zip of the reposotory or clone it and install with the setup.py script 
+For a manual install, download the .zip of the repository or clone it and install with the setup.py script 
 
 ```bash
 git clone https://github.com/gregmoille/pyLLE.git
@@ -65,7 +65,7 @@ sim = {'Pin': 100e-3, #input power in W
 ```
 
 
-Here, the dict keys can be defined with greek letters for a nicer script (in my opinion) or with latin letter such that the translator dictionary is defined by:
+Here, the dict keys can be defined with greek letters for a nicer script (in my opinion) or with Latin letter such that the translator dictionary is defined by:
 
 ```python
 greek ={'α': 'alpha',
@@ -79,7 +79,7 @@ greek ={'α': 'alpha',
         'ε': 'epsilon',
         'φ': 'phi'}
 ```
-Hence, instead of providing *δω_init* in the sim dictionary, one could provice *domega_init*.
+Hence, instead of providing *δω_init* in the sim dictionary, one could provide *domega_init*.
 
 We can now setup the pyLLE class: 
 
@@ -92,7 +92,7 @@ solver = pyLLE.LLEsovler(sim=sim,
 The debug input allows the script to generate a log file in the working directory with useful information on the simulation. The authors highly encourage to keep this key to True, unless some loops are run which could create an issue with the read/write access to the file. 
 
 
-To analyse the dispersion just the *Anlayze* method with the correct parameters listed in the [docs](http://pylle.readthedocs.io/en/latest/source/pyLLE.html)
+To analyze the dispersion just the *Analyze* method with the correct parameters listed in the [docs](http://pylle.readthedocs.io/en/latest/source/pyLLE.html)
 
 ```python
 solver.Analyze(plot=True,
@@ -104,7 +104,7 @@ To start the simulation, first we need to setup an hdf5 file which makes the bri
 ```python
 solver.Setup()
 ```
-For the sake of simplicity and to retrieve the difference parameter, all keys of the sim and res dictionary are translated with the previously described translator dictionary and cannot be access anymore with the greek alphabet. Hence, in an ipython consol, one can retrieve the parameter with, for example 
+For the sake of simplicity and to retrieve the difference parameter, all keys of the sim and res dictionary are translated with the previously described translator dictionary and cannot be access anymore with the greek alphabet. Hence, in an ipython console, one can retrieve the parameter with, for example 
 
 ```python
 IN [1]: solver.sim['mu_sim']
@@ -196,11 +196,6 @@ t, U, ft, axt = solver.PlotSolitonTime(600)
 ## How to Cite Us?
 
 Soon you will be. For the moment, please provide the name of the package, the authors (Gregory Moille, Qing Li, Xiyuan Lu and Kartik Srinivasan) as a full url to the repository
-
-## Further work
-
-- [ ] Add a steady state solver through Newton Method
-- [ ] Add normalized formalism
 
 
 ## References
