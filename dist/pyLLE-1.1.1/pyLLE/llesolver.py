@@ -710,6 +710,7 @@ class LLEsovler(object):
             - f <obj>: matplotlib figure handle
             - ax <obj>: matplotlib axe handle
         '''
+
         freq = self.sol['freq']
         tR = 2*np.pi*self.res['R']*self.res['ng']/self._c0
         f, ax = plt.subplots()
