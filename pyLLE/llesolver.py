@@ -693,7 +693,7 @@ class LLEsovler(object):
         return freq, Sout, Sring, f, ax
 
     def PlotSolitonTime(self, ind, f=None, ax=None, label=None):
-         '''
+        '''
         Plot the spectra for a given index in the 1000 sub-sampled LLE step 
 
         **Input** 
@@ -710,8 +710,10 @@ class LLEsovler(object):
             - f <obj>: matplotlib figure handle
             - ax <obj>: matplotlib axe handle
         '''
-        freq = self.sol['freq']
+
+        
         tR = 2*np.pi*self.res['R']*self.res['ng']/self._c0
+        freq = self.sol['freq']
         f, ax = plt.subplots()
         τ = np.linspace(-0.5, 0.5, freq.size) * tR
         U = np.abs(self.sol['u_probe'][:,ind])**2
