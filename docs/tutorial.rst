@@ -38,12 +38,12 @@ Now, we should define the simulation parameters through the _sim_ dictionary
             }
 
 
-It is important to note the format of the dipersion file *TestDispersion.txt*. It be format such as each line represent an resoanace, with first the azymuthal mode order then the frequency of resonance separated by a comma ',' 
+It is important to note the format of the dispersion file *TestDispersion.txt*. It be format such as each line represent a resonance, with first the azimuthal mode order then the frequency of resonance separated by a comma ',' 
 
 
 |
 
-Here, the dict keys can be defined with greek letters for a nicer script (in my opinion) or with Latin letter such that the translator dictionary is defined by:
+Here, the dict keys can be defined with Greek letters for a nicer script (in my opinion) or with Latin letter such that the translator dictionary is defined by:
 
 .. code-block:: python
 
@@ -81,6 +81,14 @@ To analyze the dispersion just the *Analyze* method with the correct parameters 
     solver.Analyze(plot=True,
                    plottype='all')
 
+.. image:: https://github.com/gregmoille/pyLLE/tree/master/example/image/Analyze.png
+    :width: 400px
+    :align: center
+    :alt: alternate text
+
+The green dot corresponds to the raw data provided by the *TestDispersion.txt* file, the blue solid line is the spline fit of the integrated dispersion and the orange dashed line is the integrated dispersion that will be used in the LLE solver
+
+|
 
 To start the simulation, first we need to setup an hdf5 file which makes the bridge between python and julia 
 
@@ -88,10 +96,11 @@ To start the simulation, first we need to setup an hdf5 file which makes the bri
     
     solver.Setup()
 
+Here, two attributes has been created *self.sim* and *self.res*  which are dictionaries where one can easily retrieve the different parameters of the simulation
 
 |
 
-For the sake of simplicity and to retrieve the difference parameter, all keys of the sim and res dictionary are translated with the previously described translator dictionary and cannot be access anymore with the greek alphabet. Hence, in an ipython console, one can retrieve the parameter with, for example 
+For the sake of simplicity and to retrieve the difference parameter, all keys of the sim and res dictionary are translated with the previously described translator dictionary and cannot be access anymore with the Greek alphabet. Hence, in an ipython console, one can retrieve the parameter with, for example 
 
 .. code-block:: python
     
@@ -113,6 +122,9 @@ To retrieve the data computed by julia, we call the *RetrieveData* method
     
     solver.RetrieveData()
 
+Here a attribute called *.sol* is created, corresponding to a dictionary where all the different data can be easily retrieved if needed.
+
+|
 
 We can finally start to plot the result of the simulation. One can start with a complete overview of the simulation, were a spectral and a temporal map Vs the LLE step is displayed in addition to the comb power Vs the LLE step
 
@@ -120,6 +132,10 @@ We can finally start to plot the result of the simulation. One can start with a 
     
     solver.PlotCombPower()
 
+.. image:: https://github.com/gregmoille/pyLLE/tree/master/example/image/CombResults.png
+    :width: 400px
+    :align: center
+    :alt: alternate text
 
 From there, we can find the step of the LLE where we want to see the spectra:
 
@@ -128,19 +144,52 @@ From there, we can find the step of the LLE where we want to see the spectra:
     ind = 600
     solver.PlotCombSpectra(ind)
 
+.. image:: https://github.com/gregmoille/pyLLE/tree/master/example/image/CombSpectra.png
+    :width: 400px
+    :align: center
+    :alt: alternate text
 
+The temporal profile of the soliton can also be retrieve using 
+
+.. code-block:: python
+    
+    ind = 600
+    solver.PlotSolitonTime(600)
+
+.. image:: https://github.com/gregmoille/pyLLE/tree/master/example/image/SolitonTime.png
+    :width: 400px
+    :align: center
+    :alt: alternate text
+
+|
 
 One can also solver quickly the LLE through a steady state method finding the root of the LLE
 
 .. code-block:: python
     
     sim['δω'] =  -10e9,
-    Ering, Ewg, f, ax = solver.SolveSteadySteate()
+    solver.SolveSteadySteate()
+
+.. image:: https://github.com/gregmoille/pyLLE/tree/master/example/image/SteadyState.png
+    :width: 400px
+    :align: center
+    :alt: alternate text
+
+|
+
+Finally, an easy way to solve the simulation has been implemented in the *self.SaveResults* method where the whole class is pickled, hence can be easily retrieved following the example below:
+
+.. code-block:: python
+    
+    solver.SaveResults('TestSimulation.pkl', path = 'Results/')
+    import pickle as pkl
+    old_solver = pkl.load(open('Results/TestSimulation.pkl','br'))
+
 
 |
 |
 
-The complete script is: 
+All the different method to plot the field or the spectra return the corresponding values, and one can easily access it through the *self.sol* attribute (dictionary), The complete script is: 
 
 .. code-block:: python
 
@@ -168,7 +217,7 @@ The complete script is:
            'dispfile': 'TestDispersion.txt'
             }
 
-    # --  Setup thte Solver --
+    # --  Setup the Solver --
     solver = pyLLE.LLEsovler(sim=sim,
                            res=res,
                            debug=True)

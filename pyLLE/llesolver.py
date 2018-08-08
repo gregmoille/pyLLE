@@ -608,7 +608,8 @@ class LLEsovler(object):
         f, ax = plt.subplots(3, 1, sharex=True)
         ax[0].pcolormesh(np.arange(0, 1000), freq,Epb,
                          rasterized=True, 
-                         vmin = -80)
+                         vmin = -120,
+                         vmax = -15)
         theta = self.sol['theta']
         ax[1].pcolormesh(np.arange(0, 1000), theta/np.pi,
                          (np.abs(self.sol['u_probe'])**2),

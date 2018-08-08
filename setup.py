@@ -16,7 +16,7 @@ class MyInstall(install):
             julia = 'julia'
         if sys.platform == 'win32':
             julia = os.path.expanduser('~') + '\\AppData\\Local\\Julia-0.6.4\\bin\\julia.exe'
-        sub.call([julia, 'InstallPkg.jl'])
+        # sub.call([julia, 'InstallPkg.jl'])
         
 
 # class MyBuild(build_py):
