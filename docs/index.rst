@@ -12,7 +12,6 @@ Welcome to pyLLE's documentation!
 
    installation
    tutorial
-   getting_started
    team
    source/pyLLE
 
