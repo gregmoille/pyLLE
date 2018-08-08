@@ -29,7 +29,7 @@ If the julia location is custom, please before installing change in the setup.py
 
 ## Example
 
-First download the .mat file available in the example folder of this repository. 
+First download the .txt file available in the example folder of this repository. 
 
 
 Import the pyLLE module, and the different utility modules
@@ -60,10 +60,14 @@ sim = {'Pin': 100e-3, #input power in W
        'δω_end': 10, # stop frequency of detuning ramp in Hz
        'μ_sim': [-70,170], # limit of the mode on the left and right side of the pump to simulate
        'μ_fit': [-60, 160], # limit of the mode on the left and right side of the pump to fit the dispersion with
-       'dispfile': 'ExampleQing.mat' # name of the dispersion file
+       'dispfile': 'TestDispersion.txt' # name of the dispersion file
         }
 ```
 
+It is important to note the format of the dipersion file *TestDispersion.txt*. It be format such as each line represent an resoanace, with first the azymuthal mode order then the frequency of resonance separated by a comma ',' 
+
+
+<br>
 
 Here, the dict keys can be defined with greek letters for a nicer script (in my opinion) or with Latin letter such that the translator dictionary is defined by:
 
@@ -81,6 +85,8 @@ greek ={'α': 'alpha',
 ```
 Hence, instead of providing *δω_init* in the sim dictionary, one could provide *domega_init*.
 
+
+<br>
 We can now setup the pyLLE class: 
 
 ```python 
@@ -91,6 +97,7 @@ solver = pyLLE.LLEsovler(sim=sim,
 
 The debug input allows the script to generate a log file in the working directory with useful information on the simulation. The authors highly encourage to keep this key to True, unless some loops are run which could create an issue with the read/write access to the file. 
 
+<br>
 
 To analyze the dispersion just the *Analyze* method with the correct parameters listed in the [docs](http://pylle.readthedocs.io/en/latest/source/pyLLE.html)
 
@@ -104,6 +111,9 @@ To start the simulation, first we need to setup an hdf5 file which makes the bri
 ```python
 solver.Setup()
 ```
+
+<br>
+
 For the sake of simplicity and to retrieve the difference parameter, all keys of the sim and res dictionary are translated with the previously described translator dictionary and cannot be access anymore with the greek alphabet. Hence, in an ipython console, one can retrieve the parameter with, for example 
 
 ```python
@@ -111,6 +121,7 @@ IN [1]: solver.sim['mu_sim']
 OUT [1]: [-70,170]
 ```
 
+<br>
 
 Then we can start the simulation 
 
@@ -145,6 +156,7 @@ sim['δω'] =  -10e9,
 Ering, Ewg, f, ax = solver.SolveSteadySteate()
 ```
 
+<br><br>
 
 
 The complete script is: 
@@ -171,7 +183,7 @@ sim = {'Pin': 100e-3,
        'δω_end': -5e9*2*np.pi, 
        'μ_sim': [-70,170],
        'μ_fit': [-71, 170],
-       'dispfile': 'TestDispersion.mat'
+       'dispfile': 'TestDispersion.txt'
         }
 
 # --  Setup thte Solver --
