@@ -22,9 +22,12 @@ with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=FutureWarning)
     import h5py
 
-path_juliaScript = '/'.join(os.path.realpath(__file__).split('/')[:-1]) + '/'
-tmp_dir = tempfile.gettempdir() + '/'
-
+path_juliaScript = os.path.dirname(os.path.abspath(__file__))
+path_juliaScript = os.path.join(path_juliaScript, 'ComputeLLE.jl')
+tmp_dir = os.path.join(tempfile.gettempdir(), '')
+print('-'*50)
+print(path_juliaScript)
+print('-'*50)
 
 class LLEsovler(object):
     '''
@@ -86,7 +89,7 @@ class LLEsovler(object):
             self._logger = logging.getLogger(__name__)
             self._logger.setLevel(logging.INFO)
             self._logger.handlers = []
-            _loghdl = logging.FileHandler(LOG_FILE)
+            _loghdl = logging.FileHandler(LOG_FILE, 'a', 'utf-8')
             _loghdl.setFormatter(FORMATTER)
             self._logger.addHandler(_loghdl)
             self._logger.propagate = False
@@ -213,15 +216,15 @@ class LLEsovler(object):
             dic_sim = {'Pin': ('Pin',1e3, 'mW'),
                         'Tscan': ('Tscan',1e-6, 'x1e6 Round Trip'),
                         'f_pmp': ('f_pmp',1e-12, 'THz'),
-                        'domega_init': ('δω_init',1e-9/(2*np.pi), 'x2π GHz'),
-                        'domega_end': ('δω_end',1e-9/(2*np.pi), 'x2π GHz'),
-                        'mu_sim': ('μ_sim',1, ''),
-                        'mu_fit': ('μ_fit',1, ''),}
+                        'domega_init': (u'\u03B4\u03C9_init',1e-9/(2*np.pi), u'x2\u03C0 GHz'),
+                        'domega_end': (u'\u03B4\u03C9_end',1e-9/(2*np.pi), u'x2\u03C0 GHz'),
+                        'mu_sim': (u'\u03BC_sim',1, ''),
+                        'mu_fit': (u'\u03BC_fit',1, ''),}
                         
             dic_res = {'R': ('R',1e6, 'µm'),
                         'Qi': ('Qi',1e-6, 'M'),
                         'Qc': ('Qc',1e-6, 'M'),
-                        'gamma': ('γ', 1, ''),}
+                        'gamma': (u'\u03B3', 1, ''),}
                     
 
         
@@ -429,12 +432,12 @@ class LLEsovler(object):
         if sys.platform == 'win32':
             julia = os.path.expanduser('~') + '\\AppData\\Local\\Julia-0.6.4\\bin\\julia.exe'
 
-        if self.sim_norm == None:
-            sub.call([julia,
-                      path_juliaScript + "ComputeLLE.jl", tmp_dir])
-        else:
-            sub.call(["julia",
-                      path_juliaScript + "ComputeLLE_Norm.jl", tmp_dir])
+        # if self.sim_norm == None:
+        sub.call([julia,
+                  path_juliaScript , tmp_dir])
+        # else:
+        #     sub.call(["julia",
+        #               path_juliaScript + "ComputeLLE_Norm.jl", tmp_dir])
         time_taken = time.time() - start
         end = time.time()
         hours, rem = divmod(end-start, 3600)

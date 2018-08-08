@@ -30,12 +30,12 @@ solver.Analyze(plot=True,
                plottype='all')
 solver.Setup()
 
-# --  Solver the Steady State LLE --
-Ering, Ewg, f, ax = solver.SolveSteadySteate()
+# # --  Solver the Steady State LLE --
+# Ering, Ewg, f, ax = solver.SolveSteadySteate()
 
 # # --  Solver the Temporal LLE --
-# solver.SolveTemporal()
-# solver.RetrieveData()
-# solver.PlotCombPower()
-# freq, Sout, Sring, fS, axS = solver.PlotCombSpectra(600)
-# t, U, ft, axt = solver.PlotSolitonTime(600)
+solver.SolveTemporal()
+solver.RetrieveData()
+solver.PlotCombPower()
+freq, Sout, Sring, fS, axS = solver.PlotCombSpectra(600)
+t, U, ft, axt = solver.PlotSolitonTime(600)

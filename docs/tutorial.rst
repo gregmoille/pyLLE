@@ -81,7 +81,7 @@ To analyze the dispersion just the *Analyze* method with the correct parameters 
     solver.Analyze(plot=True,
                    plottype='all')
 
-.. image:: https://github.com/gregmoille/pyLLE/blob/master/example/images/Analyze.png
+.. image:: ../example/images/Analyze.png
     :width: 400px
     :align: center
     :alt: alternate text
@@ -132,7 +132,7 @@ We can finally start to plot the result of the simulation. One can start with a 
     
     solver.PlotCombPower()
 
-.. image:: https://github.com/gregmoille/pyLLE/blob/master/example/images/CombResults.png
+.. image:: ../example/images/CombResults.png
     :width: 400px
     :align: center
     :alt: alternate text
@@ -144,7 +144,7 @@ From there, we can find the step of the LLE where we want to see the spectra:
     ind = 600
     solver.PlotCombSpectra(ind)
 
-.. image:: https://github.com/gregmoille/pyLLE/blob/master/example/images/CombSpectra.png
+.. image:: ../example/images/CombSpectra.png
     :width: 400px
     :align: center
     :alt: alternate text
@@ -156,7 +156,7 @@ The temporal profile of the soliton can also be retrieve using
     ind = 600
     solver.PlotSolitonTime(600)
 
-.. image:: https://github.com/gregmoille/pyLLE/blob/master/example/images/SolitonTime.png
+.. image:: ../example/images/SolitonTime.png
     :width: 400px
     :align: center
     :alt: alternate text
@@ -170,7 +170,7 @@ One can also solver quickly the LLE through a steady state method finding the ro
     sim['δω'] =  -10e9,
     solver.SolveSteadySteate()
 
-.. image:: https://github.com/gregmoille/pyLLE/blob/master/example/images/SteadyState.png
+.. image:: ../example/images/SteadyState.png
     :width: 400px
     :align: center
     :alt: alternate text
