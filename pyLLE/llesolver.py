@@ -29,8 +29,9 @@ with warnings.catch_warnings():
 path_juliaScript = os.path.dirname(os.path.abspath(__file__))
 path_juliaScript = os.path.join(path_juliaScript, 'ComputeLLE.jl')
 tmp_dir = tempfile.mkdtemp()
+os.rmdir(tmp_dir) # delete folder as the temp file will not be in it but will be used as a prefix
 print('-'*50)
-print('Path to temporary dir to save .h5 files:')
+print('Path to temporary dir to save .h5 files with prefix:')
 print(tmp_dir)
 print('-'*50)
 print('Path to Julia script: ')
