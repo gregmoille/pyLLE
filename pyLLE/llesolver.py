@@ -28,7 +28,7 @@ with warnings.catch_warnings():
 
 path_juliaScript = os.path.dirname(os.path.abspath(__file__))
 path_juliaScript = os.path.join(path_juliaScript, 'ComputeLLE.jl')
-tmp_dir = tempfile.mkdtemp()
+tmp_dir = os.path.join(tempfile.mkdtemp(),'')
 print('-'*50)
 print('Path to temporary dir to save .h5 files:')
 print(tmp_dir)
