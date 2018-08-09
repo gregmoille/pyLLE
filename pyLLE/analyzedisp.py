@@ -144,16 +144,20 @@ class AnalyzeDisp(object):
                 ax.plot([rf[0]*1e-12, rf[-1]*1e-12], [0, 0], 'k--')
             if self.plottype == 'all':
                 # ipdb.set_trace()
-                ax.plot(rf[ind_M]*1e-12, Dint_fit1*1e-9/(2*np.pi), lw=2)
-                ax.plot(rf_fit*1e-12, Dint_fit2*1e-9/(2*np.pi), '--', lw=2)
-                ax.plot(rf*1e-12, Dint*1e-9/(2*np.pi), '.', ms=2)
+                
+                
+                ax.plot(rf_fit*1e-12, Dint_fit2*1e-9/(2*np.pi), '--', lw=3, label = 'Sim')
+                ax.plot(rf[ind_M]*1e-12, Dint_fit1*1e-9/(2*np.pi), lw=1, label = 'Fit')
+                ax.plot(rf*1e-12, Dint*1e-9/(2*np.pi), '.', ms=4, alpha = 0.5, label = 'Raw')
+                
+                ax.legend()
             if self.plottype.lower() == 'sim':
                 ax.plot(rf_fit*1e-12, Dint_fit2*1e-9 /
                         (2*np.pi), label=self.label)
                 ax.legend()
             if self.plottype.lower() == 'fit':
                 ax.plot(rf[ind_M]*1e-12, Dint_fit1*1e-9/(2*np.pi), lw=2)
-                ax.plot(rf*1e-12, Dint*1e-9/(2*np.pi), '.', ms=2)
+                ax.plot(rf*1e-12, Dint*1e-9/(2*np.pi), '.', ms=4, alpha = 0.5)
             if self.plottype.lower() == 'fem':
                 ax.plot(rf*1e-12, Dint*1e-9/(2*np.pi), '-', label=self.label)
                 ax.legend()

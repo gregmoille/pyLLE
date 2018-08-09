@@ -185,7 +185,7 @@ for it = 1:1:Nt
 end
 S["Ewg"] = 1im*zeros(size(S["Em_probe"]))
 for ii=1:size(S["Em_probe"],1)
-    S["Ewg"][ii,:] = Ein/length(μ_sim)-S["Em_probe"][ii,:].*sqrt(θ)
+    S["Ewg"][ii,:] = Ein/length(μ)-S["Em_probe"][ii,:].*sqrt(θ)
 end
 S["ω"] = (ω0 + dω)
 

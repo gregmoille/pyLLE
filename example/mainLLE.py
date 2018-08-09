@@ -1,17 +1,21 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 import pyLLE
 
 plt.close('all')
-
+try:
+    os.remove('LLE.log')
+except:
+    pass
 
 res = {'R': 23e-6,
        'Qi': 1e6,
        'Qc': 1e6,
        'γ': 2}
 
-sim = {'Pin': 150e-3,
-       'Tscan': 2e5,
+sim = {'Pin': 100e-3,
+       'Tscan': 2e6,
        'δω_stop': "None",
        'f_pmp': 191e12,
        'δω_init': 2e9*2*np.pi, 
@@ -37,5 +41,5 @@ solver.Setup()
 solver.SolveTemporal()
 solver.RetrieveData()
 solver.PlotCombPower()
-freq, Sout, Sring, fS, axS = solver.PlotCombSpectra(600)
-t, U, ft, axt = solver.PlotSolitonTime(600)
+# freq, Sout, Sring, fS, axS = solver.PlotCombSpectra(600)
+# t, U, ft, axt = solver.PlotSolitonTime(600)

@@ -16,11 +16,16 @@ import tempfile
 from prettytable import PrettyTable
 import warnings
 import matplotlib as mpl
-import logging
+import matplotlib.gridspec as gridspec
+from matplotlib import ticker
 import matplotlib.font_manager as font_manager
+import logging
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=FutureWarning)
     import h5py
+
+import ipdb
+
 
 path_juliaScript = os.path.dirname(os.path.abspath(__file__))
 path_juliaScript = os.path.join(path_juliaScript, 'ComputeLLE.jl')
@@ -601,33 +606,75 @@ class LLEsovler(object):
 
             - f, ax handle of figure and axes of the matplotlib figure displayed
         '''
+
+
+
+
+        # --  Create the Figure -- 
+        f = plt.figure()
+        gs = gridspec.GridSpec(3,2, width_ratios=[1,0.015],wspace=0.05)
+        ax = [None]*6
+        ax[0] = plt.subplot(gs[0])
+        ax[1] = plt.subplot(gs[1])
+        ax[2] = plt.subplot(gs[2],sharex=ax[0])
+        ax[3] = plt.subplot(gs[3])
+        ax[4] = plt.subplot(gs[4],sharex=ax[0])
+
         cmap = plt.get_cmap("tab10")
+        
+        # --  Get the Data User Friendly -- 
         freq = self.sol['freq']*1e-12
         Epb = self.sol['Ewg']
         Epb[Epb==0] = 1e-20
-        Epb = 10*np.log10(np.abs(Epb)**2)
-        Epb = Epb - Epb.max()
-        # Epb[Epb<=0] = 1e-100
-        f, ax = plt.subplots(3, 1, sharex=True)
-        ax[0].pcolormesh(np.arange(0, 1000), freq,Epb,
+        Epb = 30 + 10*np.log10(np.abs(Epb)**2)
+
+        E2 = (np.abs(self.sol['u_probe'])**2)
+        E2 = E2/E2.max()
+        tR = 2*np.pi*self.res['R']*self.res['ng']/self._c0
+        t = np.linspace(-0.5, 0.5, freq.size) * tR
+
+        CmbPow = self.sol['comb_power'] /self.sol['comb_power'].max()
+        det = self.sol['detuning']*1e-9/(2*np.pi)
+
+        step = np.arange(0, 1000)
+        # -- Plot Everything -- 
+        aa = ax[0].pcolormesh(step, freq,Epb,
                          rasterized=True, 
-                         vmin = -120,
-                         vmax = -15)
-        theta = self.sol['theta']
-        ax[1].pcolormesh(np.arange(0, 1000), theta/np.pi,
-                         (np.abs(self.sol['u_probe'])**2),
+                         vmin = Epb.max()-120,
+                         vmax = Epb.max())
+        bb = ax[2].pcolormesh(step, t*1e12,E2,
                          rasterized=True, vmin=0)
-        ax[2].plot(np.arange(0, 1000), self.sol['comb_power'] /
-                   self.sol['comb_power'].max())
-        ax = np.append(ax, ax[2].twinx())
-        ax[3].plot(np.arange(0, 1000),self.sol['detuning']*1e-9/(2*np.pi),
+        ax[4].plot(step, CmbPow)
+        ax.append(ax[4].twinx())
+        ax[6].plot(step,det,
                     c = cmap.colors[1])
+
+        # -- Make it Pretty --
         ax[0].set_ylabel('Frequency (THz)')
-        ax[1].set_ylabel('Angle (x π)')
-        ax[2].set_xlabel('LLE Step (sub-sampled)')
-        ax[2].set_ylabel('Norm. Comb Pwr')
-        ax[3].set_ylabel('Detuning (GHz)')
+        ax[2].set_ylabel('Time (ps)')
+        ax[4].set_xlabel('LLE Step (sub-sampled)')
+        ax[4].set_ylabel('Norm. Comb Pwr')
+        ax[6].set_ylabel('Detuning (GHz)')
         ax[0].set_xlim([0,1000])
+        ax[2].set_yticks([ax[2].get_yticks()[0],
+                         0,
+                         ax[2].get_yticks()[-1]])
+        [label.set_visible(False) for label in ax[0].get_xticklabels()]
+        [label.set_visible(False) for label in ax[2].get_xticklabels()]
+
+
+        bar_spec = f.colorbar(aa,cax = ax[1],orientation="vertical")
+        bar_temp = f.colorbar(bb,cax = ax[3],orientation="vertical")
+        bar_spec.set_label('Spec. P (dB)')
+        bar_temp.set_label('|E|²')
+        tick_locator1 = ticker.MaxNLocator(nbins=4)
+        tick_locator2 = ticker.MaxNLocator(nbins=2)
+        bar_spec.locator = tick_locator1
+        bar_temp.locator = tick_locator2
+        bar_spec.update_ticks()
+        bar_temp.update_ticks()
+
+
         f.show()
 
         self.fPcomb = f
@@ -671,8 +718,8 @@ class LLEsovler(object):
             if type(ax) is list:
                 f, ax = plt.subplots()
 
-        Sring = 10*np.log10(np.abs(self.sol['Em_probe'][:, ind])**2)
-        Sout = 10*np.log10(np.abs(self.sol['Ewg'][:, ind])**2)
+        Sring = 30 + 10*np.log10(np.abs(self.sol['Em_probe'][:, ind])**2)
+        Sout = 30 + 10*np.log10(np.abs(self.sol['Ewg'][:, ind])**2)
 
         if pwr.lower() == 'both':
             ax.plot(freq, Sout, label='Output P')
