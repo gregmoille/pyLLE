@@ -24,13 +24,16 @@ with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=FutureWarning)
     import h5py
 
-import ipdb
 
 
 path_juliaScript = os.path.dirname(os.path.abspath(__file__))
 path_juliaScript = os.path.join(path_juliaScript, 'ComputeLLE.jl')
 tmp_dir = os.path.join(tempfile.gettempdir(), '')
 print('-'*50)
+print('Temporary directory to store .h5 files:')
+print(tmp_dir)
+print('-'*50)
+print('Julia is in:')
 print(path_juliaScript)
 print('-'*50)
 

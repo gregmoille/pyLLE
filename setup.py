@@ -24,7 +24,7 @@ with open("README.rst", "r") as fh:
     long_description = fh.read()
 
 setup(name='pyLLE',
-      version='1.1.9',
+      version='1.1.11',
       description='LLE Solver',
       url='https://github.com/gregmoille/pyLLE',
       author='Greg Moille',
