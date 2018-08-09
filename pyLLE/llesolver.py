@@ -19,7 +19,8 @@ import matplotlib as mpl
 import matplotlib.gridspec as gridspec
 from matplotlib import ticker
 import matplotlib.font_manager as font_manager
-import logging
+from datetime import datetime
+
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=FutureWarning)
     import h5py
@@ -37,6 +38,20 @@ print('-'*50)
 print('Path to Julia script: ')
 print(path_juliaScript)
 print('-'*50)
+
+class MyLogger():
+    
+    def __init__(self, fname):
+        self.fname = fname
+        open(self.fname,'a').write('\n' + '-'*75 + '\n')
+    
+    def info(self, method, message):
+        time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        mess = '[ ' + time + ' - ' + method + ' ] ' + message + '\n'
+        open(self.fname,'a').write(mess)
+    
+
+
 
 class LLEsovler(object):
     '''
@@ -63,7 +78,7 @@ class LLEsovler(object):
     **debug <bool>**: Save a trace in a logfile in the working directory of the different action pyLLE perform (default = True)
     '''
     _c0 = 299792458
-    _ħ = 6.634e-34/(2*np.pi)
+    hbar = 6.634e-34/(2*np.pi)
     __author__ = "Gregory Moille"
     __copyright__ = "Copyright 2018, NIST"
     __credits__ = ["Gregory Moille",
@@ -91,19 +106,22 @@ class LLEsovler(object):
 
         # -- Setup the Logger ---
         if self._debug: 
-            FORMATTER = logging.Formatter("[%(asctime)s — LLEsovler.%(funcName)s — %(levelname)s] %(message)s")
-            LOG_FILE = "LLE.log"
-            open(LOG_FILE, 'a').write('\n' + '-'*75 + '\n')
+            self._logger = MyLogger("LLE.log")
+            self._logger.info('__init__', 'New LLE')
 
-            self._logger = logging.getLogger(__name__)
-            self._logger.setLevel(logging.INFO)
-            self._logger.handlers = []
-            _loghdl = logging.FileHandler(LOG_FILE, 'a', 'utf-8')
-            _loghdl.setFormatter(FORMATTER)
-            self._logger.addHandler(_loghdl)
-            self._logger.propagate = False
-            self._logger.info('New LLE')
-            open(LOG_FILE , 'a').write('-'*75 + '\n')
+            # FORMATTER = logging.Formatter("[%(asctime)s — LLEsovler.%(funcName)s — %(levelname)s] %(message)s")
+            # LOG_FILE = "LLE.log"
+            # open(LOG_FILE, 'a').write('\n' + '-'*75 + '\n')
+
+            # self._logger = logging.getLogger(__name__)
+            # self._logger.setLevel(logging.INFO)
+            # self._logger.handlers = []
+            # _loghdl = logging.FileHandler(LOG_FILE, 'a', 'utf-8')
+            # _loghdl.setFormatter(FORMATTER)
+            # self._logger.addHandler(_loghdl)
+            # self._logger.propagate = False
+            # self._logger.info('New LLE')
+            # open(LOG_FILE , 'a').write('-'*75 + '\n')
         else: 
             self._logger = None
 
@@ -158,7 +176,7 @@ class LLEsovler(object):
         if self._debug:
             Info = '\n\tFilename: {}\n'.format(self.sim['dispfile'])
             Info += '\tf_pmp: {:.3f} THz'.format(self.sim['f_pmp']*1e-12)
-            self._logger.info("Analyzing dispersion file" + Info)
+            self._logger.info('LLEsovler.Analyze', "Analyzing dispersion file" + Info)
 
         self.sim = self._Translator(self.sim)
         self.res = self._Translator(self.res)
@@ -259,14 +277,14 @@ class LLEsovler(object):
 
             print(Info)
             if self._debug:
-                self._logger.info(Info)
+                self._logger.info('LLEsovler.Setup', Info)
                 
 
             # -- create h5file --
             # ipdb.set_trace()
             h5f = h5py.File(tmp_dir + 'ParamLLEJulia.h5', 'w')
             if self._debug:
-                self._logger.info('Saving parameters in: {}'.format(tmp_dir + 'ParamLLEJulia.h5'))
+                self._logger.info('LLEsovler.Setup','Saving parameters in: {}'.format(tmp_dir + 'ParamLLEJulia.h5'))
 
 
             h5f.create_group('sim')
@@ -291,7 +309,7 @@ class LLEsovler(object):
             # -- Normalize parameters --
             # ------------------------------------------------------------
             ω0 = 2*np.pi * self.sim['f_pmp']
-            ħ = self._ħ
+            ħ = self.hbar
             μ_sim = self.sim['μ_sim']
             c0 = self._c0
             ng = self.res['ng']
@@ -421,7 +439,7 @@ class LLEsovler(object):
         self._solver = 'temporal'
 
         if self._debug:
-            self._logger.info('Solving Temporal LLE with Julia....')
+            self._logger.info('LLEsovler.SolveTemporal','Solving Temporal LLE with Julia....')
         print('-'*70)
         date = time.localtime()
         date = "{}-{:0>2}-{:0>2} ".format(date.tm_year,
@@ -466,7 +484,7 @@ class LLEsovler(object):
 
         self._solver = 'steady'
         if self._debug:
-            self._logger.info('Solving Steady State LLE with Python....')
+            self._logger.info('LLEsovler.SolveSteadySteate','Solving Steady State LLE with Python....')
         print('-'*70)
         date = time.localtime()
         date = "{}-{:0>2}-{:0>2} ".format(date.tm_year,
@@ -486,7 +504,7 @@ class LLEsovler(object):
             INFO = 'Not symmetric mode calculation -> switching to it with µ_sim = {}\n'.format(μ_sim)
             print(INFO)
             if self._debug:
-                self._logger.info(INFO)
+                self._logger.info('LLEsovler.SolveSteadySteate',INFO)
             self.Analyze(mu_sim = μ_sim)
 
 
@@ -556,7 +574,7 @@ class LLEsovler(object):
         drct = tmp_dir
         S = h5py.File(tmp_dir + 'ResultsJulia.h5', 'r')
         if self._debug:
-            self._logger.info('Retrieving results from Julia in {}'.format(tmp_dir + 'ResultsJulia.h5'))
+            self._logger.info('LLEsovler.RetrieveData','Retrieving results from Julia in {}'.format(tmp_dir + 'ResultsJulia.h5'))
         sol = {}
         keys = ['u_probe','Em_probe', 'Ewg']
         for k in keys:
@@ -791,44 +809,46 @@ class LLEsovler(object):
 
 
         to_save = copy(self)
-        to_save.sim_norm.pop('domega_disp', None)
+        if self.sim_norm:
+            to_save.sim_norm.pop('domega_disp', None)
+
         to_save.sim.pop('domega_disp', None)
         fname = path + fname + '.pkl'
         print(fname)
         pkl.dump(to_save, open(fname,'bw'))
 
-    def __repr__(self):
-        to_print = ''
-        to_print = 'Dispersion load from:\t{}\n\n'.format(self.sim['dispfile']) 
-        to_print += 'Resonator Parameters:\n'
-        res_table = PrettyTable(['Parameters', 'Value', 'Units'])
-        res_table.add_row(['R', "{:.3f}".format(self.res['R']*1e6),'µm'])
-        res_table.add_row(['Qi', "{:.3f}".format(self.res['Qi']*1e-6),'x1e6'])
-        res_table.add_row(['Qc', "{:.3f}".format(self.res['Qc']*1e-6),'x1e6'])
-        if 'gamma' in self.res:
-            res_table.add_row(['γ', "{:.3f}".format(self.res['gamma']),''])
-        if 'n2' in self.res:
-            res_table.add_row(['n2', "{:.3f}".format(self.res['n2']*1e19),'x1e-19 m2/W'])
-        to_print += res_table.get_string()
-        to_print += '\n'
+    # def __repr__(self):
+    #     to_print = ''
+    #     to_print = 'Dispersion load from:\t{}\n\n'.format(self.sim['dispfile']) 
+    #     to_print += 'Resonator Parameters:\n'
+    #     res_table = PrettyTable(['Parameters', 'Value', 'Units'])
+    #     res_table.add_row(['R', "{:.3f}".format(self.res['R']*1e6),'µm'])
+    #     res_table.add_row(['Qi', "{:.3f}".format(self.res['Qi']*1e-6),'x1e6'])
+    #     res_table.add_row(['Qc', "{:.3f}".format(self.res['Qc']*1e-6),'x1e6'])
+    #     if 'gamma' in self.res:
+    #         res_table.add_row(['γ', "{:.3f}".format(self.res['gamma']),''])
+    #     if 'n2' in self.res:
+    #         res_table.add_row(['n2', "{:.3f}".format(self.res['n2']*1e19),'x1e-19 m2/W'])
+    #     to_print += res_table.get_string()
+    #     to_print += '\n'
 
-        to_print += 'Simulation Parameters:\n'
-        sim_table = PrettyTable(['Parameters', 'Value', 'Units'])
+    #     to_print += 'Simulation Parameters:\n'
+    #     sim_table = PrettyTable(['Parameters', 'Value', 'Units'])
 
-        if 'Pin' in self.sim:
-            sim_table.add_row(['Pin',"{:.3f}".format(self.sim['Pin']*1e3),'mW'])
-        if 'f_pmp' in self.sim:
-            sim_table.add_row(['f_pmp',"{:.3f}".format(self.sim['f_pmp']*1e-12),'THz'])
-        if 'μ_sim' in self.sim:
-            sim_table.add_row(['μ_sim',"{}".format(self.sim['mu_sim']),''])
-        if 'Tscan' in self.sim:
-            sim_table.add_row(['Tscan',"{:.3f}".format(self.sim['Tscan']*1e-5),'x1e5 tR'])        
-        if 'domega_init' in self.sim:
-            sim_table.add_row(['δω_init',"{:.3f}".format(self.sim['domega_init']*1e-9),'GHz'])
-        if 'domega_end' in self.sim:
-            sim_table.add_row(['δω_end',"{:.3f}".format(self.sim['domega_end']*1e-9),'GHz'])
-        to_print += sim_table.get_string()
-        to_print += '\n'
+    #     if 'Pin' in self.sim:
+    #         sim_table.add_row(['Pin',"{:.3f}".format(self.sim['Pin']*1e3),'mW'])
+    #     if 'f_pmp' in self.sim:
+    #         sim_table.add_row(['f_pmp',"{:.3f}".format(self.sim['f_pmp']*1e-12),'THz'])
+    #     if 'μ_sim' in self.sim:
+    #         sim_table.add_row(['μ_sim',"{}".format(self.sim['mu_sim']),''])
+    #     if 'Tscan' in self.sim:
+    #         sim_table.add_row(['Tscan',"{:.3f}".format(self.sim['Tscan']*1e-5),'x1e5 tR'])        
+    #     if 'domega_init' in self.sim:
+    #         sim_table.add_row(['δω_init',"{:.3f}".format(self.sim['domega_init']*1e-9),'GHz'])
+    #     if 'domega_end' in self.sim:
+    #         sim_table.add_row(['δω_end',"{:.3f}".format(self.sim['domega_end']*1e-9),'GHz'])
+    #     to_print += sim_table.get_string()
+    #     to_print += '\n'
 
         # to_print += 'Normalized Simulation Parameters:\n'
         # aa = self.sim_norm['δω_disp']
@@ -842,4 +862,4 @@ class LLEsovler(object):
         # to_print += sim_norm_table.get_string()
         # to_print += '\n'
         
-        return to_print
+        # return to_print

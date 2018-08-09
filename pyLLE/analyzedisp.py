@@ -190,7 +190,7 @@ class AnalyzeDisp(object):
             Info += '\t mu_sim: [{:.0f}, {:.0f}]\n'.format(self.rM_sim[0],
                                                            self.rM_sim[1])
 
-            self._logger.info(Info)
+            self._logger.info('AnalyzeDisp', Info)
 
         self.PrM_fit = PrM_fit
         self.β2 = β2
