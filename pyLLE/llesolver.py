@@ -650,12 +650,25 @@ class LLEsovler(object):
         aa = ax[0].pcolormesh(step, freq,Epb,
                          rasterized=True, 
                          vmin = Epb.max()-120,
-                         vmax = Epb.max(),
-                         shading='gouraud')
-        bb = ax[2].pcolormesh(step, t*1e12,E2,
-                         rasterized=True, vmin=0,
-                         vmax = 1,
-                         shading='gouraud')
+                         vmax = Epb.max())
+        # bb = ax[2].pcolormesh(step, t*1e12,E2,
+        #                  rasterized=True, vmin=0,
+        #                  vmax = 1)
+
+        bb = ax[2].imshow(E2,aspect='auto',
+                origin = 'lower', 
+                interpolation='bessel')
+        tr_12 = 1e-12*np.floor(1e12*tR)/2
+        # print(np.argmin(np.abs(tr_12- t)))
+        ind = [np.argmin(np.abs(-tr_12- t)),
+               np.argmin(np.abs(t)),
+               np.argmin(np.abs(tr_12- t))]
+        ax[2].set_yticks(ind)
+        ax[2].set_yticklabels([-tr_12*1e12,
+                                 0,
+                                tr_12*1e12])
+
+
         ax[4].plot(step, CmbPow)
         ax.append(ax[4].twinx())
         ax[6].plot(step,det,
@@ -668,9 +681,6 @@ class LLEsovler(object):
         ax[4].set_ylabel('Norm. Comb Pwr')
         ax[6].set_ylabel('Detuning (GHz)')
         ax[0].set_xlim([0,1000])
-        ax[2].set_yticks([ax[2].get_yticks()[0],
-                         0,
-                         ax[2].get_yticks()[-1]])
         [label.set_visible(False) for label in ax[0].get_xticklabels()]
         [label.set_visible(False) for label in ax[2].get_xticklabels()]
 
