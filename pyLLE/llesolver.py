@@ -40,7 +40,10 @@ print(path_juliaScript)
 print('-'*50)
 
 class MyLogger():
-    
+    '''
+    Custom made logger as the logger default package cannot be pickled
+    '''
+
     def __init__(self, fname):
         self.fname = fname
         open(self.fname,'a').write('\n' + '-'*75 + '\n')
@@ -55,12 +58,12 @@ class MyLogger():
 
 class LLEsovler(object):
     '''
-    Class to solver the Lugiato Lefever Equation
+    Class to solve the Lugiato Lefever Equation
     Initialization input ([]=facultative):
 
     **res <dict>**
 
-        - Qi <float>: intrinisic Q of the resonator
+        - Qi <float>: intrinsic Q of the resonator
         - Qc <float>: coupling Q of the resonator
         - R <float>: ring radius
         - gamma <float>: Non linear index of the material
@@ -70,12 +73,12 @@ class LLEsovler(object):
         - Tscan <float>: length of the simulation (in unit of round trip)
         - mu_fit <list>: number of mode to fit
         - mu_sim <list>: number of mode to simulate
-        - dispfile <str> : str pointing to a .txt file where the azimuthal mode orders and corresponding resonances are saved
+        - dispfile <str> : str pointing to a .csv file where the azimuthal mode orders and corresponding resonances are saved
         - domega_init <float>: initial detuning of the pump 
         - domega_end <float>: final detuning of the pump 
         - [domga_stop] <float>: where to stop the scan in detuning but keep doing the simulation
     
-    **debug <bool>**: Save a trace in a logfile in the working directory of the different action pyLLE perform (default = True)
+    **debug <bool>**: Save a trace in a logfile in the working directory of the different actions pyLLE perform (default = True)
     '''
     _c0 = 299792458
     hbar = 6.634e-34/(2*np.pi)
@@ -108,20 +111,6 @@ class LLEsovler(object):
         if self._debug: 
             self._logger = MyLogger("LLE.log")
             self._logger.info('__init__', 'New LLE')
-
-            # FORMATTER = logging.Formatter("[%(asctime)s — LLEsovler.%(funcName)s — %(levelname)s] %(message)s")
-            # LOG_FILE = "LLE.log"
-            # open(LOG_FILE, 'a').write('\n' + '-'*75 + '\n')
-
-            # self._logger = logging.getLogger(__name__)
-            # self._logger.setLevel(logging.INFO)
-            # self._logger.handlers = []
-            # _loghdl = logging.FileHandler(LOG_FILE, 'a', 'utf-8')
-            # _loghdl.setFormatter(FORMATTER)
-            # self._logger.addHandler(_loghdl)
-            # self._logger.propagate = False
-            # self._logger.info('New LLE')
-            # open(LOG_FILE , 'a').write('-'*75 + '\n')
         else: 
             self._logger = None
 
@@ -149,8 +138,7 @@ class LLEsovler(object):
 
     def Analyze(self, plot=False, f=None, ax=None, label=None, plottype='all', zero_lines = True, mu_sim = None):
         '''
-        Call pyLLE.analyzedisp.AnalyzeDisp to get the dispersion of the resonator we want to 
-        simulate
+        Call pyLLE.analyzedisp.AnalyzeDisp to get the dispersion of the resonator we want to simulate
         '''
 
         if plot:
@@ -224,9 +212,8 @@ class LLEsovler(object):
 
     def Setup(self):
         '''
-        Setup the simulation for the Julia backend. 
-        Save the two main dictionary self.sim and self.res into a readable hdf5 file for Julia in the 
-        temporary location define by the os
+        Setup the simulation for the Julia back-end. 
+        Save the two main dictionary self.sim and self.res into a readable hdf5 file for Julia in the temporary location define by the os
         '''
 
 
@@ -434,7 +421,7 @@ class LLEsovler(object):
 
     def SolveTemporal(self):
         '''
-        Call Julia to solver the LLE
+        Call Julia to solve the LLE
         '''
         self._solver = 'temporal'
 
@@ -567,7 +554,7 @@ class LLEsovler(object):
 
     def RetrieveData(self):
         '''
-        Load the output hdf5 save by julia and transform it in a user-friendly dictionary to be more pyhtonistic 
+        Load the output hdf5 saved by julia and transform it in a user-friendly dictionary to be more pythonistic 
         '''
 
 
@@ -626,7 +613,7 @@ class LLEsovler(object):
 
         **Output**
 
-            - f, ax handle of figure and axes of the matplotlib figure displayed
+            - f, ax:  handle of figure and axes of the matplotlib figure displayed
         '''
 
 
@@ -663,9 +650,12 @@ class LLEsovler(object):
         aa = ax[0].pcolormesh(step, freq,Epb,
                          rasterized=True, 
                          vmin = Epb.max()-120,
-                         vmax = Epb.max())
+                         vmax = Epb.max(),
+                         shading='gouraud')
         bb = ax[2].pcolormesh(step, t*1e12,E2,
-                         rasterized=True, vmin=0)
+                         rasterized=True, vmin=0,
+                         vmax = 1,
+                         shading='gouraud')
         ax[4].plot(step, CmbPow)
         ax.append(ax[4].twinx())
         ax[6].plot(step,det,
@@ -706,7 +696,7 @@ class LLEsovler(object):
 
     def PlotCombSpectra(self, ind, f=None, ax=None, label=None, pwr='both'):
         '''
-        Plot the spectra for a given index in the 1000 sub-sampled LLE step 
+        Plot the spectra for a given index in the 1000 sub-sampled LLE steps
 
         **Input** 
 
@@ -722,7 +712,7 @@ class LLEsovler(object):
             - Sout <numpy.array>: spectral density of power in the waveguide (dBm)
             - Sring <numpy.array>: spectral density of power in the ring (dBm)
             - f <obj>:  matplotlib figure handle
-            - ax <obj>: matplotlib axe handle
+            - ax <obj>: matplotlib axes handle
         '''
 
         freq = self.sol['freq']*1e-12
@@ -817,49 +807,49 @@ class LLEsovler(object):
         print(fname)
         pkl.dump(to_save, open(fname,'bw'))
 
-    # def __repr__(self):
-    #     to_print = ''
-    #     to_print = 'Dispersion load from:\t{}\n\n'.format(self.sim['dispfile']) 
-    #     to_print += 'Resonator Parameters:\n'
-    #     res_table = PrettyTable(['Parameters', 'Value', 'Units'])
-    #     res_table.add_row(['R', "{:.3f}".format(self.res['R']*1e6),'µm'])
-    #     res_table.add_row(['Qi', "{:.3f}".format(self.res['Qi']*1e-6),'x1e6'])
-    #     res_table.add_row(['Qc', "{:.3f}".format(self.res['Qc']*1e-6),'x1e6'])
-    #     if 'gamma' in self.res:
-    #         res_table.add_row(['γ', "{:.3f}".format(self.res['gamma']),''])
-    #     if 'n2' in self.res:
-    #         res_table.add_row(['n2', "{:.3f}".format(self.res['n2']*1e19),'x1e-19 m2/W'])
-    #     to_print += res_table.get_string()
-    #     to_print += '\n'
+    def __repr__(self):
+        to_print = ''
+        to_print = 'Dispersion load from:\t{}\n\n'.format(self.sim['dispfile']) 
+        to_print += 'Resonator Parameters:\n'
+        res_table = PrettyTable(['Parameters', 'Value', 'Units'])
+        res_table.add_row(['R', "{:.3f}".format(self.res['R']*1e6),'µm'])
+        res_table.add_row(['Qi', "{:.3f}".format(self.res['Qi']*1e-6),'x1e6'])
+        res_table.add_row(['Qc', "{:.3f}".format(self.res['Qc']*1e-6),'x1e6'])
+        if 'gamma' in self.res:
+            res_table.add_row(['γ', "{:.3f}".format(self.res['gamma']),''])
+        if 'n2' in self.res:
+            res_table.add_row(['n2', "{:.3f}".format(self.res['n2']*1e19),'x1e-19 m2/W'])
+        to_print += res_table.get_string()
+        to_print += '\n'
 
-    #     to_print += 'Simulation Parameters:\n'
-    #     sim_table = PrettyTable(['Parameters', 'Value', 'Units'])
+        to_print += 'Simulation Parameters:\n'
+        sim_table = PrettyTable(['Parameters', 'Value', 'Units'])
 
-    #     if 'Pin' in self.sim:
-    #         sim_table.add_row(['Pin',"{:.3f}".format(self.sim['Pin']*1e3),'mW'])
-    #     if 'f_pmp' in self.sim:
-    #         sim_table.add_row(['f_pmp',"{:.3f}".format(self.sim['f_pmp']*1e-12),'THz'])
-    #     if 'μ_sim' in self.sim:
-    #         sim_table.add_row(['μ_sim',"{}".format(self.sim['mu_sim']),''])
-    #     if 'Tscan' in self.sim:
-    #         sim_table.add_row(['Tscan',"{:.3f}".format(self.sim['Tscan']*1e-5),'x1e5 tR'])        
-    #     if 'domega_init' in self.sim:
-    #         sim_table.add_row(['δω_init',"{:.3f}".format(self.sim['domega_init']*1e-9),'GHz'])
-    #     if 'domega_end' in self.sim:
-    #         sim_table.add_row(['δω_end',"{:.3f}".format(self.sim['domega_end']*1e-9),'GHz'])
-    #     to_print += sim_table.get_string()
-    #     to_print += '\n'
+        if 'Pin' in self.sim:
+            sim_table.add_row(['Pin',"{:.3f}".format(self.sim['Pin']*1e3),'mW'])
+        if 'f_pmp' in self.sim:
+            sim_table.add_row(['f_pmp',"{:.3f}".format(self.sim['f_pmp']*1e-12),'THz'])
+        if 'μ_sim' in self.sim:
+            sim_table.add_row(['μ_sim',"{}".format(self.sim['mu_sim']),''])
+        if 'Tscan' in self.sim:
+            sim_table.add_row(['Tscan',"{:.3f}".format(self.sim['Tscan']*1e-5),'x1e5 tR'])        
+        if 'domega_init' in self.sim:
+            sim_table.add_row(['δω_init',"{:.3f}".format(self.sim['domega_init']*1e-9),'GHz'])
+        if 'domega_end' in self.sim:
+            sim_table.add_row(['δω_end',"{:.3f}".format(self.sim['domega_end']*1e-9),'GHz'])
+        to_print += sim_table.get_string()
+        to_print += '\n'
 
-        # to_print += 'Normalized Simulation Parameters:\n'
-        # aa = self.sim_norm['δω_disp']
-        # fun = str(inspect.getsourcelines(aa)[0]).split('lambda')[-1].split(':')[-1].strip('["\\n"]')[1::]
-        # sim_norm_table = PrettyTable(['Parameters', 'Value'])
-        # sim_norm_table.add_row(['F2',"{:.3f}".format(self.sim_norm['F2'])])
-        # sim_norm_table.add_row(['α_init',"{:.3f}".format(self.sim_norm['α_init'])])
-        # sim_norm_table.add_row(['α_end',"{:.3f}".format(self.sim_norm['α_end'])])
-        # sim_norm_table.add_row(['α_stop',"{}".format(self.sim_norm['α_stop'])])
-        # sim_norm_table.add_row(['δω_disp',"{}".format(fun)])
-        # to_print += sim_norm_table.get_string()
-        # to_print += '\n'
+        to_print += 'Normalized Simulation Parameters:\n'
+        aa = self.sim_norm['δω_disp']
+        fun = str(inspect.getsourcelines(aa)[0]).split('lambda')[-1].split(':')[-1].strip('["\\n"]')[1::]
+        sim_norm_table = PrettyTable(['Parameters', 'Value'])
+        sim_norm_table.add_row(['F2',"{:.3f}".format(self.sim_norm['F2'])])
+        sim_norm_table.add_row(['α_init',"{:.3f}".format(self.sim_norm['α_init'])])
+        sim_norm_table.add_row(['α_end',"{:.3f}".format(self.sim_norm['α_end'])])
+        sim_norm_table.add_row(['α_stop',"{}".format(self.sim_norm['α_stop'])])
+        sim_norm_table.add_row(['δω_disp',"{}".format(fun)])
+        to_print += sim_norm_table.get_string()
+        to_print += '\n'
         
-        # return to_print
+        return to_print
