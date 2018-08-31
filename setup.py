@@ -34,6 +34,7 @@ setup(name='pyLLE',
       packages=['pyLLE'],
       install_requires=[
           'scipy',
+          'plotly',
           'numpy',
           'matplotlib',
           'h5py',

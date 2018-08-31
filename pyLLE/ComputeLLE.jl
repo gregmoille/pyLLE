@@ -23,6 +23,8 @@ end
 
 function SaveResults(dir, S)
     h5file = dir * "ResultsJulia.h5"
+    # print(h5file)
+    # print("\n") 
     h5open(h5file, "w") do file
         g = g_create(file, "Results") # create a group
         for ii in S
@@ -39,8 +41,12 @@ end
 # ----------------------------------------------------
 # FFTW.set_num_threads(Sys.CPU_CORES)
 tmp_dir = ARGS[1]
+tol= float(ARGS[2])
+maxiter = Int(float(ARGS[3]))
+stepFactor = float(ARGS[4])
 res, sim = Loadh5Param(tmp_dir)
 
+logfile =  open(tmp_dir * "log.log" ,"w")
 # -- Collect Data ---
 # ----------------------------------------------------
 c0 = 299792458
@@ -118,6 +124,7 @@ fft_plan = plan_fft(zeros(size(Enoise)))
 
 # -- Sim length -- 
 tol=1e-3  
+# tol=1e-20 
 maxiter=6
 Nt= round(t_ramp/tR/dt)
 t1=0
@@ -139,13 +146,30 @@ S["detuning"] = zeros(num_probe,)
 
 # -- Progress Bar -- 
 probe=0
-pb = Progress(Int(Nt),0.5, "Calculating temporal loop:", Int(25))
+# pb = Progress(Int(Nt),0.5, "Calculating temporal loop:", Int(25))
 
-
+space = "."^100
+logfile =  open(tmp_dir * "log.log" ,"a")
+write(logfile,string(Int(round(0))) * "\n")
+close(logfile)
+probe_pbar = 1/100
+cnt_pbar = 0
 # -- Main Solver -- 
 # ----------------------------------------------------
 for it = 1:1:Nt
-    update!(pb, Int(it))
+    # print("coucouc\n")
+    if it/Nt >=probe_pbar
+        cnt_pbar = cnt_pbar + 1 
+        # print("\b"^103)
+        # print("coucou")
+        # print("="^cnt_pbar)
+        # print("."^(space-cnt_pbar))
+        # print(" ")
+        logfile =  open(tmp_dir * "log.log" ,"a")
+        write(logfile,string(Int(round(probe_pbar*100))) * "\n")
+        close(logfile)
+        probe_pbar = probe_pbar + 0.01
+    end 
     u0=ifft_plan*(fft_plan*(u0) + Ein_couple*dt)
     u1=u0
     cbeta = -α  + 1im*Δω_pmp[Int(it)] +  1im*L*dβ
@@ -167,7 +191,9 @@ for it = 1:1:Nt
     end
 
     if (cnt == maxiter)
-        print("Failed to converge to ...")
+        logfile =  open(tmp_dir * "log.log" ,"a")
+        write(logfile,"Failed to converge to N=" * string(it) * " over Nt=" * string(Nt))
+        close(logfile)
     end
     u0=u1
 
@@ -189,4 +215,13 @@ for ii=1:size(S["Em_probe"],1)
 end
 S["ω"] = (ω0 + dω)
 
+# print("\n")
+# print("Congrats, everything has been solved.\n")
+# print("Now we are going to save the results in a .h5 file\n")
+# print("Everything will be in: ")
+logfile =  open(tmp_dir * "log.log" ,"a")
+write(logfile,string(Int(round(100))) * "\n")
+close(logfile)
+
 SaveResults(tmp_dir, S)
+# write(logfile,"Great we have saved everything... Moving back to Python\n")

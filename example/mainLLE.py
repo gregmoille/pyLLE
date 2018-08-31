@@ -15,7 +15,7 @@ res = {'R': 23e-6,
        'γ': 2}
 
 sim = {'Pin': 100e-3,
-       'Tscan': 2e6,
+       'Tscan': 1e4,
        'δω_stop': "None",
        'f_pmp': 191e12,
        'δω_init': 2e9*2*np.pi, 
@@ -35,12 +35,12 @@ solver.Analyze(plot=True,
 solver.Setup()
 
 # # --  Solver the Steady State LLE --
-Ering, Ewg, f, ax = solver.SolveSteadySteate()
+# f, ax = solver.SolveSteadySteate()
 
 # # --  Solver the Temporal LLE --
 solver.SolveTemporal()
 solver.RetrieveData()
 solver.PlotCombPower()
 ind = 450
-freq, Sout, Sring, fS, axS = solver.PlotCombSpectra(ind)
-t, U, ft, axt = solver.PlotSolitonTime(ind)
+S, axS = solver.PlotCombSpectra(ind)
+ft, axt = solver.PlotSolitonTime(ind)

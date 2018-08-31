@@ -1,7 +1,13 @@
 import numpy as np
 import scipy.interpolate as itp
 import scipy.io as io
+import matplotlib as mpl
 import matplotlib.pyplot as plt
+from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
+import plotly.graph_objs as go
+
+# backend = mpl.get_backend()
+# print(backend)
 
 class AnalyzeDisp(object):
     '''
@@ -35,6 +41,7 @@ class AnalyzeDisp(object):
         self.label = kwargs.get('label', None)
         self.plottype = kwargs.get('plottype', 'all')
         self._logger = kwargs.get('logger', None)
+        self.pyType = kwargs.get('pyType', 'normal')
         assert type(self.dispfile) is str, 'Please provide a file'
         assert len(self.rM_fit) > 1, 'Please the modes to fit'
 
@@ -124,55 +131,92 @@ class AnalyzeDisp(object):
 
         # ipdb.set_trace()
         if self.debug:
-            f = self.f
-            ax = self.ax
-            if f is None and ax is None:
-                f, ax = plt.subplots()
-            elif f is None and not(ax is None):
-                if not type(ax) is list:
-                    f = ax.figure
+            if not self.pyType == 'jupyter':
+                f = self.f
+                ax = self.ax
+                if f is None and ax is None:
+                    f, ax = plt.subplots(dpi=120)
+                elif f is None and not(ax is None):
+                    if not type(ax) is list:
+                        f = ax.figure
+                    else:
+                        f, ax = plt.subplots(dpi=120)
+                        print('Only 1 subplots supported, created a new figure')
+                elif not(f is None) and ax is None:
+                    ax = f.axes[0]
                 else:
-                    f, ax = plt.subplots()
-                    print('Only 1 subplots supported, created a new figure')
-            elif not(f is None) and ax is None:
-                ax = f.axes[0]
+                    if type(ax) is list:
+                        f, ax = plt.subplots(dpi=120)
+
+                if self.zero_lines:
+                    ax.plot([rf[0]*1e-12, rf[-1]*1e-12], [0, 0], 'k--')
+                if self.plottype == 'all':
+                    # ipdb.set_trace()
+                    
+                    
+                    ax.plot(rf_fit*1e-12, Dint_fit2*1e-9/(2*np.pi), '--', lw=3, label = 'Sim')
+                    ax.plot(rf[ind_M]*1e-12, Dint_fit1*1e-9/(2*np.pi), lw=1, label = 'Fit')
+                    ax.plot(rf*1e-12, Dint*1e-9/(2*np.pi), '.', ms=4, alpha = 0.5, label = 'Raw')
+                    
+                    ax.legend()
+                if self.plottype.lower() == 'sim':
+                    ax.plot(rf_fit*1e-12, Dint_fit2*1e-9 /
+                            (2*np.pi), label=self.label)
+                    ax.legend()
+                if self.plottype.lower() == 'fit':
+                    ax.plot(rf[ind_M]*1e-12, Dint_fit1*1e-9/(2*np.pi), lw=2)
+                    ax.plot(rf*1e-12, Dint*1e-9/(2*np.pi), '.', ms=4, alpha = 0.5)
+                if self.plottype.lower() == 'fem':
+                    ax.plot(rf*1e-12, Dint*1e-9/(2*np.pi), '-', label=self.label)
+                    ax.legend()
+                if self.plottype.lower() == 'ind':
+                    ax.plot(rf[ind_M]*1e-12, Dint[ind_M]*1e-9 /
+                            (2*np.pi), '-', label=self.label)
+                    ax.legend()
+                ax.set_xlabel('Frequency (THz)')
+                ax.set_ylabel('Dint (GHz)')
+                f.show()
+                plt.pause(0.25)
             else:
-                if type(ax) is list:
-                    f, ax = plt.subplots()
+                init_notebook_mode(connected=True)
+                trace0 = go.Scatter(
+                            x = rf_fit*1e-12,
+                            y = Dint_fit2*1e-9/(2*np.pi),
+                            mode = 'lines',
+                            name = 'LLE simulation'
+                        )
+                trace1 = go.Scatter(
+                    x = rf[ind_M]*1e-12,
+                    y = Dint_fit1*1e-9/(2*np.pi),
+                    line = dict(
+                        width = 2,
+                        dash = 'dash'),
+                    name = 'Fit'
+                )
+                trace2 = go.Scatter(
+                    x = rf*1e-12,
+                    y = Dint*1e-9/(2*np.pi),
+                    mode = 'markers',
+                    name = 'FEM Simulation'
+                )
+                if self.plottype.lower() == 'all':
+                    data = [trace2, trace0, trace1]
+                if self.plottype.lower() == 'sim':
+                    data = [trace0]
+                if self.plottype.lower() == 'fit':
+                    data = [trace2, trace1]
+                if self.plottype.lower() == 'fem':
+                    data = [trace2]
 
-            if self.zero_lines:
-                ax.plot([rf[0]*1e-12, rf[-1]*1e-12], [0, 0], 'k--')
-            if self.plottype == 'all':
-                # ipdb.set_trace()
-                
-                
-                ax.plot(rf_fit*1e-12, Dint_fit2*1e-9/(2*np.pi), '--', lw=3, label = 'Sim')
-                ax.plot(rf[ind_M]*1e-12, Dint_fit1*1e-9/(2*np.pi), lw=1, label = 'Fit')
-                ax.plot(rf*1e-12, Dint*1e-9/(2*np.pi), '.', ms=4, alpha = 0.5, label = 'Raw')
-                
-                ax.legend()
-            if self.plottype.lower() == 'sim':
-                ax.plot(rf_fit*1e-12, Dint_fit2*1e-9 /
-                        (2*np.pi), label=self.label)
-                ax.legend()
-            if self.plottype.lower() == 'fit':
-                ax.plot(rf[ind_M]*1e-12, Dint_fit1*1e-9/(2*np.pi), lw=2)
-                ax.plot(rf*1e-12, Dint*1e-9/(2*np.pi), '.', ms=4, alpha = 0.5)
-            if self.plottype.lower() == 'fem':
-                ax.plot(rf*1e-12, Dint*1e-9/(2*np.pi), '-', label=self.label)
-                ax.legend()
-            if self.plottype.lower() == 'ind':
-                ax.plot(rf[ind_M]*1e-12, Dint[ind_M]*1e-9 /
-                        (2*np.pi), '-', label=self.label)
-                ax.legend()
+                layout = dict(xaxis = dict(title = 'Frequency (THz)'),
+                  yaxis = dict(title = 'D<sub>int</sub> (GHz)'),
+                  )
+                fig = go.Figure(data=data, layout=layout)
+                iplot(fig)
+        else:
+            print('coucou')
 
-            # ax.plot(ind_sim, dphi_fit2,)
-            # ax.plot(ind_fit, dphi_fit1,'.')
 
-            ax.set_xlabel('Frequency (THz)')
-            ax.set_ylabel('Dint (GHz)')
-            f.show()
-            plt.pause(0.25)
             # f, ax = plt.subplots()
             # ax.plot([ind_sim[0], ind_sim[-1]], [0, 0], 'k--')
 
@@ -205,8 +249,13 @@ class AnalyzeDisp(object):
         self.ind_M = ind_M
         self.pump_index = pump_index
         self.dφ = dφ_fitted
-
-        return PrM_fit, Dint_fit2, self.neff_pmp, self.ng_pmp
+        try:
+            self.f = f
+            self.ax = ax
+        except:
+            self.f = None
+            self.ax = None
+        return PrM_fit, Dint_fit2, self.neff_pmp, self.ng_pmp, self.f, self.ax
 
 
 # if __name__ == '__main__':
