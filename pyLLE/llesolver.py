@@ -726,6 +726,12 @@ class LLEsovler(object):
 
         step = np.arange(0, 1000)
 
+        self.cmbpow = {'step': step,
+                        'CmbPow': CmbPow,
+                        'Epb': Epb,
+                        'E2': E2,
+                        't':t}
+
         if not pyType == 'jupyter' or do_matplotlib:
             # --  Create the Figure -- 
             f = plt.figure()
