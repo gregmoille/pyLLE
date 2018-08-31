@@ -1,7 +1,7 @@
 This is the 2.0 beta version. Please checkout the notebook and the python script in the example folder for more informations.
 
 - It should be compatible with Jupyter notebook pretty nicely. 
-- Fixed most of the issue for the previous windows version
+- Fixed most of the issue for the previous windows version (logger should work now)
 - Can now specified _tol_ = 1e-3, _maxiter_  and _step_factor_  for the temporal solver (i.e solver.SolveTemporal(tol = 1e-3, maxiter = 6, step_factor = 0.1))
 - _PlotCombPower_, _PlotCombSpectra_, _PlotSolitonTime_ return only the figure and the axes handles when using python or iPyhton, nothing when using jupyter. The usefull data are store in the dictionaries _self.cmbpow_, _self.spectra_,_self.fasttime_ respectively
 - Pickling with Jupyter doesn't work, so _self.SaveResults_ won't word (because of jupyter, so save the notebook instead)
