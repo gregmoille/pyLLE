@@ -4,7 +4,7 @@ Installation
 Requirement
 --------------------
 
-pyLLE relies on a **python >3.4** front-end for a user friendly interface – either through script commands or GUI - and on a **julia v0.6.4** back-end for fast computation. Hence, one need to `download <https://julialang.org/downloads/>`_ and install julia first before running the installation of pyLLE. Please, keep julia in the default directory during the installation (i.e. ~\AppData\Local\Julia-0.6.4\). If not, please go to the manual installation
+pyLLE relies on a **python >3.4** front-end for a user friendly interface – either through script commands or GUI - and on a **julia v0.6.4** back-end for fast computation. Hence, one need to `download <https://julialang.org/downloads/oldreleases.html>`_ and install julia first before running the installation of pyLLE. **It is important to keep version 0.6.4 as there is some issue with HDF5 with further released**. Please, keep julia in the default directory during the installation (i.e. ~\AppData\Local\Julia-0.6.4\). If not, please go to the manual installation
 
 The different julia packages required for solving the LLE and interfacing with python will be installed while pyLLE is set up. 
 
@@ -30,7 +30,7 @@ Download the .zip `repository <https://github.com/gregmoille/pyLLE/archive/maste
     cd pyLLE
     python setup.py install
 
-Just a heads up, the installation can vary in time, especially because of Julia that might rebuilds the cache. If the julia location is custom, please before running the last line, change in the setup.py line 18 to the correct location, as in pyLLE/llesolver.py line 430 to point to the correct location. Thanks
+Just a heads up, the installation can vary in time, especially because of Julia that might rebuilds the cache. If the julia location is custom, please before running the last line, change in the setup.py line 18 to the correct location, as in pyLLE/_llesolver.py line 508 to point to the correct location. Thanks
 
 Python Dependencies
 --------------------

@@ -1,17 +1,4 @@
-This is the 2.0 beta version. Please checkout the notebook and the python script in the example folder for more informations.
-
-- It should be compatible with Jupyter notebook pretty nicely. 
-- Fixed most of the issue for the previous windows version (logger should work now)
-- Can now specified _tol_ = 1e-3, _maxiter_  and _step_factor_  for the temporal solver (i.e solver.SolveTemporal(tol = 1e-3, maxiter = 6, step_factor = 0.1))
-- _PlotCombPower_, _PlotCombSpectra_, _PlotSolitonTime_ return only the figure and the axes handles when using python or iPyhton, nothing when using jupyter. The usefull data are store in the dictionaries _self.cmbpow_, _self.spectra_,_self.fasttime_ respectively
-- Pickling with Jupyter doesn't work, so _self.SaveResults_ won't word (because of jupyter, so save the notebook instead)
-- If using Jupyter, one can save the figure in pdf format for better editing after using the _self.SavePlots2Pdf(basename)_ method
-
-Still need to work on:
-- Automatic installation of Julia
-
-
-<!-- # pyLLE ![NIST logo](images/NISTlogo32x32.jpg)
+# pyLLE ![NIST logo](images/NISTlogo32x32.jpg)
 
 ![](https://readthedocs.org/projects/pylle/badge/?version=latest) 
 [![](https://img.shields.io/github/license/mashape/apistatus.svg)](licence.txt)
@@ -22,9 +9,13 @@ For a complete documentation of the package, please visit the [readthedocs page]
 
 ## Instalation
 
-As pyLLE relies on a Julia v0.6.4 back-end, please prior to install this package be sure that Julia is installed on your machine or visit the julia [package downloader page](https://julialang.org/downloads/) to install it. Please, keep julia in the default directory during the installation (i.e. ~\AppData\Local\Julia-0.6.4\). If not, please go to the manual installation. Once Julia installed, the different packages needed to run pyLLE, either python or julia related, will be automatically downloaded and installed. Just a heads up, the installation of the package can vary in time, especially because of Julia that might rebuilds the cache.
+As pyLLE relies on a Julia back-end, please prior to install this package be sure that Julia is installed on your machine or visit the julia [package downloader page](https://julialang.org/downloads/oldreleases.html) to install it by selecting &#9888; **v0.6.4** &#9888;. Due to issue handling hdf5 file format, version 1.0.1 is not yet supported.
 
-For a automatic install, just
+**Windows user**: Please, keep julia in the default directory during the installation (i.e. ~\AppData\Local\Julia-0.6.4\ for windows). 
+
+If not, please go to the manual installation.
+Once Julia installed, the different packages needed to run pyLLE, either python or julia related, will be automatically downloaded and installed. Just a heads up, the installation of the package can vary in time, especially because of Julia that might rebuilds the cache.
+For a automatic install, just pip it : 
 
 ```bash
 pip install pyLLE
@@ -42,64 +33,41 @@ If the julia location is custom, please before installing change in the setup.py
 
 ## Example
 
-First download the .txt file available in the example folder of this repository. 
+A complete example is available in the example directory [notebook](https://github.com/gregmoille/pyLLE/tree/master/example/NotebookExample.ipynb) with the corresponding file needed in the folder. Here we will only go through the main aspect of pyLLE
 
-
-Import the pyLLE module, and the different utility modules
-
+- First import the package:
 ```python
 import pyLLE
 ```
 
-Define the resonator properties. Here we will simulate the ring resonator made of Si3N4 from Li et al<sup>[4](#ref4)</sup>. Hence the _res_ dictionary should look like
-
+- Define a resonator and a simulation dictionary such as (parameters from Li et _al._<sup>[4](#ref4)</sup>): 
 ```python
 res = {'R': 23e-6, # ring radius
        'Qi': 1e6,  # intrinsic quality factor
        'Qc': 1e6,  # coupling quality factor
        'γ': 2, # non-linear coefficient
+       'dispfile': 'TestDispersion.txt' # name of the dispersion file
        }
-```
-
-Now, we should define the simulation parameters through the _sim_ dictionary
-
-
-```python
 sim = {'Pin': 100e-3, #input power in W
-       'Tscan': 0.6e5, # Total time for the simulation in unit of round trip
-       'δω_stop': "None", # if we want to stop the detuning at a given frequency
+       'Tscan': 1e6, # Total time for the simulation in unit of round trip
        'f_pmp': 191e12, # frequency of the pump in Hz
        'δω_init': -4, # start frequency of detuning ramp in Hz
        'δω_end': 10, # stop frequency of detuning ramp in Hz
        'μ_sim': [-70,170], # limit of the mode on the left and right side of the pump to simulate
        'μ_fit': [-60, 160], # limit of the mode on the left and right side of the pump to fit the dispersion with
-       'dispfile': 'TestDispersion.txt' # name of the dispersion file
         }
 ```
 
-It is important to note the format of the dipersion file *TestDispersion.txt*. It be format such as each line represent an resoanace, with first the azymuthal mode order then the frequency of resonance separated by a comma ',' 
+It is important to note the format of the dispersion file *TestDispersion.txt*. It be format such as each line represent an resonance, with first the azimuthal mode order then the frequency of resonance separated by a comma ',' 
 
-
-<br>
-
-Here, the dict keys can be defined with greek letters for a nicer script (in my opinion) or with Latin letter such that the translator dictionary is defined by:
+- The simulation need to be setup to create a .hdf5 
 
 ```python
-greek ={'α': 'alpha',
-        'β':'beta',
-        'γ': 'gamma',
-        'ω': 'omega',
-        'δ': 'd',
-        'Δ': 'D',
-        'μ': 'mu',
-        'λ': 'lambda',
-        'ε': 'epsilon',
-        'φ': 'phi'}
+   solver.Setup()
 ```
-Hence, instead of providing *δω_init* in the sim dictionary, one could provide *domega_init*.
-
 
 <br>
+
 We can now setup the pyLLE class: 
 
 ```python 
@@ -112,7 +80,7 @@ The debug input allows the script to generate a log file in the working director
 
 <br>
 
-To analyze the dispersion just the *Analyze* method with the correct parameters listed in the [docs](http://pylle.readthedocs.io/en/latest/source/pyLLE.html)
+To analyze the dispersion just the *Analyze*
 
 ```python
 solver.Analyze(plot=True,
@@ -185,7 +153,8 @@ plt.close('all')
 res = {'R': 23e-6,
        'Qi': 1e6,
        'Qc': 1e6,
-       'γ': 2}
+       'γ': 1.55,
+       'dispfile': 'TestDispersion.txt'}
 
 sim = {'Pin': 100e-3,
        'Tscan': 2e5,
@@ -196,7 +165,6 @@ sim = {'Pin': 100e-3,
        'δω_end': -5e9*2*np.pi, 
        'μ_sim': [-70,170],
        'μ_fit': [-71, 170],
-       'dispfile': 'TestDispersion.txt'
         }
 
 # --  Setup thte Solver --
@@ -231,4 +199,4 @@ Soon you will be. For the moment, please provide the name of the package, the au
 
 <a name="ref1">3</a>: Stéphane Coen, Hamish G. Randle, Thibaut Sylvestre, and Miro Erkintalo. "Modeling of octave-spanning Kerr frequency combs using a generalized mean-field Lugiato–Lefever model." Optics letters 38, no. 1 (2013): 37-39.
 
-<a name="ref1">4</a>: Qing Li, Travis C. Briles, Daron A. Westly, Tara E. Drake, Jordan R. Stone, B. Robert Ilic, Scott A. Diddams, Scott B. Papp, and Kartik Srinivasan. "Stably accessing octave-spanning microresonator frequency combs in the soliton regime." Optica 4, no. 2 (2017): 193-203. -->
+<a name="ref1">4</a>: Qing Li, Travis C. Briles, Daron A. Westly, Tara E. Drake, Jordan R. Stone, B. Robert Ilic, Scott A. Diddams, Scott B. Papp, and Kartik Srinivasan. "Stably accessing octave-spanning microresonator frequency combs in the soliton regime." Optica 4, no. 2 (2017): 193-203.
