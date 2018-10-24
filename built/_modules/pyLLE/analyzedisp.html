@@ -1,0 +1,480 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyLLE.analyzedisp &mdash; pyLLE 2.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+  <script src = "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyLLE
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../NotebookExample.html">pyLLE example - Ring Resonator comb simulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../team.html">pyLLE Team</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pyLLE.html">pyLLE package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyLLE</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyLLE.analyzedisp</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyLLE.analyzedisp</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.interpolate</span> <span class="k">as</span> <span class="nn">itp</span>
+<span class="kn">import</span> <span class="nn">scipy.io</span> <span class="k">as</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">plotly.offline</span> <span class="k">import</span> <span class="n">download_plotlyjs</span><span class="p">,</span> <span class="n">init_notebook_mode</span><span class="p">,</span> <span class="n">plot</span><span class="p">,</span> <span class="n">iplot</span>
+<span class="kn">import</span> <span class="nn">plotly.graph_objs</span> <span class="k">as</span> <span class="nn">go</span>
+
+<span class="c1"># backend = mpl.get_backend()</span>
+<span class="c1"># print(backend)</span>
+
+<div class="viewcode-block" id="AnalyzeDisp"><a class="viewcode-back" href="../../pyLLE.html#pyLLE.analyzedisp.AnalyzeDisp">[docs]</a><span class="k">class</span> <span class="nc">AnalyzeDisp</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Calls to analyze the dispersion of a simulated resonator</span>
+<span class="sd">    Initialization input. Everything is in SI ([]=facultative):</span>
+<span class="sd">    **kwargs</span>
+<span class="sd">        - f_center &lt;float&gt;: pump frequency</span>
+<span class="sd">        - file &lt;str&gt;: .txt file to load </span>
+<span class="sd">        - R &lt;float&gt;: radius of the resonator</span>
+<span class="sd">        - rM_fit &lt;list&gt;.: lower and upper bonds of mode to fit the dispersion</span>
+<span class="sd">        - rM_sim &lt;list&gt;.: lower and upper bonds of the modes to extrapolate for the simulation</span>
+<span class="sd">        - f &lt;obj&gt;: matplotlib figure handle</span>
+<span class="sd">        - ax &lt;obj&gt;: matplotlib axes handle</span>
+<span class="sd">        - label &lt;list&gt;: list of the string for each plot to be labelled</span>
+<span class="sd">        - plottype &lt;str&gt;: define the type of plot &#39;all&#39; [defaults], &#39;sim&#39;, &#39;fit&#39;, &#39;fem&#39;, &#39;ind&#39;</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c</span> <span class="o">=</span> <span class="mi">299792458</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dispfile</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;file&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">R</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;R&#39;</span><span class="p">,</span> <span class="mf">23e-6</span><span class="p">)</span>
+        <span class="c1"># self.n0 = kwargs.get(&#39;n0&#39;, 2)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_center</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;f_center&#39;</span><span class="p">,</span> <span class="mf">1550e-9</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rM_fit</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rM_fit&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rM_sim</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;rM_sim&#39;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zero_lines</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;zero_lines&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ax</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;ax&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">plottype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;plottype&#39;</span><span class="p">,</span> <span class="s1">&#39;all&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;logger&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pyType</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;pyType&#39;</span><span class="p">,</span> <span class="s1">&#39;normal&#39;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dispfile</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">,</span> <span class="s1">&#39;Please provide a file&#39;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rM_fit</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Please the modes to fit&#39;</span>
+
+<div class="viewcode-block" id="AnalyzeDisp.GetDint"><a class="viewcode-back" href="../../pyLLE.html#pyLLE.analyzedisp.AnalyzeDisp.GetDint">[docs]</a>    <span class="k">def</span> <span class="nf">GetDint</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Retrieve the dispersion of a resonator based on the frequency of </span>
+<span class="sd">        resonance and azimuthal mode order. The data are fit using a cubic spline method</span>
+
+<span class="sd">        **Output**</span>
+
+<span class="sd">            - self.PrM_fit: scipy.interpolate object which fitted the data</span>
+<span class="sd">            - self.Dint_fit: fitted integrated dispersion for the simulated mode </span>
+<span class="sd">            - self.neff_pmp: effective index at the pump frequency</span>
+<span class="sd">            - self.ng_pmp: group index at the pump frequency</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># -- Get Parameters --</span>
+        <span class="n">FSR0</span> <span class="o">=</span> <span class="mf">1e12</span><span class="o">*</span><span class="mf">23e-6</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">R</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">R</span>
+        <span class="n">c0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c</span>
+        <span class="n">rM_fit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rM_fit</span>
+        <span class="n">rM_sim</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rM_sim</span>
+    
+        <span class="n">lines</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dispfile</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+        <span class="n">rM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">ll</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>  <span class="k">for</span> <span class="n">ll</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">])</span>
+        <span class="n">rf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">ll</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>  <span class="k">for</span> <span class="n">ll</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">])</span>
+        
+        <span class="c1"># -- Find the pumped mode --</span>
+        <span class="n">pump_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">rf</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">f_center</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">FSR0</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">pump_index</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Wavelength not found!&#39;</span>
+        <span class="n">pump_index</span> <span class="o">=</span> <span class="n">pump_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># -- Compute the effective/group index --</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">R</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">rf</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">neff</span> <span class="o">=</span> <span class="n">rM</span> <span class="o">*</span> <span class="n">c0</span><span class="o">/</span><span class="p">(</span><span class="n">rf</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">R</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">neff_pmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">neff</span><span class="p">[</span><span class="n">pump_index</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ng</span> <span class="o">=</span> <span class="n">c0</span><span class="o">/</span><span class="p">(</span><span class="n">df</span><span class="o">*</span><span class="n">L</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ng_pmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ng</span><span class="p">[</span><span class="n">pump_index</span><span class="p">]</span>
+
+        <span class="c1"># Compute the dispersion</span>
+        <span class="n">d1_vg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">gradient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ng</span><span class="p">)</span><span class="o">/</span><span class="n">c0</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">rf</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">c0</span><span class="p">)</span> <span class="o">*</span> <span class="n">d1_vg</span><span class="o">/</span><span class="n">df</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">=</span> <span class="n">D</span>
+
+        <span class="c1"># -- Compute Dint --</span>
+        <span class="n">dm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+        <span class="n">drf</span> <span class="o">=</span> <span class="n">rf</span> <span class="o">-</span> <span class="n">rf</span><span class="p">[</span><span class="n">pump_index</span><span class="p">]</span>
+        <span class="c1"># ipdb.set_trace()</span>
+        <span class="n">Dfit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">dm</span><span class="p">,</span> <span class="n">drf</span><span class="p">[</span><span class="n">pump_index</span><span class="o">+</span><span class="n">dm</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">FSR_p</span> <span class="o">=</span> <span class="n">Dfit</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">D2</span> <span class="o">=</span> <span class="n">Dfit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">D1</span> <span class="o">=</span> <span class="n">FSR_p</span> <span class="o">*</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">rM</span> <span class="o">-</span> <span class="n">rM</span><span class="p">[</span><span class="n">pump_index</span><span class="p">]</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">rf</span>
+        <span class="n">Dint</span> <span class="o">=</span> <span class="n">w</span> <span class="o">-</span> <span class="p">(</span><span class="n">w</span><span class="p">[</span><span class="n">pump_index</span><span class="p">]</span> <span class="o">+</span> <span class="n">D1</span> <span class="o">*</span> <span class="n">mu</span><span class="p">)</span>
+
+        <span class="c1"># dm = np.arange(-2, 2.1, dtype=int)</span>
+        <span class="c1"># drf = rf - rf[pump_index]</span>
+        <span class="c1"># Dfit = np.polyfit(dm, drf[pump_index+dm], 2)</span>
+        <span class="c1"># FSR_p = Dfit[1]</span>
+        <span class="n">β2</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">ng_pmp</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">c</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">Dfit</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">/</span><span class="n">Dfit</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+        <span class="n">dφ</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">drf</span><span class="o">-</span><span class="p">(</span><span class="n">rM</span><span class="o">-</span><span class="n">rM</span><span class="p">[</span><span class="n">pump_index</span><span class="p">])</span><span class="o">*</span><span class="n">FSR_p</span><span class="p">)</span><span class="o">/</span><span class="n">FSR_p</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+
+        <span class="n">ind_M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+            <span class="n">pump_index</span><span class="o">+</span><span class="n">rM_fit</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pump_index</span><span class="o">+</span><span class="n">rM_fit</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">ind_fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">rM_fit</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rM_fit</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">ind_sim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">rM_sim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rM_sim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">ind_M</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Left range for mode order not correct&#39;</span>
+        <span class="k">assert</span> <span class="n">ind_M</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">rM</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="s1">&#39;Right range for mode order not correct&#39;</span>
+
+        <span class="n">M2fit</span> <span class="o">=</span> <span class="n">rM</span><span class="p">[</span><span class="n">ind_M</span><span class="p">]</span> <span class="o">-</span> <span class="n">rM</span><span class="p">[</span><span class="n">pump_index</span><span class="p">]</span>
+        <span class="n">Dint2fit</span> <span class="o">=</span> <span class="n">Dint</span><span class="p">[</span><span class="n">ind_M</span><span class="p">]</span>
+        <span class="n">dφ2fit</span> <span class="o">=</span> <span class="n">dφ</span><span class="p">[</span><span class="n">ind_M</span><span class="p">]</span>
+        <span class="n">PrM_fit</span> <span class="o">=</span> <span class="n">itp</span><span class="o">.</span><span class="n">splrep</span><span class="p">(</span><span class="n">M2fit</span><span class="p">,</span> <span class="n">Dint2fit</span><span class="p">)</span>
+        <span class="n">Prφ_fit</span> <span class="o">=</span> <span class="n">itp</span><span class="o">.</span><span class="n">splrep</span><span class="p">(</span><span class="n">M2fit</span><span class="p">,</span> <span class="n">dφ2fit</span><span class="p">)</span>
+        <span class="n">Dint_fit1</span> <span class="o">=</span> <span class="n">itp</span><span class="o">.</span><span class="n">splev</span><span class="p">(</span><span class="n">ind_fit</span><span class="p">,</span> <span class="n">PrM_fit</span><span class="p">)</span>
+        <span class="n">Dint_fit2</span> <span class="o">=</span> <span class="n">itp</span><span class="o">.</span><span class="n">splev</span><span class="p">(</span><span class="n">ind_sim</span><span class="p">,</span> <span class="n">PrM_fit</span><span class="p">)</span>
+        <span class="n">dφ_fitted</span> <span class="o">=</span> <span class="n">itp</span><span class="o">.</span><span class="n">splev</span><span class="p">(</span><span class="n">ind_sim</span><span class="p">,</span> <span class="n">Prφ_fit</span><span class="p">)</span>
+        <span class="c1"># ipdb.set_trace()</span>
+
+        <span class="n">tR</span> <span class="o">=</span> <span class="n">L</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">ng_pmp</span><span class="o">/</span><span class="n">c0</span>
+        <span class="c1"># ipdb.set_trace()</span>
+        <span class="n">dw</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">rM_sim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rM_sim</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="n">tR</span>
+        <span class="n">w0</span> <span class="o">=</span> <span class="n">rf</span><span class="p">[</span><span class="n">pump_index</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+        <span class="n">rf_fit</span> <span class="o">=</span> <span class="p">(</span><span class="n">w0</span><span class="o">+</span><span class="n">dw</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+
+        <span class="c1"># ipdb.set_trace()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pyType</span> <span class="o">==</span> <span class="s1">&#39;jupyter&#39;</span><span class="p">:</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span>
+                <span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax</span>
+                <span class="k">if</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">dpi</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span><span class="p">(</span><span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+                        <span class="n">f</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">figure</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">dpi</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Only 1 subplots supported, created a new figure&#39;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="ow">not</span><span class="p">(</span><span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="n">ax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">ax</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+                        <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">dpi</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">zero_lines</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">rf</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-12</span><span class="p">,</span> <span class="n">rf</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-12</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;k--&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plottype</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+                    <span class="c1"># ipdb.set_trace()</span>
+                    
+                    
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rf_fit</span><span class="o">*</span><span class="mf">1e-12</span><span class="p">,</span> <span class="n">Dint_fit2</span><span class="o">*</span><span class="mf">1e-9</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Sim&#39;</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rf</span><span class="p">[</span><span class="n">ind_M</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-12</span><span class="p">,</span> <span class="n">Dint_fit1</span><span class="o">*</span><span class="mf">1e-9</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Fit&#39;</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rf</span><span class="o">*</span><span class="mf">1e-12</span><span class="p">,</span> <span class="n">Dint</span><span class="o">*</span><span class="mf">1e-9</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Raw&#39;</span><span class="p">)</span>
+                    
+                    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plottype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;sim&#39;</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rf_fit</span><span class="o">*</span><span class="mf">1e-12</span><span class="p">,</span> <span class="n">Dint_fit2</span><span class="o">*</span><span class="mf">1e-9</span> <span class="o">/</span>
+                            <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plottype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;fit&#39;</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rf</span><span class="p">[</span><span class="n">ind_M</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-12</span><span class="p">,</span> <span class="n">Dint_fit1</span><span class="o">*</span><span class="mf">1e-9</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rf</span><span class="o">*</span><span class="mf">1e-12</span><span class="p">,</span> <span class="n">Dint</span><span class="o">*</span><span class="mf">1e-9</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plottype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;fem&#39;</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rf</span><span class="o">*</span><span class="mf">1e-12</span><span class="p">,</span> <span class="n">Dint</span><span class="o">*</span><span class="mf">1e-9</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plottype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;ind&#39;</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">rf</span><span class="p">[</span><span class="n">ind_M</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-12</span><span class="p">,</span> <span class="n">Dint</span><span class="p">[</span><span class="n">ind_M</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-9</span> <span class="o">/</span>
+                            <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Frequency (THz)&#39;</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Dint (GHz)&#39;</span><span class="p">)</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">init_notebook_mode</span><span class="p">(</span><span class="n">connected</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">trace0</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span>
+                            <span class="n">x</span> <span class="o">=</span> <span class="n">rf_fit</span><span class="o">*</span><span class="mf">1e-12</span><span class="p">,</span>
+                            <span class="n">y</span> <span class="o">=</span> <span class="n">Dint_fit2</span><span class="o">*</span><span class="mf">1e-9</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span>
+                            <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;lines&#39;</span><span class="p">,</span>
+                            <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;LLE simulation&#39;</span>
+                        <span class="p">)</span>
+                <span class="n">trace1</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">rf</span><span class="p">[</span><span class="n">ind_M</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-12</span><span class="p">,</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">Dint_fit1</span><span class="o">*</span><span class="mf">1e-9</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                        <span class="n">width</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+                        <span class="n">dash</span> <span class="o">=</span> <span class="s1">&#39;dash&#39;</span><span class="p">),</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Fit&#39;</span>
+                <span class="p">)</span>
+                <span class="n">trace2</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">rf</span><span class="o">*</span><span class="mf">1e-12</span><span class="p">,</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">Dint</span><span class="o">*</span><span class="mf">1e-9</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">),</span>
+                    <span class="n">mode</span> <span class="o">=</span> <span class="s1">&#39;markers&#39;</span><span class="p">,</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;FEM Simulation&#39;</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plottype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;all&#39;</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">trace2</span><span class="p">,</span> <span class="n">trace0</span><span class="p">,</span> <span class="n">trace1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plottype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;sim&#39;</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">trace0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plottype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;fit&#39;</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">trace2</span><span class="p">,</span> <span class="n">trace1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plottype</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;fem&#39;</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">trace2</span><span class="p">]</span>
+
+                <span class="n">layout</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">xaxis</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;Frequency (THz)&#39;</span><span class="p">),</span>
+                  <span class="n">yaxis</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s1">&#39;D&lt;sub&gt;int&lt;/sub&gt; (GHz)&#39;</span><span class="p">),</span>
+                  <span class="p">)</span>
+                <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">)</span>
+                <span class="n">iplot</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;coucou&#39;</span><span class="p">)</span>
+
+
+            <span class="c1"># f, ax = plt.subplots()</span>
+            <span class="c1"># ax.plot([ind_sim[0], ind_sim[-1]], [0, 0], &#39;k--&#39;)</span>
+
+        <span class="c1"># f.show()</span>
+        <span class="n">Info</span> <span class="o">=</span> <span class="s1">&#39;-- Dispersion Analysis --</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">Info</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Pump index: </span><span class="si">{}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pump_index</span><span class="p">)</span>
+        <span class="n">Info</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Center Pump: </span><span class="si">{:.3f}</span><span class="s1"> THz</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rf</span><span class="p">[</span><span class="n">pump_index</span><span class="p">]</span><span class="o">*</span><span class="mf">1e-12</span><span class="p">)</span>
+        <span class="n">Info</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">FSR: </span><span class="si">{:.2f}</span><span class="s1"> GHz</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">FSR_p</span><span class="o">*</span><span class="mf">1e-9</span><span class="p">)</span>
+        <span class="n">Info</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">D2: </span><span class="si">{:.2f}</span><span class="s1"> MHz</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">D2</span><span class="o">*</span><span class="mf">1e-6</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">Info</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="p">:</span>
+            <span class="n">Info</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> mu_fit: [</span><span class="si">{:.0f}</span><span class="s1">, </span><span class="si">{:.0f}</span><span class="s1">]</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rM_fit</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                           <span class="bp">self</span><span class="o">.</span><span class="n">rM_fit</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">Info</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> mu_sim: [</span><span class="si">{:.0f}</span><span class="s1">, </span><span class="si">{:.0f}</span><span class="s1">]</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rM_sim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                           <span class="bp">self</span><span class="o">.</span><span class="n">rM_sim</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;AnalyzeDisp&#39;</span><span class="p">,</span> <span class="n">Info</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">PrM_fit</span> <span class="o">=</span> <span class="n">PrM_fit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">β2</span> <span class="o">=</span> <span class="n">β2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rf</span> <span class="o">=</span> <span class="n">rf</span><span class="p">[</span><span class="n">ind_M</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rM</span> <span class="o">=</span> <span class="n">rM</span><span class="p">[</span><span class="n">ind_M</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mu</span> <span class="o">=</span> <span class="n">mu</span><span class="p">[</span><span class="n">ind_M</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">D</span><span class="p">[</span><span class="n">ind_M</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ng</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ng</span><span class="p">[</span><span class="n">ind_M</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">neff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">neff</span><span class="p">[</span><span class="n">ind_M</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Dint</span> <span class="o">=</span> <span class="n">Dint</span><span class="p">[</span><span class="n">ind_M</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Dint_fit</span> <span class="o">=</span> <span class="n">Dint_fit2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ind_M</span> <span class="o">=</span> <span class="n">ind_M</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pump_index</span> <span class="o">=</span> <span class="n">pump_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dφ</span> <span class="o">=</span> <span class="n">dφ_fitted</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">f</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax</span> <span class="o">=</span> <span class="n">ax</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ax</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">PrM_fit</span><span class="p">,</span> <span class="n">Dint_fit2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">neff_pmp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ng_pmp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax</span></div></div>
+
+
+<span class="c1"># if __name__ == &#39;__main__&#39;:</span>
+<span class="c1">#     plt.close(&#39;all&#39;)</span>
+<span class="c1">#     analyze = AnalyzeDisp(file=&#39;TestDispersion.mat&#39;,</span>
+<span class="c1">#                           lbd_center = 1500e-9,</span>
+<span class="c1">#                           rM_fit=[-50, 160],</span>
+<span class="c1">#                           debug=True)</span>
+<span class="c1">#     analyze.GetBeta()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Gregory Moille
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../',
+              VERSION:'2.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
