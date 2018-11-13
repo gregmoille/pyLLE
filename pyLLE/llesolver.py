@@ -403,9 +403,6 @@ class LLEsovler(object):
                     'Qc': ('Qc',1e-6, 'M'),
                     'gamma': (u'\u03B3', 1, ''),}
                 
-
-    
-
         self.sim['debug'] = int(self._debug)
         Info = '-- Solving standard LLE --\n'
         Info += '\tSimulation Parameters\n'
