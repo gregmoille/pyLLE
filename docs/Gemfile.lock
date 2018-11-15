@@ -193,6 +193,8 @@ GEM
       ethon (>= 0.8.0)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
+    tzinfo-data (1.2018.7)
+      tzinfo (>= 1.0.0)
     unicode-display_width (1.4.0)
 
 PLATFORMS
@@ -200,6 +202,7 @@ PLATFORMS
 
 DEPENDENCIES
   github-pages
+  tzinfo-data
 
 BUNDLED WITH
    1.17.1
