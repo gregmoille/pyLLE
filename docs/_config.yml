@@ -27,3 +27,4 @@ highlighter:      rouge
 
 hydeout:
   repo: https://github.com/gregmoille/pyLLE
+  version: 2.1
