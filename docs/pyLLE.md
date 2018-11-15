@@ -27,7 +27,7 @@ the column/page size of different latex template
 ## LLEsolver(self, **kwargs)
 
 Class to solve the Lugiato Lefever Equation
-Initialization input (\[\]=facultative):
+Initialization input (\[\] = optional):
 
 - res \<dict\>
     - Qi \<float\>: intrinsic Q of the resonator
@@ -75,7 +75,7 @@ Plot a figure with 3 subplots.
 
 - Output
     - f \<obj\>:  matplotlib/plotly figure handle
-    - ax \<obj\>: matplotlib axes handle (if plotly, only return f)
+    - ax \<obj\>: matplotlib axes handle (if plotly, only returns f)
 
 ### LLEsolver.PlotCombSpectra(self, ind, f=None, ax=None, label=None, pwr='both', do_matplotlib=False, plot=True)
 
@@ -92,7 +92,7 @@ Plot the spectra for a given index in the 1000 sub-sampled LLE steps
     - Sout \<numpy.array\>: spectral density of power in the waveguide (dBm)
     - Sring \<numpy.array\>: spectral density of power in the ring (dBm)
     - f \<obj\>:  matplotlib/plotly figure handle
-    - ax \<obj\>: matplotlib axes handle (if plotly, only return f)
+    - ax \<obj\>: matplotlib axes handle (if plotly, only returns f)
 
 ### LLEsolver.PlotSolitonTime(self, ind, f=None, ax=None, label=None, do_matplotlib=False)
 
@@ -109,7 +109,7 @@ Plot the spectra for a given index in the 1000 sub-sampled LLE step
     - τ \<obj\>: Time in the resonator
     - U \<numpy.array\>: Temporal Electric field for the given step of the LLE
     - f \<obj\>: matplotlib/plotly figure handle
-    - ax \<obj\>: matplotlib axe handle (if plotly, only return f)
+    - ax \<obj\>: matplotlib axe handle (if plotly, only returns f)
 
 ### LLEsolver.SaveResults(self, fname, path='./')
 
@@ -118,4 +118,3 @@ Save the whole class with pickle to be able to easily call it back or retrieve t
 - Input
     - fname \<str\>: name to save. The '.pkl' extension will be added
     - path \<str\>: path to save the results (defaults './')
-
