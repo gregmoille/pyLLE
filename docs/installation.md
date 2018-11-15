@@ -1,6 +1,6 @@
 ---
 layout: page
-title: installation
+title: Archive
 ---
 
 # Installation
