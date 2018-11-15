@@ -4,9 +4,7 @@ title: pyLLE Modules
 sidebar_link: true
 ---
 
-
 <div class="section" id="pylle-package">
-<h1>pyLLE package<a class="headerlink" href="#pylle-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-pyLLE.analyzedisp">
 <span id="pylle-analyzedisp-module"></span><h2>pyLLE.analyzedisp module<a class="headerlink" href="#module-pyLLE.analyzedisp" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -309,27 +307,6 @@ the column/page size of different latex template</p>
            </div>
            
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-      
-        <a href="team.html" class="btn btn-neutral" title="pyLLE Team" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
-  
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>
-        &copy; Copyright 2018, Gregory Moille
-
-    </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
-
-</footer>
 
         </div>
       </div>
@@ -338,35 +315,3 @@ the column/page size of different latex template</p>
 
   </div>
   
-
-
-  
-
-    
-    
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'./',
-              VERSION:'2.0',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
-  <script type="text/javascript">
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
