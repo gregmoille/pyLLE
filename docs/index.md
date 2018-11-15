@@ -1,7 +1,8 @@
 ---
 title: pyLLE Documentation
 description: LLE solver documentation and examples
-show_downloads: "true"
+show_downloads: "false"
+logo: ../images/NISTlogo32x32.jpg
 ---
 
 
