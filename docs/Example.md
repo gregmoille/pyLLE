@@ -23,7 +23,7 @@ res = {'R': 23e-6, # ring radius in meter
           }
 ```
 
-We now define the simulation parameters. Here we precise a linear detuning ramp of the pump from *δω_init* to *δω_end* relative to the pump mode angular frequency, mode closest to the defined pump frequency *f_pmp*. The simulation length *Tscan* is in unit of round trip, as it is more convenient in the Lugiato-Lefever formalism. It is important to notice that two parameters for the mode bandwidth have to be defined, *μ_fit* which determined the fit window of the raw data found in *dispfile*, and *μ_sim* which is the number of mode simulated in the LLE, hence could be larger than the fit mode through extrapolation
+We now define the simulation parameters. Here we precise a linear detuning ramp of the pump from *δω_init* to *δω_end* relative to the pump mode angular frequency, mode closest to the defined pump frequency *f_pmp*. The simulation length *Tscan* is in unit of round trip, as it is more convenient in the Lugiato-Lefever formalism. It is important to notice that two parameters for the simulation frequency bandwidth have to be defined, *μ_fit* which determined the fit window of the raw data found in *dispfile*, and *μ_sim* which is the number of mode simulated in the LLE, hence could be larger than the fit mode through extrapolation
 
 ```python
 import numpy as np
@@ -112,13 +112,7 @@ And now we can solve the equation
 solver.SolveTemporal()
 ```
 
-    ----------------------------------------------------------------------
-    2018-10-10 14:42:57
-    Launching Julia: Done
-    Computing LLE [**************************************************] 100%
-
-    Simulation Time 00h:13min:05.1s
-    ----------------------------------------------------------------------
+If the user stop the solver (most of the time through a ctrl-c), the Julia solver will be killed hence won't use to much CPU resources
 
 ---
 
@@ -151,7 +145,7 @@ The temporal profile can also be retrieve, interesting in a case of we are on a 
 
 ### Saving figures
 
-Helper to save the figures, in any format supported by matplotlib have been created. The helper (pylle._llesolver_Latexify) has been designed to make “publication-ready-like” figure, while one is using jupyter notebook/jupyter lab (hence reliying on plotly for figure display) or through a python consol (hence through matplotlib display). Depending on which type of plot has already been display (comb summary, comb spectra, time profile), this figures will be saved in the specified format
+Helper to save the figures, in any format supported by matplotlib have been created. The helper (pylle._llesolver_Latexify) has been designed to make “publication-ready-like” figure, while one is using jupyter notebook/jupyter lab (hence relying on plotly for figure display) or through a python console (hence through matplotlib display). Depending on which type of plot has already been display (comb summary, comb spectra, time profile), this figures will be saved in the specified format
 
 ```python
 solver.SavePlots2File(basename = 'images/', format = 'pdf')
@@ -201,7 +195,7 @@ Although, it gives fast results, the accuracy of such solver remains questionabl
 
 ---
 
-First we need to change the simulation parameters to introduce a fixe detuning _δω_
+First we need to change the simulation parameters to introduce a fix detuning _δω_
 
 ```python
 solver.sim['δω'] = -5e9*2*np.pi # more or less what it is as the end of the soliton step
