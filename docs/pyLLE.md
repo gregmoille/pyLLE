@@ -4,102 +4,50 @@ title: pyLLE Modules
 sidebar_link: true
 ---
 
+<div role="navigation" aria-label="breadcrumbs navigation">
 
-
-
-   
-  <div class="wy-grid-for-nav">
-
+  <ul class="wy-breadcrumbs">
     
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
-
-          
-            <a href="index.html" class="icon icon-home"> pyLLE
-          
-
-          
-          </a>
-
-          
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>pyLLE package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
             
-            
-              <div class="version">
-                2.0
-              </div>
-            
+            <a href="_sources/pyLLE.rst.txt" rel="nofollow"> View page source</a>
           
+        
+      </li>
+    
+  </ul>
 
-          
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
+  
+  <hr/>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="NotebookExample.html">pyLLE example - Ring Resonator comb simulation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="team.html">pyLLE Team</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">pyLLE package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-pyLLE.analyzedisp">pyLLE.analyzedisp module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-pyLLE.llesolver">pyLLE.llesolver module</a></li>
-</ul>
-</li>
-</ul>
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
 
-            
-          
-        </div>
-      </div>
-    </nav>
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
 
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="index.html">pyLLE</a>
-        
-      </nav>
-
-
-      <div class="wy-nav-content">
-        
-        <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
 <div class="section" id="pylle-package">
 <h1>pyLLE package<a class="headerlink" href="#pylle-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-pyLLE.analyzedisp">
