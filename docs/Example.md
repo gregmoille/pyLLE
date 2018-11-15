@@ -5,6 +5,8 @@ sidebar_link: true
 sidebar_sort_order: 2
 ---
 
+This example is accessible through an Jupyter notebook available in the [example folder](https://github.com/gregmoille/pyLLE/tree/master/example). Using Jupyter is a just only based on interactivity, but obviously one can script pyLLE and using a ipython console or through a python bash command, hence will use *matplotlib* instead of *plotly*. Check the [documentation of the module](https://gregmoille.github.io/pyLLE/pyLLE.html) for the difference of output in both case.
+
 ## Import and Setup 
 
 Let’s start by importing the package
