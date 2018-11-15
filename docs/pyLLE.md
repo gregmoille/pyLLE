@@ -66,16 +66,14 @@ LLEsovler(self, **kwargs)
 Class to solve the Lugiato Lefever Equation
 Initialization input ([]=facultative):
 
-**res <dict>**
-
+- res <dict>
     - Qi <float>: intrinsic Q of the resonator
     - Qc <float>: coupling Q of the resonator
     - R <float>: ring radius
     - gamma <float>: Non linear index of the material
     - dispfile <str> : str pointing to a .csv file where the azimuthal mode orders and corresponding resonances are saved
 
-**sim <dict>**
-
+- sim <dict>
     - Tscan <float>: length of the simulation (in unit of round trip)
     - mu_fit <list>: number of mode to fit
     - mu_sim <list>: number of mode to simulate
