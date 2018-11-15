@@ -16,7 +16,7 @@ Using the efficient computing of Julia, especially the way fft are implemented m
 
 | Matlab <i class="far fa-dizzy"></i>| Python Only <i class="far fa-flushed"></i> |  pyLLE <i class="far fa-thumbs-up"></i> |
 |:------:|:-----------:|:-------:|
-| Matlab | Python Only |  **10min 51s**  |
+|  |  |  **10min 51s**  |
 
 <i class="fas fa-chalkboard-teacher"></i>  For a fairly complete example, please refer to the [example](https://gregmoille.github.io/pyLLE/Example.html) of  which investigate the soliton generation in a micro-ring resonator
 
@@ -29,4 +29,4 @@ Using the efficient computing of Julia, especially the way fft are implemented m
 <br>
 ---
 
-<a name="myfootnote1"><sup>1</sup></a>:  *Simulations made on a MacBook Pro 2017 3.1 GHz Intel Core i5, RAM 16 GB 2133 MHz LPDDR3. System simulated is using the exact same parameter than in the [example](https://gregmoille.github.io/pyLLE/Example.html)*
+<a name="myfootnote1"><sup>1</sup></a> *Simulations made on a MacBook Pro 2017 3.1 GHz Intel Core i5, RAM 16 GB 2133 MHz LPDDR3. System simulated is using the exact same parameters than in the [example](https://gregmoille.github.io/pyLLE/Example.html)*
