@@ -210,6 +210,5 @@ solver.sim['δω'] = -5e9*2*np.pi # more or less what it is as the end of the so
 ```python
 steady_fig = solver.SolveSteadySteate()
 ```
-
 <!-- PLot epctra Steady -->
 <iframe frameborder="0" scrolling="no" width="100%" height='400px' src="//plot.ly/~gmoille/40.embed"></iframe>
