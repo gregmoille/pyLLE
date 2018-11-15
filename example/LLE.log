@@ -234,3 +234,101 @@
 [ 2018-11-15 14:57:05 - LLEsovler.SolveTemporal ] tol = 0.001 -- maxiter = 6 step_factpr = 0.1
 [ 2018-11-15 15:07:57 - LLEsovler.SolveTemporal ] Simulation Time 00h:10min:51.6s
 [ 2018-11-15 15:07:57 - LLEsovler.RetrieveData ] Retrieving results from Julia in /var/folders/qh/mzl16lsd5dj4254_sx6ghdsc0000gn/T/tmpa8tuq1ccResultsJulia.h5
+[ 2018-11-15 15:18:58 - LLEsovler.SolveSteadySteate ] Solving Steady State LLE with Python....
+[ 2018-11-15 15:18:58 - LLEsovler.SolveSteadySteate ] Not symmetric mode calculation -> switching to it with µ_sim = [-170, 170]
+
+[ 2018-11-15 15:18:58 - LLEsovler.Analyze ] Analyzing dispersion file
+	Filename: TestDispersion.txt
+	f_pmp: 191.000 THz
+[ 2018-11-15 15:18:58 - AnalyzeDisp ] -- Dispersion Analysis --
+	Pump index: 72
+	Center Pump: 190.523 THz
+	FSR: 1006.36 GHz
+	D2: 24.58 MHz
+	 mu_fit: [-71, 180]
+	 mu_sim: [-170, 170]
+
+[ 2018-11-15 15:19:32 - LLEsovler.SolveSteadySteate ] Solving Steady State LLE with Python....
+[ 2018-11-15 15:19:32 - LLEsovler.SolveSteadySteate ] Not symmetric mode calculation -> switching to it with µ_sim = [-170, 170]
+
+[ 2018-11-15 15:19:32 - LLEsovler.Analyze ] Analyzing dispersion file
+	Filename: TestDispersion.txt
+	f_pmp: 191.000 THz
+[ 2018-11-15 15:19:32 - AnalyzeDisp ] -- Dispersion Analysis --
+	Pump index: 72
+	Center Pump: 190.523 THz
+	FSR: 1006.36 GHz
+	D2: 24.58 MHz
+	 mu_fit: [-71, 180]
+	 mu_sim: [-170, 170]
+
+[ 2018-11-15 15:19:49 - LLEsovler.SolveSteadySteate ] Solving Steady State LLE with Python....
+[ 2018-11-15 15:19:49 - LLEsovler.SolveSteadySteate ] Not symmetric mode calculation -> switching to it with µ_sim = [-170, 170]
+
+[ 2018-11-15 15:19:49 - LLEsovler.Analyze ] Analyzing dispersion file
+	Filename: TestDispersion.txt
+	f_pmp: 191.000 THz
+[ 2018-11-15 15:19:49 - AnalyzeDisp ] -- Dispersion Analysis --
+	Pump index: 72
+	Center Pump: 190.523 THz
+	FSR: 1006.36 GHz
+	D2: 24.58 MHz
+	 mu_fit: [-71, 180]
+	 mu_sim: [-170, 170]
+
+[ 2018-11-15 15:19:58 - LLEsovler.SolveSteadySteate ] Solving Steady State LLE with Python....
+[ 2018-11-15 15:19:58 - LLEsovler.SolveSteadySteate ] Not symmetric mode calculation -> switching to it with µ_sim = [-170, 170]
+
+[ 2018-11-15 15:19:58 - LLEsovler.Analyze ] Analyzing dispersion file
+	Filename: TestDispersion.txt
+	f_pmp: 191.000 THz
+[ 2018-11-15 15:19:58 - AnalyzeDisp ] -- Dispersion Analysis --
+	Pump index: 72
+	Center Pump: 190.523 THz
+	FSR: 1006.36 GHz
+	D2: 24.58 MHz
+	 mu_fit: [-71, 180]
+	 mu_sim: [-170, 170]
+
+[ 2018-11-15 15:20:09 - LLEsovler.SolveSteadySteate ] Solving Steady State LLE with Python....
+[ 2018-11-15 15:20:09 - LLEsovler.SolveSteadySteate ] Not symmetric mode calculation -> switching to it with µ_sim = [-170, 170]
+
+[ 2018-11-15 15:20:09 - LLEsovler.Analyze ] Analyzing dispersion file
+	Filename: TestDispersion.txt
+	f_pmp: 191.000 THz
+[ 2018-11-15 15:20:09 - AnalyzeDisp ] -- Dispersion Analysis --
+	Pump index: 72
+	Center Pump: 190.523 THz
+	FSR: 1006.36 GHz
+	D2: 24.58 MHz
+	 mu_fit: [-71, 180]
+	 mu_sim: [-170, 170]
+
+[ 2018-11-15 15:20:24 - LLEsovler.SolveSteadySteate ] Solving Steady State LLE with Python....
+[ 2018-11-15 15:20:24 - LLEsovler.SolveSteadySteate ] Not symmetric mode calculation -> switching to it with µ_sim = [-170, 170]
+
+[ 2018-11-15 15:20:24 - LLEsovler.Analyze ] Analyzing dispersion file
+	Filename: TestDispersion.txt
+	f_pmp: 191.000 THz
+[ 2018-11-15 15:20:24 - AnalyzeDisp ] -- Dispersion Analysis --
+	Pump index: 72
+	Center Pump: 190.523 THz
+	FSR: 1006.36 GHz
+	D2: 24.58 MHz
+	 mu_fit: [-71, 180]
+	 mu_sim: [-170, 170]
+
+[ 2018-11-15 15:20:32 - LLEsovler.SolveSteadySteate ] Solving Steady State LLE with Python....
+[ 2018-11-15 15:20:32 - LLEsovler.SolveSteadySteate ] Not symmetric mode calculation -> switching to it with µ_sim = [-170, 170]
+
+[ 2018-11-15 15:20:32 - LLEsovler.Analyze ] Analyzing dispersion file
+	Filename: TestDispersion.txt
+	f_pmp: 191.000 THz
+[ 2018-11-15 15:20:32 - AnalyzeDisp ] -- Dispersion Analysis --
+	Pump index: 72
+	Center Pump: 190.523 THz
+	FSR: 1006.36 GHz
+	D2: 24.58 MHz
+	 mu_fit: [-71, 180]
+	 mu_sim: [-170, 170]
+

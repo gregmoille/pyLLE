@@ -134,15 +134,16 @@ ind = 692
 _ = solver.PlotCombSpectra(ind)
 ```
 
-<iframe frameborder="0" scrolling="no" width="100%" height='700px' src="//plot.ly/~gmoille/41.embed"></iframe>
+<!-- PLot All -->
+<iframe frameborder="0" scrolling="no" width="100%" height='700px' src="//plot.ly/~gmoille/43.embed"></iframe>
 
 <!-- PLot Sepctra Temporal -->
-<iframe frameborder="0" scrolling="no" width="100%" height='400px' src="//plot.ly/~gmoille/36.embed"></iframe>
+<iframe frameborder="0" scrolling="no" width="100%" height='400px' src="//plot.ly/~gmoille/46.embed"></iframe>
 
 The temporal profile can also be retrieve, interesting in a case of we are on a soliton state for the given detuning
 
 <!-- PLot Time Temporal -->
-<iframe frameborder="0" scrolling="no" width="100%" height='400px' src="//plot.ly/~gmoille/38.embed"></iframe>
+<iframe frameborder="0" scrolling="no" width="100%" height='400px' src="//plot.ly/~gmoille/48.embed"></iframe>
 
 ### Saving figures
 
@@ -175,7 +176,7 @@ figly = oldSolver.PlotCombSpectra(692)
 ```
 
 <!-- PLot Sepctra Temporal -->
-<iframe frameborder="0" scrolling="no" width="100%" height='400px' src="//plot.ly/~gmoille/36.embed"></iframe>
+<iframe frameborder="0" scrolling="no" width="100%" height='400px' src="//plot.ly/~gmoille/46.embed"></iframe>
 
 ### Steady State Solver
 
@@ -206,4 +207,4 @@ solver.sim['δω'] = -5e9*2*np.pi # more or less what it is as the end of the so
 steady_fig = solver.SolveSteadySteate()
 ```
 <!-- PLot epctra Steady -->
-<iframe frameborder="0" scrolling="no" width="100%" height='400px' src="//plot.ly/~gmoille/40.embed"></iframe>
+<iframe frameborder="0" scrolling="no" width="100%" height='400px' src="//plot.ly/~gmoille/50.embed"></iframe>
