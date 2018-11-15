@@ -56,6 +56,10 @@ solver.Analyze(plot=True,
                plottype='all')
 ```
 
+To have a better idea of what happen for a given detuning we can plot the spectra and the temporal profile of the electric field in the resonator
+
+
+
 <iframe frameborder="0" scrolling="no" width="100%" height='400px' src="//plot.ly/~gmoille/34.embed"></iframe>
 
 One can clearly see that because we simulate a larger window with the LLE (orange curve - _LLE simulation_) than the raw data (blue dots), we extrapolate outside of this region. One has to be carefull about this feature as ripple in the integrated dispersion can happen causing zero-crossings which are artefacts
@@ -104,4 +108,108 @@ solver.Setup()
 
 And now we can solve the equation
 
+```python
 solver.SolveTemporal()
+```
+
+    ----------------------------------------------------------------------
+    2018-10-10 14:42:57
+    Launching Julia: Done
+    Computing LLE [**************************************************] 100%
+
+    Simulation Time 00h:13min:05.1s
+    ----------------------------------------------------------------------
+
+---
+
+When done, we need to retrieve the data
+
+```python
+solver.PlotCombPower()
+```
+
+## Post Process of Temporal Solver
+
+### Displaying Results
+
+To have a better idea of what happen for a given detuning we can plot the spectra and the temporal profile of the electric field in the resonator
+
+```python
+ind = 692
+_ = solver.PlotCombSpectra(ind)
+```
+
+<iframe frameborder="0" scrolling="no" width="100%" height='700px' src="//plot.ly/~gmoille/41.embed"></iframe>
+
+<!-- PLot Sepctra Temporal -->
+<iframe frameborder="0" scrolling="no" width="100%" height='400px' src="//plot.ly/~gmoille/36.embed"></iframe>
+
+The temporal profile can also be retrieve, interesting in a case of we are on a soliton state for the given detuning
+
+<!-- PLot Time Temporal -->
+<iframe frameborder="0" scrolling="no" width="100%" height='400px' src="//plot.ly/~gmoille/38.embed"></iframe>
+
+### Saving figures
+
+Helper to save the figures, in any format supported by matplotlib have been created. The helper (pylle._llesolver_Latexify) has been designed to make “publication-ready-like” figure, while one is using jupyter notebook/jupyter lab (hence reliying on plotly for figure display) or through a python consol (hence through matplotlib display). Depending on which type of plot has already been display (comb summary, comb spectra, time profile), this figures will be saved in the specified format
+
+```python
+solver.SavePlots2File(basename = 'images/', format = 'pdf')
+solver.SavePlots2File(basename = 'images/', format = 'png')
+```
+
+### Pickling the Solver
+
+The whole package has been design with simplicity in mind, which mean simplicity to compute but also simplicity to retrieve results. Hence pyLLE is coded in a way that, using the pickle package, one can easily save the state of the solver and retrieve it later, with all the feature presented above still available. It is important to use the self.SaveResults method to pickle the solver as it takes care of dumping the different thread that cannot be pickle in the class.
+
+```python
+solver.SaveResults('PickleSolver', path = './')
+```
+
+One can reload the state of the simulation:
+
+```python
+import pickle as pkl
+oldSolver = pkl.load(open('PickleSolver.pkl', 'br'))
+```
+
+The different methods can be called with the loaded pickled solver
+
+```python
+figly = oldSolver.PlotCombSpectra(692)
+```
+
+<!-- PLot Sepctra Temporal -->
+<iframe frameborder="0" scrolling="no" width="100%" height='400px' src="//plot.ly/~gmoille/36.embed"></iframe>
+
+### Steady State Solver
+
+One can solver the steady state Lugiato Lefever equation :
+
+$$
+\begin{align*}
+&- \left(\frac{\alpha'}{2} - i\delta_0 \right)E + i \cdot \mathrm{FT}^{-1}\left[ -t_R D_{int}(\omega) \cdot \mathrm{FT}\left[E(t, \tau)\right]\right] +
+& \gamma|E|^2 E + \sqrt{\theta}E_{in} = 0
+\end{align*}
+$$
+
+Using a Newton method to find the root of the equation will result in solving this particular state of the LLE.
+
+The method self.SolveSteadySteate is design for this.
+
+Although, it gives fast results, the accuracy of such solver remains questionable compare to a full temporal resolution of the equation
+
+---
+
+First we need to change the simulation parameters to introduce a fixe detuning _δω_
+
+```python
+solver.sim['δω'] = -5e9*2*np.pi # more or less what it is as the end of the soliton step
+```
+
+```python
+steady_fig = solver.SolveSteadySteate()
+```
+
+<!-- PLot epctra Steady -->
+<iframe frameborder="0" scrolling="no" width="100%" height='400px' src="//plot.ly/~gmoille/40.embed"></iframe>
