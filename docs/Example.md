@@ -100,3 +100,8 @@ solver.Setup()
                     μ_sim = [-74.00,170.00]
                     μ_fit = [-71.00,180.00]
 
+---
+
+And now we can solve the equation
+
+solver.SolveTemporal()
