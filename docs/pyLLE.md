@@ -7,43 +7,6 @@ sidebar_link: true
 
 
 
-<!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>pyLLE package &mdash; pyLLE 2.0 documentation</title>
-  
-
-  
-  
-  
-  
-
-  
-
-  
-  
-    
-
-  
-
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="pyLLE Team" href="team.html" /> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-  <script src = "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
-</head>
-
-<body class="wy-body-for-nav">
-
    
   <div class="wy-grid-for-nav">
 
@@ -546,6 +509,3 @@ the column/page size of different latex template</p>
           SphinxRtdTheme.Navigation.enable(true);
       });
   </script> 
-
-</body>
-</html>
