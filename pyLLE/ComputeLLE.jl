@@ -8,7 +8,7 @@ function Loadh5Param(dir)
     res = Dict()
     sim = Dict()
     sim_name = ["res", "sim"]
-    par = [["Qc", "R", "ng", "Qi", "gamma"], ["dphi","Pin", "Tscan", "domega_init", "domega_end", "f_pmp", "mu_sim", "debug"]] 
+    par = [["Qc", "R", "ng", "Qi", "gamma","dispfile"], ["dphi","Pin", "Tscan", "domega_init", "domega_end", "f_pmp", "mu_sim", "debug"]] 
     cnt = 1
     for sim_par = [res, sim]
         for it = par[cnt]
@@ -16,7 +16,7 @@ function Loadh5Param(dir)
         end
         cnt += 1
     end
-    
+
     return res, sim
 end
 
