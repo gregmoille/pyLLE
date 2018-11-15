@@ -11,15 +11,6 @@ baseurl                  : "/pyLLE" # the subpath of your site, e.g. "/blog"
 repository               : "gregmoille/pyLLE"
 
 
-markdown:         redcarpet
-redcarpet:
-  extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink", "tables", "with_toc_data"]
-highlighter:      pygments
-highlighter: true
-
-
-
-
 github:
 #  repo:           https://github.com/poole/hyde
   me: https://github.com/gregmoille
