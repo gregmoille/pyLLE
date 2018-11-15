@@ -1,3 +1,8 @@
+---
+layout: index
+title: Home
+---
+
 # First test
 
 ## Welcome to pyLLE documentation ! !! 
