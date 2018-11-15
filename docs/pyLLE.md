@@ -147,16 +147,13 @@ LLEsovler.PlotCombSpectra(self, ind, f=None, ax=None, label=None, pwr='both', do
 
 Plot the spectra for a given index in the 1000 sub-sampled LLE steps
 
-**Input**
-
+- Input
     - ind <ind>: index in the LLE step to plot the spectra
     - f <obj>:  matplotlib figure handle (if None, new figure)
     - ax <obj>: matplotlib axe handle
     - label <str>: label for the legend
     - pwr <str>: 'both', 'ring', 'wg' depending on the spectra wanted (inside the ring, the waveguide or both)
-
-**Output**
-
+- Output
     - freq <numpy.array>: frequency in Hz
     - Sout <numpy.array>: spectral density of power in the waveguide (dBm)
     - Sring <numpy.array>: spectral density of power in the ring (dBm)
