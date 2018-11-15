@@ -6,7 +6,7 @@ title                    : "pyLLE"
 title_separator          : "-"
 name                     : &name "Gregory Moille" # &name is a YAML anchor which can be *referenced later
 description              : &description "A Fast and User-Friendly Lugiato Lefever Equation Solver"
-url                      : https://gregmoille.github.io/ # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
+url                      : https://gregmoille.github.io # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : "/pyLLE" # the subpath of your site, e.g. "/blog"
 repository               : "gregmoille/pyLLE"
 
