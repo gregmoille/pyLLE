@@ -1,0 +1,5 @@
+[extra]
+hyde_links = [
+    {url = "https://google.com", name = "Google.com"},
+    {url = "https://google.fr", name = "Google.fr"},
+]
