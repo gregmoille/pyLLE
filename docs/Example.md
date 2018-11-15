@@ -7,4 +7,4 @@ sidebar_link: true
 
 Test 
 
-<iframe frameborder="0" scrolling="no"  width="100%" height='300' src="//plot.ly/~gmoille/30.embed"></iframe>
+<iframe frameborder="0" scrolling="no"  width="100%" height='400px' src="//plot.ly/~gmoille/30.embed"></iframe>
