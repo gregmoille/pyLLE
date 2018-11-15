@@ -66,8 +66,13 @@ A new attribute _disp_ has been created which consists of a dictionary of the di
 
 ## Temporal Sovler
 
-One can solver the full temporal Lugiato Lefever equation $$t_R \frac{\partial E(t, \tau)}{\partial t} = - \left(\frac{\alpha'}{2} - i\delta_0 \right)E + i \cdot \mathrm{FT}^{-1}\left[ -t_R D_{int}(\omega) \cdot \mathrm{FT}\left[E(t, \tau)\right]\right] + \gamma|E|^2 E + \sqrt{\theta}E_{in}$$
+One can solver the full temporal Lugiato Lefever equation 
 
+$$
+\begin{align*}
+t_R \frac{\partial E(t, \tau)}{\partial t} = - \left(\frac{\alpha'}{2} - i\delta_0 \right)E + i \cdot \mathrm{FT}^{-1}\left[ -t_R D_{int}(\omega) \cdot \mathrm{FT}\left[E(t, \tau)\right]\right] + \gamma|E|^2 E + \sqrt{\theta}E_{in}
+\end{align}
+$$n
 Test 
 
 <iframe frameborder="0" scrolling="no"  width="100%" height='400px' src="//plot.ly/~gmoille/30.embed"></iframe>
