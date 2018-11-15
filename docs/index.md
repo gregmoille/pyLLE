@@ -1,7 +1,6 @@
 ---
 layout: index
 title: Home
-theme = "hyde"
 ---
 
 # First test
