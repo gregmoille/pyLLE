@@ -12,10 +12,10 @@ except:
 res = {'R': 23e-6,
        'Qi': 1e6,
        'Qc': 1e6,
-       'γ': 2}
+       'γ': 1.55}
 
 sim = {'Pin': 100e-3,
-       'Tscan': 1e4,
+       'Tscan': 1e6,
        'δω_stop': "None",
        'f_pmp': 191e12,
        'δω_init': 2e9*2*np.pi, 
@@ -27,7 +27,7 @@ sim = {'Pin': 100e-3,
         }
 
 # --  Setup thte Solver --
-solver = pyLLE.LLEsovler(sim=sim,
+solver = pyLLE.LLEsolver(sim=sim,
                        res=res,
                        debug=True)
 solver.Analyze(plot=True,

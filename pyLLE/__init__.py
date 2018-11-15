@@ -1,2 +1,2 @@
-from ._llesolver import LLEsovler
+from ._llesolver import LLEsolver
 from ._analyzedisp import AnalyzeDisp
