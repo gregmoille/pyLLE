@@ -1,5 +1,5 @@
 import numpy as np
-from ._analyzedisp import AnalyzeDisp
+from _analyzedisp import AnalyzeDisp
 import scipy.interpolate as itp
 import scipy.optimize as optm
 import scipy.fftpack as fft
