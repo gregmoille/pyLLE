@@ -17,10 +17,6 @@
 @import "hydeout/tags";
 
 
-html {
-  font-size: 8pt;
-}
-
 code,
 pre {
   font-family: $code-font-family;
@@ -28,8 +24,19 @@ pre {
 
 code {
   padding: .25em .5em;
-  font-size: 55%;
+  font-size: 60%;
   color: $code-color;
   background-color: #f9f9f9;
   border-radius: 3px;
 }
+
+pre {
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+pre code {
+  padding: 0;
+  font-size: 60%;
+  color: inherit;
+  background-color: transparent;

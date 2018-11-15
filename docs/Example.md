@@ -70,9 +70,33 @@ One can solver the full temporal Lugiato Lefever equation
 
 $$
 \begin{align*}
-t_R \frac{\partial E(t, \tau)}{\partial t} = &- \left(\frac{\alpha'}{2} - i\delta_0 \right)E +\\ &i \cdot \mathrm{FT}^{-1}\left[ -t_R D_{int}(\omega) \cdot \mathrm{FT}\left[E(t, \tau)\right]\right] + \gamma|E|^2 E + \sqrt{\theta}E_{in}
+t_R \frac{\partial E(t, \tau)}{\partial t} = &- \left(\frac{\alpha'}{2} - i\delta_0 \right)E +\\ &i \cdot \mathrm{FT}^{-1}\left[ -t_R D_{int}(\omega) \cdot \mathrm{FT}\left[E(t, \tau)\right]\right] +\\& \gamma|E|^2 E + \sqrt{\theta}E_{in}
 \end{align*}
 $$
-Test 
 
-<iframe frameborder="0" scrolling="no"  width="100%" height='400px' src="//plot.ly/~gmoille/30.embed"></iframe>
+
+The solver implemented in this package is based on a Julia core called through python. Hence to interface both language in an easy way, a hdf5 file is created in a temporary location with all the necessary data to solve the above LLE.
+
+<br>
+
+Hence, to solver the LLE here, we first need to setup the file:
+
+```python
+solver.Setup()
+```
+
+    -- Solving standard LLE --
+            Simulation Parameters
+                    R = 23.00 µm
+                    Qi = 1.00 M
+                    Qc = 1.00 M
+                    γ = 1.55
+            Simulation Parameters
+                    Pin = 150.00 mW
+                    Tscan = 1.00 x1e6 Round Trip
+                    f_pmp = 191.00 THz
+                    δω_init = 2.00 x2π GHz
+                    δω_end = -8.00 x2π GHz
+                    μ_sim = [-74.00,170.00]
+                    μ_fit = [-71.00,180.00]
+
