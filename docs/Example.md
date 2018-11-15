@@ -5,7 +5,7 @@ sidebar_link: true
 ---
 
 
-Test tel;kw;lket
+Test
 
 <script>
     TESTER = document.getElementById('tester');
