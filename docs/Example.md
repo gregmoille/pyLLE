@@ -92,23 +92,6 @@ Hence, to solver the LLE here, we first need to setup the file:
 solver.Setup()
 ```
 
-    -- Solving standard LLE --
-            Simulation Parameters
-                    R = 23.00 µm
-                    Qi = 1.00 M
-                    Qc = 1.00 M
-                    γ = 1.55
-            Simulation Parameters
-                    Pin = 150.00 mW
-                    Tscan = 1.00 x1e6 Round Trip
-                    f_pmp = 191.00 THz
-                    δω_init = 2.00 x2π GHz
-                    δω_end = -8.00 x2π GHz
-                    μ_sim = [-74.00,170.00]
-                    μ_fit = [-71.00,180.00]
-
----
-
 And now we can solve the equation
 
 ```python
@@ -132,7 +115,7 @@ solver.PlotCombPower()
 To have a better idea of what happen for a given detuning we can plot the spectra and the temporal profile of the electric field in the resonator
 
 ```python
-ind = 692
+ind = 570
 _ = solver.PlotCombSpectra(ind)
 ```
 
@@ -174,7 +157,7 @@ oldSolver = pkl.load(open('PickleSolver.pkl', 'br'))
 The different methods can be called with the loaded pickled solver
 
 ```python
-figly = oldSolver.PlotCombSpectra(692)
+figly = oldSolver.PlotCombSpectra(570)
 ```
 
 <!-- PLot Sepctra Temporal -->

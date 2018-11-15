@@ -18,8 +18,8 @@ plugins:
   - jekyll-gist
   - jekyll-paginate
 author:
-  name:           'Andrew Fong'
-  url:            https://twitter.com/fongandrewc
+  name:           'Gregory Moille'
+  url:            https://twitter.com/greg_moille
 
 markdown:         kramdown
 highlighter:      rouge
