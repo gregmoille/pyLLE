@@ -14,15 +14,16 @@ Using the efficient computing of Julia, especially the way fft are implemented m
 
 How faster pyLLE is compared to other implementation? Well, this quick benchmark<sup>[1](#myfootnote1)</sup> speaks for itself: 
 
-
-
 For a fairly complete example, please refer to the [example](https://gregmoille.github.io/pyLLE/Example.html) of  which investigate the soliton generation in a micro-ring resonator
 
-If you are happy with the sofware, feel free to check out our [paper]() on this package, and [cite us](https://gregmoille.github.io/pyLLE/HowToCite.html) when you publish. 
+If you are happy with the software, feel free to check out our [paper]() on this package, and [cite us](https://gregmoille.github.io/pyLLE/HowToCite.html) when you publish. 
 
-If you are not happy with the package (no worry, it happens), please [refer](https://github.com/gregmoille/pyLLE/issues) any bugs or inquiries to improve the package! 
+<i class="far fa-frown-open"></i> If you are not happy with the package (no worry, it happens), please [refer](https://github.com/gregmoille/pyLLE/issues) any bugs or inquiries to improve the package! 
 
-
+<br>
+<br>
+<br>
 ---
 
-<a name="myfootnote1">1</a>: Simulations made on a MacBook Pro 2017 3.1 GHz Intel Core i5 16 GB 2133 MHz LPDDR3. 
+<a name="myfootnote1"><sup>1</sup></a>: *Simulations made on a MacBook Pro 2017 3.1 GHz Intel Core i5 16 GB 2133 MHz LPDDR3*
+<a name="myfootnote2"><sup>2</sup></a>: *Simulations made on a MacBook Pro 2017 3.1 GHz Intel Core i5 16 GB 2133 MHz LPDDR3*
