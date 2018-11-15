@@ -232,3 +232,5 @@
 [ 2018-11-15 14:57:05 - LLEsovler.Setup ] Saving parameters in: /var/folders/qh/mzl16lsd5dj4254_sx6ghdsc0000gn/T/tmpa8tuq1ccParamLLEJulia.h5
 [ 2018-11-15 14:57:05 - LLEsovler.SolveTemporal ] Solving Temporal LLE with Julia....
 [ 2018-11-15 14:57:05 - LLEsovler.SolveTemporal ] tol = 0.001 -- maxiter = 6 step_factpr = 0.1
+[ 2018-11-15 15:07:57 - LLEsovler.SolveTemporal ] Simulation Time 00h:10min:51.6s
+[ 2018-11-15 15:07:57 - LLEsovler.RetrieveData ] Retrieving results from Julia in /var/folders/qh/mzl16lsd5dj4254_sx6ghdsc0000gn/T/tmpa8tuq1ccResultsJulia.h5

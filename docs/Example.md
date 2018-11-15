@@ -183,7 +183,7 @@ One can solver the steady state Lugiato Lefever equation :
 
 $$
 \begin{align*}
-&- \left(\frac{\alpha'}{2} - i\delta_0 \right)E + i \cdot \mathrm{FT}^{-1}\left[ -t_R D_{int}(\omega) \cdot \mathrm{FT}\left[E(t, \tau)\right]\right] +
+&- \left(\frac{\alpha'}{2} - i\delta_0 \right)E + i \cdot \mathrm{FT}^{-1}\left[ -t_R D_{int}(\omega) \cdot \mathrm{FT}\left[E(t, \tau)\right]\right] +\\
 & \gamma|E|^2 E + \sqrt{\theta}E_{in} = 0
 \end{align*}
 $$
