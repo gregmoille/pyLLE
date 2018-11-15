@@ -10,11 +10,11 @@ _Current version: v2.1_
 
 pyLLE is a tool to solve the Lugiato Lefever Equations (LLE) in a fast and easy way. Thanks to an user-friendly front-end in python and a efficient back end in Julia, solving this problem becomes easy and fast.
 
-Using the efficient computing of Julia, especially the way fft are implemented makes the overall simulation last only few minutes. On the other hand, python allows a easy scripting, easy display of the figures and easy saving of the results. 
+Using the **open source, free and efficient** computing of Julia, especially the way fft are implemented makes the overall simulation last only few minutes. On the other hand, python allows a easy scripting, easy display of the figures and easy saving of the results. 
 
-<i class="fas fa-tachometer-alt"></i> How faster pyLLE is compared to other implementation? Well, this quick benchmark<sup>[1](#myfootnote1)</sup> speaks for itself: 
+<i class="fas fa-tachometer-alt"></i> How faster pyLLE is compared to other implementation? We ran this quick benchmark<sup>[1](#myfootnote1)</sup> to find out. One can see that pure Matlab R2018 is doing well, but the big drawback is the proprietary license and low portability of the language. Pure Python is really fast, hence one can see the big addition of doing the intensive job in Julia.
 
-| Matlab <i class="far fa-dizzy"></i>| Python Only <i class="far fa-flushed"></i> |  pyLLE <i class="far fa-thumbs-up"></i> |
+| Matlab R2018a <i class="fas fa-meh"></i>| Python Only <i class="far fa-flushed"></i> |  pyLLE <i class="far fa-thumbs-up"></i> |
 |:------:|:-----------:|:-------:|
 |  |  |  **10min 51s**  |
 

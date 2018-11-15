@@ -12,7 +12,8 @@ except:
 res = {'R': 23e-6,
        'Qi': 1e6,
        'Qc': 1e6,
-       'γ': 1.55}
+       'γ': 1.55,
+       'dispfile': 'TestDispersion.txt'}
 
 sim = {'Pin': 100e-3,
        'Tscan': 1e6,
@@ -23,7 +24,6 @@ sim = {'Pin': 100e-3,
        'δω_end': -8e9*2*np.pi, 
        'μ_sim': [-74,170],
        'μ_fit': [-71, 180],
-       'dispfile': 'TestDispersion.txt'
         }
 
 # --  Setup thte Solver --
