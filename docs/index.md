@@ -8,7 +8,7 @@ title: Home
 _Current version: v2.1_
 
 
-pyLLE is a tool to solve the Lugiato Lefever Equations (LLE)1,2,3in a fast and easy way. Thanks to an user-friendly front-end in python and a efficient back end in Julia, solving this problem becomes easy and fast.
+pyLLE is a tool to solve the Lugiato Lefever Equations (LLE) in a fast and easy way. Thanks to an user-friendly front-end in python and a efficient back end in Julia, solving this problem becomes easy and fast.
 
 Using the efficient computing of Julia, especillay the way fft are implemented makes the overall simulation last only few minutes. On the other hand, python allows a easy scripting, easy display of the figures and easy saving of the results. 
 
