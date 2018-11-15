@@ -1,7 +1,7 @@
 ---
-title: [pyLLE Documentation]
-description: [LLE solver documentation and examples]
-show_downloads: ["true"]
+title: pyLLE Documentation
+description: LLE solver documentation and examples
+show_downloads: "true"
 ---
 
 
