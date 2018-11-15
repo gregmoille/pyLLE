@@ -32,7 +32,7 @@ git clone https://github.com/gregmoille/pyLLE.git
 cd pyLLE
 python setup.py install
 ```
-Just a heads up, the installation can vary in time, especially because of Julia that might rebuilds the cache. If the Julia location is custom, please before running the last line, change in the _setup.py_ line 18 to the correct location, as in _pyLLE/_llesolver.py_ line **508** to point to the correct location. Thanks
+Just a heads up, the installation can vary in time, especially because of Julia that might rebuilds the cache. If the Julia location is custom, please before running the last line, change in the *setup.py* line 18 to the correct location, as in *pyLLE/_llesolver.py* line **508** to point to the correct location. Thanks
 
 ## Python Dependencies
 
