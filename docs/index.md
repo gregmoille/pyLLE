@@ -16,7 +16,7 @@ How faster pyLLE is compared to other implementation? Well, this quick benchmark
 
 For a fairly complete example, please refer to the [example](https://gregmoille.github.io/pyLLE/Example.html) of  which investigate the soliton generation in a micro-ring resonator
 
-If you are happy with the software, feel free to check out our [paper]() on this package, and [cite us](https://gregmoille.github.io/pyLLE/HowToCite.html) when you publish. 
+<i class="far fa-smile-beam"></i> If you are happy with the software, feel free to check out our [paper]() on this package, and [cite us](https://gregmoille.github.io/pyLLE/HowToCite.html) when you publish. 
 
 <i class="far fa-frown-open"></i> If you are not happy with the package (no worry, it happens), please [refer](https://github.com/gregmoille/pyLLE/issues) any bugs or inquiries to improve the package! 
 
@@ -25,5 +25,6 @@ If you are happy with the software, feel free to check out our [paper]() on this
 <br>
 ---
 
-<a name="myfootnote1"><sup>1</sup></a>: *Simulations made on a MacBook Pro 2017 3.1 GHz Intel Core i5 16 GB 2133 MHz LPDDR3*
+<a name="myfootnote1"><sup>1</sup></a>: *Simulations made on a MacBook Pro 2017 3.1 GHz Intel Core i5, RAM 16 GB 2133 MHz LPDDR3*
+
 <a name="myfootnote2"><sup>2</sup></a>: *Simulations made on a MacBook Pro 2017 3.1 GHz Intel Core i5 16 GB 2133 MHz LPDDR3*
