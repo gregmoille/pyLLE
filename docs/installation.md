@@ -1,6 +1,7 @@
 ---
 layout: page
 title: Installation
+sidebar_link: true
 ---
 
 ## Requirement
