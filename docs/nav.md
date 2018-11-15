@@ -3,4 +3,4 @@ layout: main
 title: installation
 ---
 
-installation
+[installation]('/intallation.html')
