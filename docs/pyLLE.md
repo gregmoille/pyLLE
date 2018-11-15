@@ -2,6 +2,7 @@
 layout: page
 title: pyLLE Modules
 sidebar_link: true
+sidebar_sort_order: 5
 ---
 
 <div class="section" id="pylle-package">

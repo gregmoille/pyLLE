@@ -2,6 +2,7 @@
 layout: page
 title: Example
 sidebar_link: true
+sidebar_sort_order: 2
 ---
 
 ## Import and Setup 

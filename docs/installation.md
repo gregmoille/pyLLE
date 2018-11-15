@@ -2,7 +2,7 @@
 layout: page
 title: Installation
 sidebar_link: true
-order: 1
+sidebar_sort_order: 1
 ---
 
 ## Requirement
