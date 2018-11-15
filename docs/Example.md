@@ -15,15 +15,15 @@ import pyLLE
 We now define the resonator parameters.
 
 ```python 
-res = {'R': 23e-6, # ring radius in meter
-       'Qi': 1e6,  # Intrinsic Q factor
-       'Qc': 1e6,  # Coupled Q factor
-       'γ': 1.55,  # Non-linear coefficient at the pump frequency
-       'dispfile': 'TestDispersion.txt', # frequency and corresponding azymuthal mode simulated previously
-      }
+IN[0]: res = {'R': 23e-6, # ring radius in meter
+           'Qi': 1e6,  # Intrinsic Q factor
+           'Qc': 1e6,  # Coupled Q factor
+           'γ': 1.55,  # Non-linear coefficient at the pump frequency
+           'dispfile': 'TestDispersion.txt', # frequency and corresponding azymuthal mode simulated previously
+          }
 ```
 
-We now define the simulation parameters. Here we precise a linear detuning ramp of the pump from δω_init to δω_end relative to the pump mode angular frequency, mode closest to the defined pump frequency f_pmp. The simulation length Tscan is in unit of round trip, as it is more convenient in the Lugiato-Lefever formalism. It is important to notice that two parameters for the mode bandwidth have to be defined, μ_fit which determined the fit window of the raw data found in dispfile, and μ_sim which is the number of mode simulated in the LLE, hence could be larger than the fit mode through extrapolation
+We now define the simulation parameters. Here we precise a linear detuning ramp of the pump from *δω_init* to *δω_end* relative to the pump mode angular frequency, mode closest to the defined pump frequency *f_pmp*. The simulation length *Tscan* is in unit of round trip, as it is more convenient in the Lugiato-Lefever formalism. It is important to notice that two parameters for the mode bandwidth have to be defined, *μ_fit* which determined the fit window of the raw data found in *dispfile*, and *μ_sim* which is the number of mode simulated in the LLE, hence could be larger than the fit mode through extrapolation
 
 ```python
 import numpy as np
@@ -37,6 +37,33 @@ sim = {'Pin': 150e-3, # Input power in Q
         }
 ```
 
+---
+
+Let’s initialize the class
+
+```python
+solver = pyLLE.LLEsovler(sim=sim,
+                       res=res,
+                       debug=True)
+```
+
+## Dispersion Analyse
+
+To plot and retrieve all the data of the dispersion, the method _self.Analyze_ has to be called, resulting in the plot of the integrated dispersion Dint
+
+```python
+solver.Analyze(plot=True,
+               plottype='all')
+```
+<iframe frameborder="0" scrolling="no"  width="100%" height='400px'src="//plot.ly/~gmoille/34.embed"></iframe>
+
+One can clearly see that because we simulate a larger window with the LLE (orange curve - _LLE simulation_) than the raw data (blue dots), we extrapolate outside of this region. One has to be carefull about this feature as ripple in the integrated dispersion can happen causing zero-crossings which are artefacts
+
+---
+
+A new attribute _disp_ has been created which consists of a dictionary of the different value of the retrieve dispersion
+
+'''python
 
 Test 
 
