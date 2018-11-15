@@ -9,8 +9,3 @@ description              : &description "A Fast and User-Friendly Lugiato Lefeve
 url                      : https://gregmoille.github.io # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : "/pyLLE" # the subpath of your site, e.g. "/blog"
 repository               : "gregmoille/pyLLE"
-
-
-github:
-#  repo:           https://github.com/poole/hyde
-  me: https://github.com/gregmoille
