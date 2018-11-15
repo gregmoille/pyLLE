@@ -1,6 +1,6 @@
 ---
 layout: main
-title: installation
+title: pyLLE/installation
 ---
 
 [installation]('pyLLE/intallation.html')
