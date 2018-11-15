@@ -302,16 +302,3 @@ the column/page size of different latex template</p>
 
 </div>
 </div>
-
-
-           </div>
-           
-          </div>
-
-        </div>
-      </div>
-
-    </section>
-
-  </div>
-  
