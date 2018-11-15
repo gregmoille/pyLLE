@@ -3,4 +3,4 @@ layout: main
 title: installation
 ---
 
-[installation]('/intallation.html')
+[installation]('pyLLE/intallation.html')
