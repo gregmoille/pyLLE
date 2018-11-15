@@ -9,3 +9,16 @@ description              : &description "A Fast and User-Friendly Lugiato Lefeve
 url                      : https://gregmoille.github.io # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : "/pyLLE" # the subpath of your site, e.g. "/blog"
 repository               : "gregmoille/pyLLE"
+
+
+footer:
+  links:
+    - label: "Twitter"
+      icon: "fab fa-fw fa-twitter-square"
+      url: "https://twitter.com/mmistakes"
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/mmistakes"
+    - label: "Instagram"
+      icon: "fab fa-fw fa-instagram"
+      url: "https://instagram.com/mmistakes"
