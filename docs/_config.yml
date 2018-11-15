@@ -18,8 +18,6 @@ description              : &description "A fast and user-friendly Lugiato Lefeve
 url                      : https://gregmoille.github.io/ # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
 baseurl                  : "/pyLLE" # the subpath of your site, e.g. "/blog"
 repository               : "gregmoille/pyLLE"
-teaser                   : # path of fallback teaser image, e.g. "/assets/images/500x300.png"
-breadcrumbs            : true # true, false (default)
 
 author:
   name: "Gregory Moille"
@@ -39,3 +37,12 @@ author:
     - label: "Instagram"
       icon: "fab fa-fw fa-instagram"
       url: "https://instagram.com/mmistakes"
+
+
+sidebar:
+  - title: "Title"
+    image: http://placehold.it/350x250
+    image_alt: "image"
+    text: "Some text here."
+  - title: "Another Title"
+    text: "More text here."
