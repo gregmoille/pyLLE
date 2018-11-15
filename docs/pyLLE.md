@@ -42,7 +42,7 @@ Initialization input (\[\]=facultative):
     - domega_init \<float\>: initial detuning of the pump
     - domega_end \<float\>: final detuning of the pump
     - \[domga_stop\] \<float\>: where to stop the scan in detuning but keep doing the simulation
-- debug \<bool\>: Save a trace in a logfile in the working directory of the different actions pyLLE perform (default = True)
+- debug \<bool\>: Save a trace in a log file in the working directory of the different actions pyLLE perform (default = True)
 
 ### LLEsolver.Analyze(self, plot=False, f=None, ax=None, label=None, plottype='all', zero_lines=True, mu_sim=None)
 
@@ -63,7 +63,7 @@ Newton Method to find the root of the steady state equation
 
 ### LLEsolver.RetrieveData(self)
 
-Load the output hdf5 saved by julia and transform it in a user-friendly dictionary to be more pythonistic
+Load the output hdf5 saved by Julia and transform it in a user-friendly dictionary to be more pythonistic
 
 ### LLEsolver.PlotCombPower(self, do_matplotlib=False)
 
@@ -74,7 +74,8 @@ Plot a figure with 3 subplots.
 - bottom subplot = normalized comb power
 
 - Output
-    - f, ax:  handle of figure and axes of the matplotlib figure displayed
+    - f \<obj\>:  matplotlib/plotly figure handle
+    - ax \<obj\>: matplotlib axes handle (if plotly, only return f)
 
 ### LLEsolver.PlotCombSpectra(self, ind, f=None, ax=None, label=None, pwr='both', do_matplotlib=False, plot=True)
 
@@ -90,8 +91,8 @@ Plot the spectra for a given index in the 1000 sub-sampled LLE steps
     - freq \<numpy.array\>: frequency in Hz
     - Sout \<numpy.array\>: spectral density of power in the waveguide (dBm)
     - Sring \<numpy.array\>: spectral density of power in the ring (dBm)
-    - f \<obj\>:  matplotlib figure handle
-    - ax \<obj\>: matplotlib axes handle
+    - f \<obj\>:  matplotlib/plotly figure handle
+    - ax \<obj\>: matplotlib axes handle (if plotly, only return f)
 
 ### LLEsolver.PlotSolitonTime(self, ind, f=None, ax=None, label=None, do_matplotlib=False)
 
@@ -107,8 +108,8 @@ Plot the spectra for a given index in the 1000 sub-sampled LLE step
 - Output
     - τ \<obj\>: Time in the resonator
     - U \<numpy.array\>: Temporal Electric field for the given step of the LLE
-    - f \<obj\>: matplotlib figure handle
-    - ax \<obj\>: matplotlib axe handle
+    - f \<obj\>: matplotlib/plotly figure handle
+    - ax \<obj\>: matplotlib axe handle (if plotly, only return f)
 
 ### LLEsolver.SaveResults(self, fname, path='./')
 
