@@ -18,7 +18,7 @@ Using the efficient computing of Julia, especially the way fft are implemented m
 |:------:|:-----------:|:-------:|
 | Matlab | Python Only |  10min 51s  |
 
-For a fairly complete example, please refer to the [example](https://gregmoille.github.io/pyLLE/Example.html) of  which investigate the soliton generation in a micro-ring resonator
+<i class="fas fa-glasses"></i>For a fairly complete example, please refer to the [example](https://gregmoille.github.io/pyLLE/Example.html) of  which investigate the soliton generation in a micro-ring resonator
 
 <i class="far fa-smile-beam"></i> If you are happy with the software, feel free to check out our [paper]() on this package, and [cite us](https://gregmoille.github.io/pyLLE/HowToCite.html) when you publish. 
 
