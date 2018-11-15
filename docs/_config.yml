@@ -10,3 +10,20 @@ url                      : https://gregmoille.github.io/pyLLE # the base hostnam
 baseurl                  : "/pyLLE" # the subpath of your site, e.g. "/blog"
 repository               : "gregmoille/pyLLE"
 
+sidebar_home_link:  true
+
+
+plugins:
+  - jekyll-feed
+  - jekyll-gist
+  - jekyll-paginate
+author:
+  name:           'Andrew Fong'
+  url:            https://twitter.com/fongandrewc
+
+markdown:         kramdown
+highlighter:      rouge
+
+
+hydeout:
+  repo: github.com/gregmoille/pyLLE
