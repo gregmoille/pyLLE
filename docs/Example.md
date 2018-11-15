@@ -15,7 +15,7 @@ import pyLLE
 We now define the resonator parameters.
 
 ```python 
-IN[0]: res = {'R': 23e-6, # ring radius in meter
+res = {'R': 23e-6, # ring radius in meter
            'Qi': 1e6,  # Intrinsic Q factor
            'Qc': 1e6,  # Coupled Q factor
            'γ': 1.55,  # Non-linear coefficient at the pump frequency
@@ -55,7 +55,8 @@ To plot and retrieve all the data of the dispersion, the method _self.Analyze_ h
 solver.Analyze(plot=True,
                plottype='all')
 ```
-<iframe frameborder="0" scrolling="no"  width="100%" height='400px'src="//plot.ly/~gmoille/34.embed"></iframe>
+
+<iframe frameborder="0" scrolling="no" width="100%" height='400px'src="//plot.ly/~gmoille/34.embed"></iframe>
 
 One can clearly see that because we simulate a larger window with the LLE (orange curve - _LLE simulation_) than the raw data (blue dots), we extrapolate outside of this region. One has to be carefull about this feature as ripple in the integrated dispersion can happen causing zero-crossings which are artefacts
 
@@ -63,7 +64,11 @@ One can clearly see that because we simulate a larger window with the LLE (orang
 
 A new attribute _disp_ has been created which consists of a dictionary of the different value of the retrieve dispersion
 
-'''python
+## Temporal Sovler
+
+One can solver the full temporal Lugiato Lefever equation :
+
+$\(t_R \frac{\partial E(t, \tau)}{\partial t} = - \left(\frac{\alpha'}{2} - i\delta_0 \right)E + i \cdot \mathrm{FT}^{-1}\left[ -t_R D_{int}(\omega) \cdot \mathrm{FT}\left[E(t, \tau)\right]\right] + \gamma|E|^2 E + \sqrt{\theta}E_{in}\)$
 
 Test 
 
