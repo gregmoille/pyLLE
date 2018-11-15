@@ -10,3 +10,6 @@ site:
   url                      : https://gregmoille.github.io/pyLLE # the base hostname & protocol for your site e.g. "https://mmistakes.github.io"
   baseurl                  : "/" # the subpath of your site, e.g. "/blog"
   repository               : "gregmoille/pyLLE"
+
+github:
+  me: https://github.com/gregmoille/pyLLE
