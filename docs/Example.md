@@ -56,7 +56,7 @@ solver.Analyze(plot=True,
                plottype='all')
 ```
 
-<iframe frameborder="0" scrolling="no" width="100%" height='400px'src="//plot.ly/~gmoille/34.embed"></iframe>
+<iframe frameborder="0" scrolling="no" width="100%" height='400px' src="//plot.ly/~gmoille/34.embed"></iframe>
 
 One can clearly see that because we simulate a larger window with the LLE (orange curve - _LLE simulation_) than the raw data (blue dots), we extrapolate outside of this region. One has to be carefull about this feature as ripple in the integrated dispersion can happen causing zero-crossings which are artefacts
 
@@ -68,7 +68,7 @@ A new attribute _disp_ has been created which consists of a dictionary of the di
 
 One can solver the full temporal Lugiato Lefever equation :
 
-$\(t_R \frac{\partial E(t, \tau)}{\partial t} = - \left(\frac{\alpha'}{2} - i\delta_0 \right)E + i \cdot \mathrm{FT}^{-1}\left[ -t_R D_{int}(\omega) \cdot \mathrm{FT}\left[E(t, \tau)\right]\right] + \gamma|E|^2 E + \sqrt{\theta}E_{in}\)$
+$$\(t_R \frac{\partial E(t, \tau)}{\partial t} = - \left(\frac{\alpha'}{2} - i\delta_0 \right)E + i \cdot \mathrm{FT}^{-1}\left[ -t_R D_{int}(\omega) \cdot \mathrm{FT}\left[E(t, \tau)\right]\right] + \gamma|E|^2 E + \sqrt{\theta}E_{in}\)$$
 
 Test 
 
