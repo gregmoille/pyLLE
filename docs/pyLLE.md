@@ -5,7 +5,7 @@ sidebar_link: true
 sidebar_sort_order: 6
 ---
 
-# _llesolver
+# _llesolver.py
 
 ## MyLogger(self, fname)
 
@@ -16,11 +16,11 @@ Custom made logger as the logger default package cannot be pickled
 Class that handle saving the figures in a nice way compatible with
 the column/page size of different latex template
 
-- input (\[\] = optional):
+- Input (\[\] = optional):
     - figname = name to save the figure (without extension)
     - fig = matplotlib handle to the figure
-    - \[fig_width\]: default = 1column
-    - \[frmt\]: default = pdf
+    - \[fig_width\]: default = '1column'
+    - \[frmt\]: default = 'pdf'
     - \[fig_height\] : default = 6.5
     - \[font_size\] : default = 8
 
@@ -97,15 +97,14 @@ Plot the spectra for a given index in the 1000 sub-sampled LLE steps
 
 Plot the spectra for a given index in the 1000 sub-sampled LLE step
 
-**Input**
+- Input
 
     - ind \<ind\>: index in the LLE step to plot the spectra
     - f \<obj\>:  matplotlib figure handle (if None, new figure)
     - ax \<obj\>: matplotlib axe handle
     - label \<str\>: label for the legend
 
-**Output**
-
+- Output
     - τ \<obj\>: Time in the resonator
     - U \<numpy.array\>: Temporal Electric field for the given step of the LLE
     - f \<obj\>: matplotlib figure handle
@@ -113,10 +112,9 @@ Plot the spectra for a given index in the 1000 sub-sampled LLE step
 
 ### LLEsolver.SaveResults(self, fname, path='./')
 
-Save the whole class with pickle to be able to easilly call it back or retrieve the results after saving
+Save the whole class with pickle to be able to easily call it back or retrieve the results after saving
 
-**Input**
-
+- Input
     - fname \<str\>: name to save. The '.pkl' extension will be added
     - path \<str\>: path to save the results (defaults './')
 
