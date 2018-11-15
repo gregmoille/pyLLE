@@ -2,6 +2,7 @@
 layout: page
 title: Installation
 sidebar_link: true
+order: 1
 ---
 
 ## Requirement
