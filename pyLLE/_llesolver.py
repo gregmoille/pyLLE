@@ -1,5 +1,5 @@
 import numpy as np
-from _analyzedisp import AnalyzeDisp
+from ._analyzedisp import AnalyzeDisp
 import scipy.interpolate as itp
 import scipy.optimize as optm
 import scipy.fftpack as fft
@@ -230,7 +230,7 @@ class Latexify():
             file))
         self.f.canvas.draw()
 
-class LLEsovler(object):
+class LLEsolver(object):
     '''
     Class to solve the Lugiato Lefever Equation
     Initialization input ([]=facultative):
@@ -734,7 +734,7 @@ class LLEsovler(object):
         det = self.sol['detuning']*1e-9/(2*np.pi)
 
         step = np.arange(0, 1000)
-
+        self._plotPower = True
         if not pyType == 'jupyter' or do_matplotlib:
             # --  Create the Figure -- 
             f = plt.figure()
@@ -838,7 +838,7 @@ class LLEsovler(object):
             fig = go.Figure(data=data, layout=layout)
             iplot(fig)
 
-        self._plotPower = True
+            return fig
 
     def PlotCombSpectra(self, ind, f=None, ax=None, label=None, pwr='both', do_matplotlib = False, plot = True):
         '''

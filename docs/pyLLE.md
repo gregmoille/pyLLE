@@ -7,36 +7,27 @@ sidebar_sort_order: 6
 
 # _llesolver
 
-## MyLogger
-```python
-MyLogger(self, fname)
-```
+## MyLogger(self, fname)
 
 Custom made logger as the logger default package cannot be pickled
 
-## Latexify
-```python
-Latexify(self, **kwarg)
-```
+## Latexify(self, **kwarg)
 
 Class that handle saving the figures in a nice way compatible with
 the column/page size of different latex template
 
-- input [] = optional:
+- input (\[\] = optional):
     - figname = name to save the figure (without extension)
     - fig = matplotlib handle to the figure
-    - [fig_width]: default = 1column
-    - [frmt]: default = pdf
-    - [fig_height] : default = 6.5
-    - [font_size] : default = 8
+    - \[fig_width\]: default = 1column
+    - \[frmt\]: default = pdf
+    - \[fig_height\] : default = 6.5
+    - \[font_size\] : default = 8
 
-## LLEsovler
-```python
-LLEsovler(self, **kwargs)
-```
+## LLEsolver(self, **kwargs)
 
 Class to solve the Lugiato Lefever Equation
-Initialization input ([]=facultative):
+Initialization input (\[\]=facultative):
 
 - res \<dict\>
     - Qi \<float\>: intrinsic Q of the resonator
@@ -50,78 +41,31 @@ Initialization input ([]=facultative):
     - mu_sim \<list\>: number of mode to simulate
     - domega_init \<float\>: initial detuning of the pump
     - domega_end \<float\>: final detuning of the pump
-    - [domga_stop] \<float\>: where to stop the scan in detuning but keep doing the simulation
+    - \[domga_stop\] \<float\>: where to stop the scan in detuning but keep doing the simulation
 - debug \<bool\>: Save a trace in a logfile in the working directory of the different actions pyLLE perform (default = True)
 
-# LLEsovler
-```python
-LLEsovler(self, **kwargs)
-```
-
-Class to solve the Lugiato Lefever Equation
-Initialization input ([]=facultative):
-
-- res \<dict\>
-    - Qi \<float\>: intrinsic Q of the resonator
-    - Qc \<float\>: coupling Q of the resonator
-    - R \<float\>: ring radius
-    - gamma \<float\>: Non linear index of the material
-    - dispfile \<str\> : str pointing to a .csv file where the azimuthal mode orders and corresponding resonances are saved
-
-- sim \<dict\>
-    - Tscan \<float\>: length of the simulation (in unit of round trip)
-    - mu_fit \<list\>: number of mode to fit
-    - mu_sim \<list\>: number of mode to simulate
-    - domega_init \<float\>: initial detuning of the pump
-    - domega_end \<float\>: final detuning of the pump
-    - [domga_stop] \<float\>: where to stop the scan in detuning but keep doing the simulation
-
-- debug \<bool\>: Save a trace in a logfile in the working directory of the different actions pyLLE perform (default = True)
-
-### hbar
-float(x) -\> floating point number
-
-Convert a string or number to a floating point number, if possible.
-### Analyze
-```python
-LLEsovler.Analyze(self, plot=False, f=None, ax=None, label=None, plottype='all', zero_lines=True, mu_sim=None)
-```
+### LLEsolver.Analyze(self, plot=False, f=None, ax=None, label=None, plottype='all', zero_lines=True, mu_sim=None)
 
 Call pyLLE.analyzedisp.AnalyzeDisp to get the dispersion of the resonator we want to simulate
 
-### Setup
-```python
-LLEsovler.Setup(self)
-```
+### LLEsolver.Setup(self)
 
 Setup the simulation for the Julia back-end.
 Save the two main dictionary self.sim and self.res into a readable hdf5 file for Julia in the temporary location define by the os
 
-### SolveTemporal
-```python
-LLEsovler.SolveTemporal(self, tol=0.001, maxiter=6, step_factor=0.1)
-```
+### LLEsolver.SolveTemporal(self, tol=0.001, maxiter=6, step_factor=0.1)
 
 Call Julia to solve the LLE
 
-### SolveSteadySteate
-```python
-LLEsovler.SolveSteadySteate(self)
-```
+### LLEsolver.SolveSteadySteate(self)
 
 Newton Method to find the root of the steady state equation
 
-### RetrieveData
-```python
-LLEsovler.RetrieveData(self)
-```
+### LLEsolver.RetrieveData(self)
 
 Load the output hdf5 saved by julia and transform it in a user-friendly dictionary to be more pythonistic
 
-### PlotCombPower
-```python
-LLEsovler.PlotCombPower(self, do_matplotlib=False)
-```
+### LLEsolver.PlotCombPower(self, do_matplotlib=False)
 
 Plot a figure with 3 subplots.
 
@@ -132,10 +76,7 @@ Plot a figure with 3 subplots.
 - Output
     - f, ax:  handle of figure and axes of the matplotlib figure displayed
 
-### PlotCombSpectra
-```python
-LLEsovler.PlotCombSpectra(self, ind, f=None, ax=None, label=None, pwr='both', do_matplotlib=False, plot=True)
-```
+### LLEsolver.PlotCombSpectra(self, ind, f=None, ax=None, label=None, pwr='both', do_matplotlib=False, plot=True)
 
 Plot the spectra for a given index in the 1000 sub-sampled LLE steps
 
@@ -152,10 +93,7 @@ Plot the spectra for a given index in the 1000 sub-sampled LLE steps
     - f \<obj\>:  matplotlib figure handle
     - ax \<obj\>: matplotlib axes handle
 
-### PlotSolitonTime
-```python
-LLEsovler.PlotSolitonTime(self, ind, f=None, ax=None, label=None, do_matplotlib=False)
-```
+### LLEsolver.PlotSolitonTime(self, ind, f=None, ax=None, label=None, do_matplotlib=False)
 
 Plot the spectra for a given index in the 1000 sub-sampled LLE step
 
@@ -173,10 +111,7 @@ Plot the spectra for a given index in the 1000 sub-sampled LLE step
     - f \<obj\>: matplotlib figure handle
     - ax \<obj\>: matplotlib axe handle
 
-### SaveResults
-```python
-LLEsovler.SaveResults(self, fname, path='./')
-```
+### LLEsolver.SaveResults(self, fname, path='./')
 
 Save the whole class with pickle to be able to easilly call it back or retrieve the results after saving
 

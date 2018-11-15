@@ -45,7 +45,7 @@ sim = {'Pin': 150e-3, # Input power in Q
 Let’s initialize the class
 
 ```python
-solver = pyLLE.LLEsovler(sim=sim,
+solver = pyLLE.LLEsolver(sim=sim,
                        res=res,
                        debug=True)
 ```
