@@ -5,7 +5,7 @@
 
 pyLLE is a tool to solve the Lugiato Lefever Equations (LLE)<sup>[1](#ref1)</sup><sup>,</sup><sup>[2](#ref2)</sup><sup>,</sup><sup>[3](#ref3)</sup>in a fast and easy way. Thanks to an user-friendly front-end in python and a efficient back end in Julia, solving this problem becomes easy and fast. 
 
-For a complete documentation of the package, please visit the [readthedocs page](http://pylle.readthedocs.io/en/latest/index.html)
+For a complete documentation of the package, please visit the [gtihub page](https://gregmoille.github.io/pyLLE/)
 
 ## Instalation
 
@@ -71,7 +71,7 @@ It is important to note the format of the dispersion file *TestDispersion.txt*. 
 We can now setup the pyLLE class: 
 
 ```python 
-solver = pyLLE.LLEsovler(sim=sim,
+solver = pyLLE.LLEsolver(sim=sim,
                        res=res,
                        debug=True)
 ```
@@ -135,55 +135,6 @@ One can also solver quickly the LLE through a steady state method finding the ro
 ```python
 sim['δω'] =  -10e9,
 Ering, Ewg, f, ax = solver.SolveSteadySteate()
-```
-
-<br><br>
-
-
-The complete script is: 
-
-```python
-import matplotlib.pyplot as plt
-import numpy as np
-import pyLLE
-
-plt.close('all')
-
-
-res = {'R': 23e-6,
-       'Qi': 1e6,
-       'Qc': 1e6,
-       'γ': 1.55,
-       'dispfile': 'TestDispersion.txt'}
-
-sim = {'Pin': 100e-3,
-       'Tscan': 2e5,
-       'δω_stop': "None",
-       'f_pmp': 191e12,
-       'δω_init': 1e9*2*np.pi, 
-       'δω': -10e9,
-       'δω_end': -5e9*2*np.pi, 
-       'μ_sim': [-70,170],
-       'μ_fit': [-71, 170],
-        }
-
-# --  Setup thte Solver --
-solver = pyLLE.LLEsovler(sim=sim,
-                       res=res,
-                       debug=True)
-solver.Analyze(plot=True,
-               plottype='all')
-solver.Setup()
-
-# --  Solver the Steady State LLE --
-Ering, Ewg, f, ax = solver.SolveSteadySteate()
-
-# --  Solver the Temporal LLE --
-solver.SolveTemporal()
-solver.RetrieveData()
-solver.PlotCombPower()
-freq, Sout, Sring, fS, axS = solver.PlotCombSpectra(600)
-t, U, ft, axt = solver.PlotSolitonTime(600)
 ```
 
 ## How to Cite Us?
