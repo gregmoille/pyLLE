@@ -118,3 +118,35 @@ Save the whole class with pickle to be able to easily call it back or retrieve t
 - Input
     - fname \<str\>: name to save. The '.pkl' extension will be added
     - path \<str\>: path to save the results (defaults './')
+
+
+# _analyzedisp
+
+## AnalyzeDisp(self, **kwargs)
+
+Calls to analyze the dispersion of a simulated resonator
+Initialization input. Everything is in SI ([]=optional):
+
+- Input:
+    - f_center \<float\>: pump frequency
+    - file \<str\>: .txt file to load
+    - R \<float\>: radius of the resonator
+    - rM_fit \<list\>.: lower and upper bonds of mode to fit the dispersion
+    - rM_sim \<list\>.: lower and upper bonds of the modes to extrapolate for the simulation
+    - f \<obj\>: matplotlib figure handle
+    - ax \<obj\>: matplotlib axes handle
+    - label \<list\>: list of the string for each plot to be labeled
+    - plottype \<str\>: define the type of plot 'all' \[defaults\], 'sim', 'fit', 'fem', 'ind'
+
+### AnalyzeDisp.GetDint(self)
+
+Retrieve the dispersion of a resonator based on the frequency of
+resonance and azimuthal mode order. The data are fit using a cubic spline method
+
+- Output: 
+    + self.PrM_fit: scipy.interpolate object which fitted the data
+    + self.Dint_fit: fitted integrated dispersion for the simulated mode
+    + self.neff_pmp: effective index at the pump frequency
+    + self.ng_pmp: group index at the pump frequency
+
+
