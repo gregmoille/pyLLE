@@ -16,7 +16,7 @@ Using the **open source, free and efficient** computing of Julia, especially the
 
 | Matlab R2018a <i class="far fa-meh"></i>| Python Only <i class="far fa-sad-cry"></i>|  pyLLE <i class="far fa-thumbs-up"></i> |
 |:------:|:-----------:|:-------:|
-| 19 min | 45 min |  **10min**  |
+| 19 min | 45 min |  **11 min**  |
 
 <i class="fas fa-chalkboard-teacher"></i>  For a fairly complete example, please refer to the [example](https://gregmoille.github.io/pyLLE/Example.html) where we investigate the soliton generation in a micro-ring resonator
 
