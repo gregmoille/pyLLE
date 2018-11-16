@@ -12,13 +12,13 @@ pyLLE is a tool to solve the Lugiato Lefever Equations (LLE) in a fast and easy 
 
 Using the **open source, free and efficient** computing of Julia, especially the way fft are implemented makes the overall simulation last only few minutes. On the other hand, python allows a easy scripting, easy display of the figures and easy saving of the results. 
 
-<i class="fas fa-tachometer-alt"></i> How faster pyLLE is compared to other implementation? We ran this quick benchmark<sup>[1](#myfootnote1)</sup> to find out. One can see that pure Matlab R2018sa is doing not that bad (thank to a better JIT), but in addition of being slower than pyLLE the major drawback is the proprietary license and low portability of the language. Pure Python is really slow, hence one can see the **big** addition of doing the intensive job in Julia.
+<i class="fas fa-tachometer-alt"></i> How faster pyLLE is compared to other implementation? We ran this quick benchmark<sup>[1](#myfootnote1)</sup> to find out. One can see that pure Matlab R2018sa is doing not that bad (thank to a better JIT, beware of previous versions), but in addition of being slower than pyLLE the major drawback is the proprietary license and low portability of the language. Pure Python is really slow, hence one can see the **big** addition of doing the intensive job in Julia.
 
 | Matlab R2018a <i class="far fa-meh"></i>| Python Only <i class="far fa-sad-cry"></i>|  pyLLE <i class="far fa-thumbs-up"></i> |
 |:------:|:-----------:|:-------:|
-| 19 min |  |  **10min**  |
+| 19 min | 45 min |  **10min**  |
 
-<i class="fas fa-chalkboard-teacher"></i>  For a fairly complete example, please refer to the [example](https://gregmoille.github.io/pyLLE/Example.html) of  which investigate the soliton generation in a micro-ring resonator
+<i class="fas fa-chalkboard-teacher"></i>  For a fairly complete example, please refer to the [example](https://gregmoille.github.io/pyLLE/Example.html) where we investigate the soliton generation in a micro-ring resonator
 
 <i class="far fa-smile-beam"></i> If you are happy with the software, feel free to check out our [paper]() on this package, and [cite us](https://gregmoille.github.io/pyLLE/HowToCite.html) when you publish. 
 
