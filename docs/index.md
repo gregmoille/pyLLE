@@ -14,7 +14,7 @@ Using the **open source, free and efficient** computing of Julia, especially the
 
 <i class="fas fa-tachometer-alt"></i> How faster pyLLE is compared to other implementation? We ran this quick benchmark<sup>[1](#myfootnote1)</sup> to find out. One can see that pure Matlab R2018sa is doing not that bad (thank to a better JIT), but in addition of being slower than pyLLE the major drawback is the proprietary license and low portability of the language. Pure Python is really slow, hence one can see the **big** addition of doing the intensive job in Julia.
 
-| Matlab R2018a <i class="far fa-meh"></i>| Python Only <i class="far fa-dizzy"></i>|  pyLLE <i class="far fa-thumbs-up"></i> |
+| Matlab R2018a <i class="far fa-meh"></i>| Python Only <i class="far fa-sad-cry"></i>|  pyLLE <i class="far fa-thumbs-up"></i> |
 |:------:|:-----------:|:-------:|
 | 19 min |  |  **10min**  |
 
