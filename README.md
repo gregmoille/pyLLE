@@ -3,18 +3,18 @@
 ![](https://readthedocs.org/projects/pylle/badge/?version=latest) 
 [![](https://img.shields.io/github/license/mashape/apistatus.svg)](licence.txt)
 
-pyLLE is a tool to solve the Lugiato Lefever Equations (LLE)<sup>[1](#ref1)</sup><sup>,</sup><sup>[2](#ref2)</sup><sup>,</sup><sup>[3](#ref3)</sup>in a fast and easy way. Thanks to an user-friendly front-end in python and a efficient back end in Julia, solving this problem becomes easy and fast. 
+pyLLE is a tool to solve the Lugiato Lefever Equations (LLE)<sup>[1](#ref1)</sup><sup>,</sup><sup>[2](#ref2)</sup><sup>,</sup><sup>[3](#ref3)</sup>in a fast and easy way. Thanks to a user-friendly front-end in python and an efficient back-end in Julia, solving this problem becomes easy and fast. 
 
 For a complete documentation of the package, please visit the [gtihub page](https://gregmoille.github.io/pyLLE/)
 
 ## Instalation
 
-As pyLLE relies on a Julia back-end, please prior to install this package be sure that Julia is installed on your machine or visit the julia [package downloader page](https://julialang.org/downloads/oldreleases.html) to install it by selecting &#9888; **v0.6.4** &#9888;. Due to issue handling hdf5 file format, version 1.0.1 is not yet supported.
+As pyLLE relies on a Julia back-end, please prior to installing this package be sure that Julia is installed on your machine or visit the julia [package downloader page](https://julialang.org/downloads/oldreleases.html) to install it by selecting &#9888; **v0.6.4** &#9888;. Due to issues handling the hdf5 file format, version 1.0.1 is not yet supported.
 
-**Windows user**: Please, keep julia in the default directory during the installation (i.e. ~\AppData\Local\Julia-0.6.4\ for windows). 
+**Windows users**: Please, keep julia in the default directory during the installation (i.e. ~\AppData\Local\Julia-0.6.4\ for windows). 
 
 If not, please go to the manual installation.
-Once Julia installed, the different packages needed to run pyLLE, either python or julia related, will be automatically downloaded and installed. Just a heads up, the installation of the package can vary in time, especially because of Julia that might rebuilds the cache.
+Once Julia installed, the different packages needed to run pyLLE, either python or julia related, will be automatically downloaded and installed. Just a heads up, the installation of the package can vary in time, especially because of Julia that might rebuild the cache.
 For a automatic install, just pip it : 
 
 ```bash
@@ -58,9 +58,9 @@ sim = {'Pin': 100e-3, #input power in W
         }
 ```
 
-It is important to note the format of the dispersion file *TestDispersion.txt*. It be format such as each line represent an resonance, with first the azimuthal mode order then the frequency of resonance separated by a comma ',' 
+It is important to note the format of the dispersion file *TestDispersion.txt*. It must be formatted such that each line represents a resonance, with first the azimuthal mode order listed and then the frequency of the resonance, separated by a comma ',' 
 
-- The simulation need to be setup to create a .hdf5 
+- The simulation needs to be set up to create a .hdf5 
 
 ```python
    solver.Setup()
@@ -68,7 +68,7 @@ It is important to note the format of the dispersion file *TestDispersion.txt*. 
 
 <br>
 
-We can now setup the pyLLE class: 
+We can now set up the pyLLE class: 
 
 ```python 
 solver = pyLLE.LLEsolver(sim=sim,
@@ -76,7 +76,7 @@ solver = pyLLE.LLEsolver(sim=sim,
                        debug=True)
 ```
 
-The debug input allows the script to generate a log file in the working directory with useful information on the simulation. The authors highly encourage to keep this key to True, unless some loops are run which could create an issue with the read/write access to the file. 
+The debug input allows the script to generate a log file in the working directory with useful information on the simulation. The authors highly encourage to keep this key to True, unless some loops are run, which could create an issue with the read/write access to the file. 
 
 <br>
 
@@ -87,7 +87,7 @@ solver.Analyze(plot=True,
                plottype='all')
 ```
 
-To start the simulation, first we need to setup an hdf5 file which makes the bridge between python and julia 
+To start the simulation, first we need to set up an hdf5 file which makes the bridge between python and julia 
 
 ```python
 solver.Setup()
@@ -95,7 +95,7 @@ solver.Setup()
 
 <br>
 
-For the sake of simplicity and to retrieve the difference parameter, all keys of the sim and res dictionary are translated with the previously described translator dictionary and cannot be access anymore with the greek alphabet. Hence, in an ipython console, one can retrieve the parameter with, for example 
+For the sake of simplicity and to retrieve the different parameters, all keys of the sim and res dictionary are translated with the previously described translator dictionary and cannot be accessed anymore with the greek alphabet. Hence, in an ipython console, one can retrieve the parameter with, for example: 
 
 ```python
 IN [1]: solver.sim['mu_sim']
@@ -116,7 +116,7 @@ To retrieve the data computed by julia, we call the *RetrieveData* method
 solver.RetrieveData()
 ```
 
-We can finally start to plot the result of the simulation. One can start with a complete overview of the simulation, were a spectral and a temporal map Vs the LLE step is displayed in addition to the comb power Vs the LLE step
+We can finally start to plot the result of the simulation. One can start with a complete overview of the simulation, where a spectral and a temporal map vs the LLE step is displayed in addition to the comb power Vs the LLE step
 
 ```python
 solver.PlotCombPower()
@@ -130,7 +130,7 @@ solver.PlotCombSpectra(ind)
 ```
 
 
-One can also solver quickly the LLE through a steady state method finding the root of the LLE
+One can also quickly solve the LLE through a steady-state method to find its roots
 
 ```python
 sim['δω'] =  -10e9,
@@ -139,7 +139,7 @@ Ering, Ewg, f, ax = solver.SolveSteadySteate()
 
 ## How to Cite Us?
 
-Soon you will be. For the moment, please provide the name of the package, the authors (Gregory Moille, Qing Li, Xiyuan Lu and Kartik Srinivasan) as a full url to the repository
+Soon you will be able to cite a manuscript. For the moment, please provide the name of the package, the authors (Gregory Moille, Qing Li, Xiyuan Lu and Kartik Srinivasan) as a full url to the repository
 
 
 ## References
