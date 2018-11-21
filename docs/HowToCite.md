@@ -9,4 +9,4 @@ The paper is in preparation....
 
 For the moment please use the following citation:
 
-> G. Moille, Q. Lu, X. Li, K. Srinivasan, 'pyLLE sofwtare', https://github.com/gregmoille/pyLLE
+> G. Moille, Q. Li, X. Lu, K. Srinivasan, 'pyLLE sofwtare', https://github.com/gregmoille/pyLLE
