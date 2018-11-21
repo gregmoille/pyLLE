@@ -13,8 +13,8 @@ Custom made logger as the logger default package cannot be pickled
 
 ## Latexify(self, **kwarg)
 
-Class that handle saving the figures in a nice way compatible with
-the column/page size of different latex template
+Class that handles saving the figures in a nice way compatible with
+the column/page size of different latex templates.
 
 - Input (\[\] = optional):
     - figname = name to save the figure (without extension)
@@ -33,12 +33,12 @@ Initialization input (\[\] = optional):
     - Qi \<float\>: intrinsic Q of the resonator
     - Qc \<float\>: coupling Q of the resonator
     - R \<float\>: ring radius
-    - gamma \<float\>: Non linear index of the material
-    - dispfile \<str\> : str pointing to a .csv file where the azimuthal mode orders and corresponding resonances are saved
+    - gamma \<float\>: Effective nonlinearity of the waveguide comprising the resonator.
+    - dispfile \<str\> : str pointing to a .csv file where the azimuthal mode orders and corresponding resonance frequencies are saved
 - sim \<dict\>
-    - Tscan \<float\>: length of the simulation (in unit of round trip)
-    - mu_fit \<list\>: number of mode to fit
-    - mu_sim \<list\>: number of mode to simulate
+    - Tscan \<float\>: length of the simulation (in units of round trip)
+    - mu_fit \<list\>: number of modes to fit
+    - mu_sim \<list\>: number of mode that were simulated
     - domega_init \<float\>: initial detuning of the pump
     - domega_end \<float\>: final detuning of the pump
     - \[domga_stop\] \<float\>: where to stop the scan in detuning but keep doing the simulation
@@ -124,7 +124,7 @@ Save the whole class with pickle to be able to easily call it back or retrieve t
 
 ## AnalyzeDisp(self, **kwargs)
 
-Calls to analyze the dispersion of a simulated resonator
+Call to analyze the dispersion of a simulated resonator
 Initialization input. Everything is in SI ([]=optional):
 
 - Input:
