@@ -18,19 +18,15 @@ class MyInstall(install):
             julia = os.path.expanduser('~') + '\\AppData\\Local\\Julia-0.6.4\\bin\\julia.exe'
         sub.call([julia, 'InstallPkg.jl'])
         
-        
-
-with open("README.rst", "r") as fh:
-    long_description = fh.read()
-
+      
 setup(name='pyLLE',
-      version='2.1',
+      version='2.1.1',
       description='LLE Solver',
       url='https://github.com/gregmoille/pyLLE',
       author='Greg Moille',
       author_email='gregory.moille@nist.gov',
       license='MIT',
-      long_description=long_description,
+      long_description='',
       packages=['pyLLE'],
       install_requires=[
           'scipy',
