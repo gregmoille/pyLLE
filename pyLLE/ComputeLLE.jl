@@ -8,7 +8,7 @@ function Loadh5Param(dir)
     res = Dict()
     sim = Dict()
     sim_name = ["res", "sim"]
-    par = [["Qc", "R", "ng", "Qi", "gamma","dispfile"], ["dphi","Pin", "Tscan", "domega_init", "domega_end", "f_pmp", "mu_sim", "debug"]] 
+    par = [["Qc", "R", "ng", "Qi", "gamma","dispfile"], ["dphi","Pin", "Tscan", "domega_init", "domega_end", "f_pmp", "mu_sim", "debug", "ind_aux"]] 
     cnt = 1
     for sim_par = [res, sim]
         for it = par[cnt]
@@ -40,13 +40,14 @@ end
 # -- STARTING MAIN SCRIPT -- 
 # ----------------------------------------------------
 # FFTW.set_num_threads(Sys.CPU_CORES)
+
 tmp_dir = ARGS[1]
 tol= float(ARGS[2])
 maxiter = Int(float(ARGS[3]))
 stepFactor = float(ARGS[4])
 res, sim = Loadh5Param(tmp_dir)
+logfile =  open(tmp_dir * "Log.log" ,"w")
 
-logfile =  open(tmp_dir * "log.log" ,"w")
 # -- Collect Data ---
 # ----------------------------------------------------
 c0 = 299792458
@@ -67,13 +68,22 @@ debug = Bool(sim["debug"][1])
 δω_end = sim["domega_end"][1]
 t_end = sim["Tscan"][1]
 fpmp = sim["f_pmp"][1]
+Pin = sim["Pin"][1]
+if length(sim["f_pmp"])>1
+    faux = sim["f_pmp"][2:length(sim["f_pmp"])]
+    Paux = sim["Pin"][2:length(sim["f_pmp"])]
+else
+    faux = []
+    Paux = []
+end
 ω0 = 2*pi*fpmp
 dφ = sim["dphi"]
-Pin = sim["Pin"][1]
 μ_sim = sim["mu_sim"]
 μ = collect(μ_sim[1]:μ_sim[2])
 pmp_sim = find(μ .== 0)[1]
-
+ind_aux = sim["ind_aux"]
+write(logfile,string(ind_aux))
+print(string(ind_aux))
 # -- Setup the different Parameters -- 
 # ----------------------------------------------------
 tR = L*ng/c0
@@ -95,6 +105,11 @@ dφ_Kerr=θ*Pin*γ*L/α^2
 # -- Input Energy -- 
 Ein= zeros(size(μ))
 Ein[pmp_sim]=sqrt.(Pin)*length(μ)
+
+
+for ii=1:length(faux)
+    Ein[pmp_sim - ind_aux[ii]] = sqrt.(Paux[ii])*length(μ)
+end
 Ein_couple=sqrt(θ).*Ein
 
 # -- Noise Background -- 
@@ -110,9 +125,6 @@ dt=0.1/(sqrt(Pin))
 
 t_end = t_end*tR
 t_ramp=t_end
-
-
-
 
 # -- Seting up Simulation -- 
 # ----------------------------------------------------

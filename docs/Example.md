@@ -67,7 +67,7 @@ Here, we extrapolate (orange curve - _LLE simulation_) outside of the spectral w
 
 A new attribute _disp_ has been created, and consists of a dictionary of the different values of the retrieve dispersion.
 
-## Temporal Sovler
+## Temporal Solver
 
 One can solver the full temporal Lugiato Lefever equation 
 
@@ -99,6 +99,14 @@ If the user stops the solver (most of the time through a ctrl-c command), the Ju
 ---
 
 When done, we need to retrieve the data:
+
+```python
+solver.RetrieveData()
+```
+
+---
+
+Once done, one can plot a figure which summarize the evolution of the comb with the detuning using 
 
 ```python
 solver.PlotCombPower()

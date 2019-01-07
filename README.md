@@ -5,11 +5,11 @@
 
 pyLLE is a tool to solve the Lugiato Lefever Equations (LLE)<sup>[1](#ref1)</sup><sup>,</sup><sup>[2](#ref2)</sup><sup>,</sup><sup>[3](#ref3)</sup>in a fast and easy way. Thanks to a user-friendly front-end in python and an efficient back-end in Julia, solving this problem becomes easy and fast. 
 
-For a complete documentation of the package, please visit the [gtihub page](https://gregmoille.github.io/pyLLE/)
+For a complete documentation of the package, please visit the [github page](https://gregmoille.github.io/pyLLE/)
 
 ## Instalation
 
-As pyLLE relies on a Julia back-end, please prior to installing this package be sure that Julia is installed on your machine or visit the julia [package downloader page](https://julialang.org/downloads/oldreleases.html) to install it by selecting &#9888; **v0.6.4** &#9888;. Due to issues handling the hdf5 file format, version 1.0.1 is not yet supported.
+As pyLLE relies on a Julia back-end, please prior to installing this package be sure that Julia is installed on your machine or visit the julia [package download page](https://julialang.org/downloads/oldreleases.html) to install it by selecting &#9888; **v0.6.4** &#9888;. Due to issues handling the hdf5 file format, version 1.0.1 is not yet supported.
 
 **Windows users**: Please, keep julia in the default directory during the installation (i.e. ~\AppData\Local\Julia-0.6.4\ for windows). 
 

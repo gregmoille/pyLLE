@@ -28,6 +28,7 @@ with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=FutureWarning)
     import h5py
 
+import ipdb
 
 
 backend = mpl.get_backend()
@@ -340,11 +341,17 @@ class LLEsolver(object):
         if not('f_pmp' in self.sim.keys()):
             self.sim['f_pmp'] = self._c0/self.sim['lbd_pmp']
 
+
+        ## modification 12/21/2018
+        if not type(self.sim['f_pmp'])==list:
+            self.sim['f_pmp']= [self.sim['f_pmp']]
+
         do_plot = plot
 
         if self._debug:
             Info = '\n\tFilename: {}\n'.format(self.res['dispfile'])
-            Info += '\tf_pmp: {:.3f} THz'.format(self.sim['f_pmp']*1e-12)
+            for ff in self.sim['f_pmp']:
+                Info += '\tf_pmp: {:.3f} THz'.format(ff*1e-12)
             self._logger.info('LLEsovler.Analyze', "Analyzing dispersion file" + Info)
 
         self.sim = self._Translator(self.sim)
@@ -355,8 +362,8 @@ class LLEsolver(object):
         else: 
             μsim = mu_sim
 
-        self._analyze = AnalyzeDisp(file=self.res['dispfile'],
-                                    f_center=self.sim['f_pmp'],
+        self._analyze  = AnalyzeDisp(file=self.res['dispfile'],
+                                    f_center=self.sim['f_pmp'][0], # modification 12/21/2018
                                     rM_fit=self.sim['mu_fit'],
                                     rM_sim=μsim,
                                     R=self.res['R'],
@@ -392,6 +399,8 @@ class LLEsolver(object):
             self.fDint = f
             self.axDint = ax
             return f, ax 
+        else:
+            return f
 
     def Setup(self):
         '''
@@ -420,7 +429,21 @@ class LLEsolver(object):
                     'gamma': (u'\u03B3', 1, ''),}
                 
 
+        if not type(self.sim['f_pmp'][1::]) == list: 
+            self.sim['f_pmp'] = [self.sim['f_pmp']]
     
+        ind_aux = []
+        ind_pmp = np.argmin(np.abs(self.disp['freq']- self.sim['f_pmp'][0]))
+        # ipdb.set_trace()
+        for ii in range(len(self.sim['f_pmp'][1::])):
+            dummy = np.argmin(np.abs(self.disp['freq']- self.sim['f_pmp'][ii+1]))
+            ind_aux += [ind_pmp - dummy]
+
+        if ind_aux == []:
+            ind_aux = -1
+        self.sim['ind_aux'] = ind_aux
+        print(ind_aux)
+
 
         self.sim['debug'] = int(self._debug)
         Info = '-- Solving standard LLE --\n'
@@ -434,10 +457,15 @@ class LLEsolver(object):
         for k, it in self.sim.items():
             if k in dic_sim.keys():
                 if type(it) is list:
-                    Info += '\t\t{} = [{:.2f},{:.2f}] {}\n'.format(dic_sim[k][0], 
-                                                            it[0]*dic_sim[k][1],
-                                                            it[1]*dic_sim[k][1],
-                                                            dic_sim[k][2])
+                    try:
+                        Info += '\t\t{} = [{:.2f},{:.2f}] {}\n'.format(dic_sim[k][0], 
+                                                                it[0]*dic_sim[k][1],
+                                                                it[1]*dic_sim[k][1],
+                                                                dic_sim[k][2])
+                    except:
+                         Info += '\t\t{} = {:.2f} {}\n'.format(dic_sim[k][0], 
+                                                                it[0]*dic_sim[k][1],
+                                                                dic_sim[k][2])
                 else:
                     Info +='\t\t{} = {:.2f} {}\n'.format(dic_sim[k][0], it*dic_sim[k][1],dic_sim[k][2])
 
@@ -451,7 +479,6 @@ class LLEsolver(object):
             
 
         # -- create h5file --
-        # ipdb.set_trace()
         h5f = h5py.File(tmp_dir + 'ParamLLEJulia.h5', 'w')
         if self._debug:
             self._logger.info('LLEsovler.Setup','Saving parameters in: {}'.format(tmp_dir + 'ParamLLEJulia.h5'))
@@ -512,7 +539,8 @@ class LLEsolver(object):
         print('Launching Julia....', end = '')
         line = ''
         len_lin = len(line)
-        fname = tmp_dir + 'log.log' 
+        fname = tmp_dir + 'log.log'
+        print(fname) 
         conv_err = False
 
         def Pbar(perc, pgrs, tb_up):
@@ -617,7 +645,7 @@ class LLEsolver(object):
         Pin = self.sim['Pin']
         γ = self.res['gamma']
         L = 2*np.pi*self.res['R']
-        ω0 = self.sim['f_pmp']*2*np.pi
+        ω0 = self.sim['f_pmp'][0]*2*np.pi
         Q0 = self.res['Qi']
         Qc = self.res['Qc']
         tR = L*self.res['ng']/self._c0

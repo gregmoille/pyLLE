@@ -30,7 +30,7 @@ sim = {'Pin': 100e-3,
 solver = pyLLE.LLEsolver(sim=sim,
                        res=res,
                        debug=True)
-solver.Analyze(plot=True,
+f, ax = solver.Analyze(plot=True,
                plottype='all')
 solver.Setup()
 
@@ -38,9 +38,11 @@ solver.Setup()
 # f, ax = solver.SolveSteadySteate()
 
 # # --  Solver the Temporal LLE --
-solver.SolveTemporal()
-solver.RetrieveData()
-solver.PlotCombPower()
-ind = 450
-S, axS = solver.PlotCombSpectra(ind)
-ft, axt = solver.PlotSolitonTime(ind)
+# solver.SolveTemporal()
+# solver.RetrieveData()
+# solver.PlotCombPower()
+# ind = 450
+# S, axS = solver.PlotCombSpectra(ind)
+# ft, axt = solver.PlotSolitonTime(ind)
+solver.sim['δω'] = -3.6e9*2*np.pi # more or less what it is as the end of the soliton step 
+steady_fig = solver.SolveSteadySteate()

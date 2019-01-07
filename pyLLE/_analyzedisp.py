@@ -213,6 +213,7 @@ class AnalyzeDisp(object):
                   )
                 fig = go.Figure(data=data, layout=layout)
                 iplot(fig)
+                f = fig
         else:
             pass
 
@@ -251,10 +252,13 @@ class AnalyzeDisp(object):
         self.dφ = dφ_fitted
         try:
             self.f = f
+        except: 
+            self.f = None
+        try:
             self.ax = ax
         except:
-            self.f = None
             self.ax = None
+
         return PrM_fit, Dint_fit2, self.neff_pmp, self.ng_pmp, self.f, self.ax
 
 

@@ -1,10 +1,10 @@
 
 ---------------------------------------------------------------------------
-[ 2018-11-15 18:33:52 - __init__ ] New LLE
-[ 2018-11-15 18:33:53 - LLEsovler.Analyze ] Analyzing dispersion file
+[ 2019-01-04 17:03:29 - __init__ ] New LLE
+[ 2019-01-04 17:03:29 - LLEsovler.Analyze ] Analyzing dispersion file
 	Filename: TestDispersion.txt
 	f_pmp: 191.000 THz
-[ 2018-11-15 18:33:53 - AnalyzeDisp ] -- Dispersion Analysis --
+[ 2019-01-04 17:03:30 - AnalyzeDisp ] -- Dispersion Analysis --
 	Pump index: 72
 	Center Pump: 190.523 THz
 	FSR: 1006.36 GHz
@@ -12,7 +12,7 @@
 	 mu_fit: [-71, 180]
 	 mu_sim: [-74, 170]
 
-[ 2018-11-15 18:33:53 - LLEsovler.Setup ] -- Solving standard LLE --
+[ 2019-01-04 17:03:30 - LLEsovler.Setup ] -- Solving standard LLE --
 	Simulation Parameters
 		R = 23.00 µm
 		Qi = 1.00 M
@@ -27,8 +27,18 @@
 		μ_sim = [-74.00,170.00] 
 		μ_fit = [-71.00,180.00] 
 
-[ 2018-11-15 18:33:53 - LLEsovler.Setup ] Saving parameters in: /var/folders/qh/mzl16lsd5dj4254_sx6ghdsc0000gn/T/tmp1bk_jm4yParamLLEJulia.h5
-[ 2018-11-15 18:33:53 - LLEsovler.SolveTemporal ] Solving Temporal LLE with Julia....
-[ 2018-11-15 18:33:53 - LLEsovler.SolveTemporal ] tol = 0.001 -- maxiter = 6 step_factpr = 0.1
-[ 2018-11-15 18:48:03 - LLEsovler.SolveTemporal ] Simulation Time 00h:14min:09.3s
-[ 2018-11-15 18:48:03 - LLEsovler.RetrieveData ] Retrieving results from Julia in /var/folders/qh/mzl16lsd5dj4254_sx6ghdsc0000gn/T/tmp1bk_jm4yResultsJulia.h5
+[ 2019-01-04 17:03:30 - LLEsovler.Setup ] Saving parameters in: /var/folders/qh/mzl16lsd5dj4254_sx6ghdsc0000gn/T/tmp0xnvz_4uParamLLEJulia.h5
+[ 2019-01-04 17:03:30 - LLEsovler.SolveSteadySteate ] Solving Steady State LLE with Python....
+[ 2019-01-04 17:03:30 - LLEsovler.SolveSteadySteate ] Not symmetric mode calculation -> switching to it with µ_sim = [-170, 170]
+
+[ 2019-01-04 17:03:30 - LLEsovler.Analyze ] Analyzing dispersion file
+	Filename: TestDispersion.txt
+	f_pmp: 191.000 THz
+[ 2019-01-04 17:03:30 - AnalyzeDisp ] -- Dispersion Analysis --
+	Pump index: 72
+	Center Pump: 190.523 THz
+	FSR: 1006.36 GHz
+	D2: 24.58 MHz
+	 mu_fit: [-71, 180]
+	 mu_sim: [-170, 170]
+
