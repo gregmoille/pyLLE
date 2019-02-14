@@ -53,7 +53,7 @@ try:
     if className == 'ZMQInteractiveShell':
         pyType = 'jupyter'
     elif className == 'TerminalInteractiveShell':
-        pyType = 'ipython' 
+        pyType = 'ipython'
 except:
     # launching trhough a normal python
     pyType = 'normal'
@@ -69,18 +69,18 @@ class MyLogger():
     def __init__(self, fname):
         self.fname = fname
         open(self.fname,'a').write('\n' + '-'*75 + '\n')
-    
+
     def info(self, method, message):
         time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         mess = '[ ' + time + ' - ' + method + ' ] ' + message + '\n'
         open(self.fname,'a').write(mess)
-    
+
 class Latexify():
     '''
-    Class that handle saving the figures in a nice way compatible with 
+    Class that handle saving the figures in a nice way compatible with
     the column/page size of different latex template
 
-    input [] = optional: 
+    input [] = optional:
         - figname = name to save the figure (without extension)
         -
         - fig = matplotlib handle to the figure
@@ -182,15 +182,15 @@ class Latexify():
                 line.set_markeredgewidth(0.25)
                 line.set_markersize(3)
             for tick in ax.xaxis.get_major_ticks():
-                tick.label.set_fontsize(self.font_size) 
+                tick.label.set_fontsize(self.font_size)
             for tick in ax.yaxis.get_major_ticks():
-                tick.label.set_fontsize(self.font_size) 
+                tick.label.set_fontsize(self.font_size)
             for axis in ['top', 'bottom', 'left', 'right']:
                 ax.spines[axis].set_visible(True)
                 ax.spines[axis].set_edgecolor('k')
                 ax.spines[axis].set_linewidth(0.25)
-            ax.axesPatch.set_facecolor('None')  
-            
+            ax.axesPatch.set_facecolor('None')
+
             # ax.grid('off')
             xstr = ax.get_xlabel()
             ax.set_xlabel(xstr, size=self.font_size)
@@ -249,10 +249,10 @@ class LLEsolver(object):
         - Tscan <float>: length of the simulation (in unit of round trip)
         - mu_fit <list>: number of mode to fit
         - mu_sim <list>: number of mode to simulate
-        - domega_init <float>: initial detuning of the pump 
-        - domega_end <float>: final detuning of the pump 
+        - domega_init <float>: initial detuning of the pump
+        - domega_end <float>: final detuning of the pump
         - [domga_stop] <float>: where to stop the scan in detuning but keep doing the simulation
-    
+
     **debug <bool>**: Save a trace in a logfile in the working directory of the different actions pyLLE perform (default = True)
     '''
     _c0 = 299792458
@@ -288,10 +288,10 @@ class LLEsolver(object):
         assert 'dispfile' in self.res.keys(), 'Please provide dispfile'
 
         # -- Setup the Logger ---
-        if self._debug: 
+        if self._debug:
             self._logger = MyLogger("LLE.log")
             self._logger.info('__init__', 'New LLE')
-        else: 
+        else:
             self._logger = None
 
     def _Translator(self,D):
@@ -359,7 +359,7 @@ class LLEsolver(object):
 
         if mu_sim is None:
             μsim = self.sim['mu_sim']
-        else: 
+        else:
             μsim = mu_sim
 
         self._analyze  = AnalyzeDisp(file=self.res['dispfile'],
@@ -398,13 +398,13 @@ class LLEsolver(object):
         if (not pyType == 'jupyter'):
             self.fDint = f
             self.axDint = ax
-            return f, ax 
+            return f, ax
         else:
             return f
 
     def Setup(self):
         '''
-        Setup the simulation for the Julia back-end. 
+        Setup the simulation for the Julia back-end.
         Save the two main dictionary self.sim and self.res into a readable hdf5 file for Julia in the temporary location define by the os
         '''
         # -- Make the hdf5 file --
@@ -422,16 +422,16 @@ class LLEsolver(object):
                     'domega_end': (u'\u03B4\u03C9_end',1e-9/(2*np.pi), u'x2\u03C0 GHz'),
                     'mu_sim': (u'\u03BC_sim',1, ''),
                     'mu_fit': (u'\u03BC_fit',1, ''),}
-                    
+
         dic_res = {'R': ('R',1e6, 'µm'),
                     'Qi': ('Qi',1e-6, 'M'),
                     'Qc': ('Qc',1e-6, 'M'),
                     'gamma': (u'\u03B3', 1, ''),}
-                
 
-        if not type(self.sim['f_pmp'][1::]) == list: 
+
+        if not type(self.sim['f_pmp'][1::]) == list:
             self.sim['f_pmp'] = [self.sim['f_pmp']]
-    
+
         ind_aux = []
         ind_pmp = np.argmin(np.abs(self.disp['freq']- self.sim['f_pmp'][0]))
         # ipdb.set_trace()
@@ -458,12 +458,12 @@ class LLEsolver(object):
             if k in dic_sim.keys():
                 if type(it) is list:
                     try:
-                        Info += '\t\t{} = [{:.2f},{:.2f}] {}\n'.format(dic_sim[k][0], 
+                        Info += '\t\t{} = [{:.2f},{:.2f}] {}\n'.format(dic_sim[k][0],
                                                                 it[0]*dic_sim[k][1],
                                                                 it[1]*dic_sim[k][1],
                                                                 dic_sim[k][2])
                     except:
-                         Info += '\t\t{} = {:.2f} {}\n'.format(dic_sim[k][0], 
+                         Info += '\t\t{} = {:.2f} {}\n'.format(dic_sim[k][0],
                                                                 it[0]*dic_sim[k][1],
                                                                 dic_sim[k][2])
                 else:
@@ -473,10 +473,10 @@ class LLEsolver(object):
         if self._debug:
             try:
                 self._logger.info('LLEsovler.Setup', Info)
-            except: 
+            except:
                 Info = ''.join([self._greek[ii] if ii in self._greek.keys() else ii for ii in Info])
                 self._logger.info('LLEsovler.Setup', Info)
-            
+
 
         # -- create h5file --
         h5f = h5py.File(tmp_dir + 'ParamLLEJulia.h5', 'w')
@@ -487,13 +487,13 @@ class LLEsolver(object):
         h5f.create_group('sim')
         h5f.create_group('res')
         cnt = 0
-        
-        for key, it in self.sim.items():    
+
+        for key, it in self.sim.items():
             if not key == 'δω_disp':
                 if type(it) is str:
                     it = np.string_(it)
                 h5f.create_dataset('sim/{}'.format(key), data=[it])
-        for key, it in self.res.items():    
+        for key, it in self.res.items():
             if not key == 'δω_disp':
                 if type(it) is str:
                     it = np.string_(it)
@@ -540,7 +540,7 @@ class LLEsolver(object):
         line = ''
         len_lin = len(line)
         fname = tmp_dir + 'log.log'
-        print(fname) 
+        print(fname)
         conv_err = False
 
         def Pbar(perc, pgrs, tb_up):
@@ -561,7 +561,7 @@ class LLEsolver(object):
         pgrs = ''
         perc_old = 0
         perc = -1
-        
+
         line = ''
 
         # wait for the solver to actually start
@@ -576,8 +576,8 @@ class LLEsolver(object):
         while not perc == 100 and self.JuliaSolver.poll() == None:
             try:
                 ll = open(fname).readlines()[-1].strip()
-                try: 
-                    perc = int(ll)  
+                try:
+                    perc = int(ll)
                     if not perc_old == perc:
                         line, length, pgrs, tb_up= Pbar(perc, pgrs, tb_up)
                         print('\r' + line, end = '')
@@ -588,7 +588,7 @@ class LLEsolver(object):
                         conv_err = True
             except Exception as e:
                 pass
-        
+
         time_taken = time.time() - start
         end = time.time()
         hours, rem = divmod(end-start, 3600)
@@ -602,7 +602,7 @@ class LLEsolver(object):
         print('-'*70)
         if self._debug:
             self._logger.info('LLEsovler.SolveTemporal', time_taken)
-            
+
 
     def SolveSteadySteate(self):
         '''
@@ -640,7 +640,7 @@ class LLEsolver(object):
             dum = self.Analyze(mu_sim = μ_sim, plot = False, f = None)
 
 
-        # -- setting up parameters -- 
+        # -- setting up parameters --
         β2 = self._analyze.β2
         Pin = self.sim['Pin']
         γ = self.res['gamma']
@@ -650,19 +650,19 @@ class LLEsolver(object):
         Qc = self.res['Qc']
         tR = L*self.res['ng']/self._c0
         α = 1/2 * (ω0/Q0 + ω0/Qc) * tR
-        θ = ω0/Qc*tR 
+        θ = ω0/Qc*tR
         δω = -self.sim['domega']* tR
-        
+
         nlc = -1j*γ*L
         μ = np.arange(μ_sim[0], μ_sim[1]+1)
         pmp_ind = np.where(μ == 0)[0][0]
         ω = μ*2*np.pi/tR + ω0
         ν = ω/(2*np.pi)
-        # -- setting up input power -- 
+        # -- setting up input power --
         Ein = np.zeros(μ.size)
         Ein[pmp_ind] = np.sqrt(Pin) * μ.size
         Ein_couple = np.sqrt(θ)*Ein
-    
+
         # -- Define Initial Guess --
         sech = lambda x: 1/np.cosh(x)
         η = δω/α # need to be fixed
@@ -674,7 +674,7 @@ class LLEsolver(object):
         ut0 = np.sqrt(α/γ/L) * (Φ0+ B0 * np.exp(1j*φ0) * sech(B0*np.sqrt(α/(np.abs(β2)*L))*τ))
         Em0 = fft.fftshift(fft.fft(ut0))
         x_init = np.concatenate((Em0.real, -Em0.imag))
-        
+
         # -- Define the Steady State LLE Equation --
         φ = -α + 1j*δω - 1j*self.sim["dphi"]
         Em= lambda xx:  xx[0:int(xx.shape[0]/2)] + 1j*xx[int(xx.shape[0]/2)]
@@ -682,7 +682,7 @@ class LLEsolver(object):
         fm= lambda xx: φ*Em(xx) + nlc*fft.fft(np.abs(Ut(xx))**2*Ut(xx)) + Ein_couple;
         fvec= lambda xx: np.concatenate((fm(xx).real, fm(xx).imag))
 
-        # -- Solver the Steady State -- 
+        # -- Solver the Steady State --
         out = optm.root(fvec, x_init, method='lm', jac=None, tol=1e-20)
         Ering = Em(out.x)/μ.size
         Ewg = Ein/μ.size -Ering*np.sqrt(θ)
@@ -690,17 +690,18 @@ class LLEsolver(object):
         self.steady = {'Ering':Ering, 'Ewg':Ewg}
         if not pyType == 'jupyter':
             f, ax = plt.subplots(dpi=120)
-            ax.plot(1e-12*ν, 20*np.log10(np.abs(Ering)), label='Ring')
-            ax.plot(1e-12*ν, 20*np.log10(np.abs(Ewg)), label='Waveguide')
+            ax.plot(1e-12*ν, 30 + 10*np.log10(np.abs(Ewg)**2), label='Waveguide')
+            ax.plot(1e-12*ν, 30 + 10*np.log10(np.abs(Ering)**2), label='Ring')
             ax.legend()
             f.show()
             return f, ax
+
         else:
-            trace0 = go.Scatter(x = 1e-12*ν,y = 20*np.log10(np.abs(Ering)),
+            trace0 = go.Scatter(x = 1e-12*ν,y = 30 + 10*np.log10(np.abs(Ering)**2),
                             mode = 'lines', name='Res. Power')
-            trace1 = go.Scatter(x = 1e-12*ν,y = 20*np.log10(np.abs(Ewg)),
+            trace1 = go.Scatter(x = 1e-12*ν,y = 30 + 10*np.log10(np.abs(Ewg)**2),
                             mode = 'lines', name='Out Power')
-            data = [trace0, trace1]
+            data = [trace1, trace0]
             layout = dict(xaxis = dict(title = 'Frequency (THz)'),
                   yaxis = dict(title = 'Power (dBm)'),
                   )
@@ -710,7 +711,7 @@ class LLEsolver(object):
 
     def RetrieveData(self):
         '''
-        Load the output hdf5 saved by julia and transform it in a user-friendly dictionary to be more pythonistic 
+        Load the output hdf5 saved by julia and transform it in a user-friendly dictionary to be more pythonistic
         '''
 
         time.sleep(0.5)
@@ -731,12 +732,12 @@ class LLEsolver(object):
         os.remove(tmp_dir + 'ParamLLEJulia.h5')
         os.remove(tmp_dir + 'ResultsJulia.h5')
         sol['freq'] = sol['ω']/(2*np.pi)
-        sol['theta'] = np.linspace(-np.pi,np.pi, sol['u_probe'].shape[0]) 
+        sol['theta'] = np.linspace(-np.pi,np.pi, sol['u_probe'].shape[0])
         self.sol = sol
 
     def PlotCombPower(self, do_matplotlib = False):
         '''
-        Plot a figure with 3 subplots. 
+        Plot a figure with 3 subplots.
 
         - Top subplot = map of the spectra for the steps taken by the LLE (step sub-sampled to be 1000)
         - middle subplot = temporal map of the intensity inside the resonator for the steps of the LLE
@@ -764,7 +765,7 @@ class LLEsolver(object):
         step = np.arange(0, 1000)
         self._plotPower = True
         if not pyType == 'jupyter' or do_matplotlib:
-            # --  Create the Figure -- 
+            # --  Create the Figure --
             f = plt.figure()
             gs = gridspec.GridSpec(3,2, width_ratios=[1,0.015],wspace=0.05)
             ax = [None]*6
@@ -775,14 +776,14 @@ class LLEsolver(object):
             ax[4] = plt.subplot(gs[4],sharex=ax[0])
             cmap = plt.get_cmap("tab10")
 
-            # -- Plot Everything -- 
+            # -- Plot Everything --
             aa = ax[0].pcolormesh(step, freq,Epb,
-                             rasterized=True, 
+                             rasterized=True,
                              vmin = Epb.max()-120,
                              vmax = Epb.max())
 
             bb = ax[2].imshow(E2,aspect='auto',
-                    origin = 'lower', 
+                    origin = 'lower',
                     interpolation='bessel')
             tr_12 = 1e-12*np.floor(1e12*tR)/2
             # print(np.argmin(np.abs(tr_12- t)))
@@ -830,7 +831,7 @@ class LLEsolver(object):
             return f, ax
 
         else:
-            
+
             Sspec = go.Heatmap(x=step, y=freq, z=Epb,
                   colorbar=dict(len=0.37, y=0.83, title='Power (dBm)'),
                   yaxis='y3',
@@ -840,7 +841,7 @@ class LLEsolver(object):
                   )
 
             Stime = go.Heatmap(x = step, y = t*1e12, z = E2,
-                  colorbar=dict(len=0.34, y=0.47, title = '|E|^2'), 
+                  colorbar=dict(len=0.34, y=0.47, title = '|E|^2'),
                    yaxis='y2',
                    colorscale='Viridis')
 
@@ -872,7 +873,7 @@ class LLEsolver(object):
         '''
         Plot the spectra for a given index in the 1000 sub-sampled LLE steps
 
-        **Input** 
+        **Input**
 
             - ind <ind>: index in the LLE step to plot the spectra
             - f <obj>:  matplotlib figure handle (if None, new figure)
@@ -912,7 +913,7 @@ class LLEsolver(object):
                 if type(ax) is list:
                     f, ax = plt.subplots(dpi=120)
 
-        
+
 
             if pwr.lower() == 'both':
                 ax.plot(freq, Sout, label='Output P')
@@ -964,13 +965,13 @@ class LLEsolver(object):
 
     def PlotSolitonTime(self, ind, f=None, ax=None, label=None, do_matplotlib = False):
         '''
-        Plot the spectra for a given index in the 1000 sub-sampled LLE step 
+        Plot the spectra for a given index in the 1000 sub-sampled LLE step
 
-        **Input** 
+        **Input**
 
             - ind <ind>: index in the LLE step to plot the spectra
             - f <obj>:  matplotlib figure handle (if None, new figure)
-            - ax <obj>: matplotlib axe handle 
+            - ax <obj>: matplotlib axe handle
             - label <str>: label for the legend
 
         **Output**
@@ -981,14 +982,14 @@ class LLEsolver(object):
             - ax <obj>: matplotlib axe handle
         '''
 
-        
+
         tR = 2*np.pi*self.res['R']*self.res['ng']/self._c0
         freq = self.sol['freq']
-        
+
         τ = np.linspace(-0.5, 0.5, freq.size) * tR
         U = np.abs(self.sol['u_probe'][:,ind])**2
 
-        self.fasttime ={'U': U, 
+        self.fasttime ={'U': U,
                         'tau': τ}
         if not pyType == 'jupyter' or do_matplotlib:
             f, ax = plt.subplots(dpi=120)
@@ -1041,7 +1042,7 @@ class LLEsolver(object):
 
     def __repr__(self):
         to_print = ''
-        to_print = 'Dispersion load from:\t{}\n\n'.format(self.res['dispfile']) 
+        to_print = 'Dispersion load from:\t{}\n\n'.format(self.res['dispfile'])
         to_print += 'Resonator Parameters:\n'
         res_table = PrettyTable(['Parameters', 'Value', 'Units'])
         res_table.add_row(['R', "{:.3f}".format(self.res['R']*1e6),'µm'])
@@ -1064,12 +1065,12 @@ class LLEsolver(object):
         if 'μ_sim' in self.sim:
             sim_table.add_row(['μ_sim',"{}".format(self.sim['mu_sim']),''])
         if 'Tscan' in self.sim:
-            sim_table.add_row(['Tscan',"{:.3f}".format(self.sim['Tscan']*1e-5),'x1e5 tR'])        
+            sim_table.add_row(['Tscan',"{:.3f}".format(self.sim['Tscan']*1e-5),'x1e5 tR'])
         if 'domega_init' in self.sim:
             sim_table.add_row(['δω_init',"{:.3f}".format(self.sim['domega_init']*1e-9),'GHz'])
         if 'domega_end' in self.sim:
             sim_table.add_row(['δω_end',"{:.3f}".format(self.sim['domega_end']*1e-9),'GHz'])
         to_print += sim_table.get_string()
         to_print += '\n'
-        
+
         return to_print

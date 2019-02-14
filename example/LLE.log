@@ -42,3 +42,105 @@
 	 mu_fit: [-71, 180]
 	 mu_sim: [-170, 170]
 
+
+---------------------------------------------------------------------------
+[ 2019-02-14 09:40:24 - __init__ ] New LLE
+[ 2019-02-14 09:40:24 - LLEsovler.Analyze ] Analyzing dispersion file
+	Filename: TestDispersion.txt
+	f_pmp: 191.000 THz
+[ 2019-02-14 09:40:27 - AnalyzeDisp ] -- Dispersion Analysis --
+	Pump index: 72
+	Center Pump: 190.523 THz
+	FSR: 1006.36 GHz
+	D2: 24.58 MHz
+	 mu_fit: [-71, 180]
+	 mu_sim: [-74, 170]
+
+[ 2019-02-14 09:40:44 - LLEsovler.SolveSteadySteate ] Solving Steady State LLE with Python....
+[ 2019-02-14 09:40:44 - LLEsovler.SolveSteadySteate ] Not symmetric mode calculation -> switching to it with µ_sim = [-170, 170]
+
+[ 2019-02-14 09:40:44 - LLEsovler.Analyze ] Analyzing dispersion file
+	Filename: TestDispersion.txt
+	f_pmp: 191.000 THz
+[ 2019-02-14 09:40:44 - AnalyzeDisp ] -- Dispersion Analysis --
+	Pump index: 72
+	Center Pump: 190.523 THz
+	FSR: 1006.36 GHz
+	D2: 24.58 MHz
+	 mu_fit: [-71, 180]
+	 mu_sim: [-170, 170]
+
+
+---------------------------------------------------------------------------
+[ 2019-02-14 09:41:34 - __init__ ] New LLE
+[ 2019-02-14 09:41:35 - LLEsovler.Analyze ] Analyzing dispersion file
+	Filename: TestDispersion.txt
+	f_pmp: 191.000 THz
+[ 2019-02-14 09:41:37 - AnalyzeDisp ] -- Dispersion Analysis --
+	Pump index: 72
+	Center Pump: 190.523 THz
+	FSR: 1006.36 GHz
+	D2: 24.58 MHz
+	 mu_fit: [-71, 180]
+	 mu_sim: [-74, 170]
+
+[ 2019-02-14 09:41:43 - LLEsovler.SolveSteadySteate ] Solving Steady State LLE with Python....
+[ 2019-02-14 09:41:43 - LLEsovler.SolveSteadySteate ] Not symmetric mode calculation -> switching to it with µ_sim = [-170, 170]
+
+[ 2019-02-14 09:41:43 - LLEsovler.Analyze ] Analyzing dispersion file
+	Filename: TestDispersion.txt
+	f_pmp: 191.000 THz
+[ 2019-02-14 09:41:43 - AnalyzeDisp ] -- Dispersion Analysis --
+	Pump index: 72
+	Center Pump: 190.523 THz
+	FSR: 1006.36 GHz
+	D2: 24.58 MHz
+	 mu_fit: [-71, 180]
+	 mu_sim: [-170, 170]
+
+[ 2019-02-14 09:41:53 - LLEsovler.SolveSteadySteate ] Solving Steady State LLE with Python....
+[ 2019-02-14 09:41:53 - LLEsovler.SolveSteadySteate ] Not symmetric mode calculation -> switching to it with µ_sim = [-170, 170]
+
+[ 2019-02-14 09:41:53 - LLEsovler.Analyze ] Analyzing dispersion file
+	Filename: TestDispersion.txt
+	f_pmp: 191.000 THz
+[ 2019-02-14 09:41:53 - AnalyzeDisp ] -- Dispersion Analysis --
+	Pump index: 72
+	Center Pump: 190.523 THz
+	FSR: 1006.36 GHz
+	D2: 24.58 MHz
+	 mu_fit: [-71, 180]
+	 mu_sim: [-170, 170]
+
+
+---------------------------------------------------------------------------
+[ 2019-02-14 09:50:13 - __init__ ] New LLE
+[ 2019-02-14 09:50:13 - LLEsovler.Analyze ] Analyzing dispersion file
+	Filename: TestDispersion.txt
+	f_pmp: 191.000 THz
+[ 2019-02-14 09:50:15 - AnalyzeDisp ] -- Dispersion Analysis --
+	Pump index: 72
+	Center Pump: 190.523 THz
+	FSR: 1006.36 GHz
+	D2: 24.58 MHz
+	 mu_fit: [-71, 180]
+	 mu_sim: [-74, 170]
+
+[ 2019-02-14 09:50:19 - LLEsovler.Setup ] -- Solving standard LLE --
+	Simulation Parameters
+		R = 23.00 µm
+		Qi = 1.00 M
+		Qc = 1.00 M
+		γ = 1.55 
+	Simulation Parameters
+		Pin = 150.00 mW
+		Tscan = 1.00 x1e6 Round Trip
+		f_pmp = 191.00 THz
+		δω_init = 2.00 x2π GHz
+		δω_end = -8.00 x2π GHz
+		μ_sim = [-74.00,170.00] 
+		μ_fit = [-71.00,180.00] 
+
+[ 2019-02-14 09:50:19 - LLEsovler.Setup ] Saving parameters in: /var/folders/qh/mzl16lsd5dj4254_sx6ghdsc0000gn/T/tmp79dt_w_9ParamLLEJulia.h5
+[ 2019-02-14 09:50:19 - LLEsovler.SolveTemporal ] Solving Temporal LLE with Julia....
+[ 2019-02-14 09:50:19 - LLEsovler.SolveTemporal ] tol = 0.001 -- maxiter = 6 step_factpr = 0.1
