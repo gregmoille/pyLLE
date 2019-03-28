@@ -73,7 +73,7 @@ We can now set up the pyLLE class:
 ```python 
 solver = pyLLE.LLEsolver(sim=sim,
                        res=res,
-                       debug=True)
+                       debug=False)
 ```
 
 The debug input allows the script to generate a log file in the working directory with useful information on the simulation. The authors highly encourage to keep this key to True, unless some loops are run, which could create an issue with the read/write access to the file. 
