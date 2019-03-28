@@ -139,7 +139,9 @@ Ering, Ewg, f, ax = solver.SolveSteadySteate()
 
 ## How to Cite Us?
 
-Soon you will be able to cite a manuscript. For the moment, please provide the name of the package, the authors (Gregory Moille, Qing Li, Xiyuan Lu and Kartik Srinivasan) as a full url to the repository
+You can cite our arXiv paper availabel [here](https://arxiv.org/abs/1903.10441): 
+
+> G. Moille, Q. Li, X. Lu and K. Srinivasan, _"pyLLE: a Fast and User Friendly Lugiato-Lefever Equation Solver"_, arXiv, 1903.10441 , 2019
 
 
 ## References
