@@ -47,8 +47,10 @@ Let’s initialize the class
 ```python
 solver = pyLLE.LLEsolver(sim=sim,
                        res=res,
-                       debug=True)
+                       debug=False)
 ```
+
+Using the option _debug=False_ is important especially on windows where a bug is still hapening due to coing of the greek characters, resulting in a crash of the solver.
 
 ## Dispersion Analysis
 
