@@ -28,8 +28,7 @@ sim = {'Pin': 100e-3,
 
 # --  Setup thte Solver --
 solver = pyLLE.LLEsolver(sim=sim,
-                       res=res,
-                       debug=True)
+                       res=res)
 f, ax = solver.Analyze(plot=True,
                plottype='all')
 solver.Setup()
