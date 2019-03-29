@@ -251,9 +251,9 @@ class LLEsolver(object):
         - mu_sim <list>: number of mode to simulate
         - domega_init <float>: initial detuning of the pump
         - domega_end <float>: final detuning of the pump
-        - [domga_stop] <float>: where to stop the scan in detuning but keep doing the simulation
+        - [domega_stop] <float>: where to stop the scan in detuning but keep doing the simulation
 
-    **debug <bool>**: Save a trace in a logfile in the working directory of the different actions pyLLE perform (default = True)
+    **debug <bool>**: Save a trace in a logfile in the working directory of the different actions pyLLE perform (default = False)
     '''
     _c0 = 299792458
     hbar = 6.634e-34/(2*np.pi)
@@ -273,7 +273,7 @@ class LLEsolver(object):
         self.res = kwargs.get('res', {})
         self.sim = kwargs.get('sim', {})
         self.sim_norm = kwargs.get('sim_norm', None)
-        self._debug = kwargs.get('debug', True)
+        self._debug = kwargs.get('debug', False)
         self._plotPower = None
         self._plotSpecta = None
         self._indSpectra = 0
