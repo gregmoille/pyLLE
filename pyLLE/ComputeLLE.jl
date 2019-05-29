@@ -1,7 +1,8 @@
 using HDF5
 using Base
 using ProgressMeter
-
+using FFTW
+using LinearAlgebra
 
 function Loadh5Param(dir)
     h5file = dir * "ParamLLEJulia.h5"
@@ -42,9 +43,11 @@ end
 # FFTW.set_num_threads(Sys.CPU_CORES)
 
 tmp_dir = ARGS[1]
-tol= float(ARGS[2])
-maxiter = Int(float(ARGS[3]))
-stepFactor = float(ARGS[4])
+tol = parse(Float64,ARGS[2])
+#maxiter = Int(float(ARGS[3]))
+maxiter = parse(Int,ARGS[3])
+#stepFactor = float(ARGS[4])
+stepFactor = parse(Float64,ARGS[4])
 res, sim = Loadh5Param(tmp_dir)
 logfile =  open(tmp_dir * "Log.log" ,"w")
 
@@ -80,7 +83,8 @@ end
 dφ = sim["dphi"]
 μ_sim = sim["mu_sim"]
 μ = collect(μ_sim[1]:μ_sim[2])
-pmp_sim = find(μ .== 0)[1]
+pmp_sim_nm = findall(μ .== 0)
+pmp_sim = pmp_sim_nm[1]
 ind_aux = sim["ind_aux"]
 write(logfile,string(ind_aux))
 print(string(ind_aux))
@@ -92,14 +96,13 @@ T = 1*tR
 θ = ω0/Qc*tR 
 α=1/2* (ω0/Q0 + ω0/Qc) * tR
 
-# -- losses -- 
 dω = collect(μ_sim[1]:μ_sim[end])*2*pi/T
 Qc_disp=Qc*ones(size(dω))
 Qi_disp=Q0*ones(size(dω))
 
 # -- Dispersion -- 
 dβ=dφ/L
-dβ=dβ-dβ[pmp_sim]
+dβ=dβ.-dβ[pmp_sim]
 dφ_Kerr=θ*Pin*γ*L/α^2
 
 # -- Input Energy -- 
@@ -113,7 +116,7 @@ end
 Ein_couple=sqrt(θ).*Ein
 
 # -- Noise Background -- 
-Ephoton=ħ*(ω0+dω)
+Ephoton=ħ*(ω0.+dω)
 phase=2*pi*(rand(1,length(μ)))
 array=rand(1,length(μ))
 Enoise=array'.*sqrt.(Ephoton/2/tR).*exp.(1im*phase') .*length(μ)
@@ -130,8 +133,8 @@ t_ramp=t_end
 # ----------------------------------------------------
 
 # -- Allocate FFT to go faster -- 
-ifft_plan = plan_ifft(zeros(size(Enoise)))
-fft_plan = plan_fft(zeros(size(Enoise)))
+ifft_plan = FFTW.plan_ifft(zeros(size(Enoise)))
+fft_plan = FFTW.plan_fft(zeros(size(Enoise)))
 
 
 # -- Sim length -- 
@@ -143,7 +146,7 @@ t1=0
 
 # -- Detuning ramp -- 
 xx = collect(1:Nt)
-Δω_pmp = δω_init+ xx/Nt * (δω_end- δω_init)
+Δω_pmp = δω_init.+ xx/Nt * (δω_end - δω_init)
 
 # -- Initiial State -- 
 u0=ifft_plan*Enoise 
@@ -164,13 +167,17 @@ space = "."^100
 logfile =  open(tmp_dir * "log.log" ,"a")
 write(logfile,string(Int(round(0))) * "\n")
 close(logfile)
-probe_pbar = 1/100
+probe_pbar = parse(Float64,"0.01")
 cnt_pbar = 0
 # -- Main Solver -- 
 # ----------------------------------------------------
 for it = 1:1:Nt
+    global probe_pbar
+    global u0
+    global probe
+    global cnt_pbar
     # print("coucouc\n")
-    if it/Nt >=probe_pbar
+    if it/Nt >= probe_pbar
         cnt_pbar = cnt_pbar + 1 
         # print("\b"^103)
         # print("coucou")
@@ -180,20 +187,21 @@ for it = 1:1:Nt
         logfile =  open(tmp_dir * "log.log" ,"a")
         write(logfile,string(Int(round(probe_pbar*100))) * "\n")
         close(logfile)
-        probe_pbar = probe_pbar + 0.01
+        probe_pbar2 = probe_pbar + 0.01
+        probe_pbar=probe_pbar2
     end 
     u0=ifft_plan*(fft_plan*(u0) + Ein_couple*dt)
     u1=u0
-    cbeta = -α  + 1im*Δω_pmp[Int(it)] +  1im*L*dβ
+    cbeta = -α  .+ 1im*Δω_pmp[Int(it)] .+  1im*L*dβ
     halfprop = exp.(cbeta*dt/2)
     cnt = 0
     uhalf = ifft_plan*(halfprop.*(fft_plan*(u0)))
-    half1 = ifft_plan*(γ*(fft_plan*( abs.(u0).^2.*u0) ) )./u0
+    half1 = ifft_plan*(γ*(fft_plan*( abs.(u0).^2 .*u0) ) )./u0
     for ii = 1:maxiter
-        half2 = ifft_plan*(γ*(fft_plan*( abs.(u1).^2.*u1)))./u1
+        half2 = ifft_plan*(γ*(fft_plan*( abs.(u1).^2 .*u1)))./u1
         uv = uhalf .* exp.(1im*L.*(half1 + half2)*dt/2)  
         uv2 = ifft_plan*(halfprop.*(fft_plan*(uv)))
-        if (norm(uv2-u1,2)/norm(u1,2) < tol)
+        if (LinearAlgebra.norm(uv2-u1,2)/LinearAlgebra.norm(u1,2) < tol)
             u1 = uv2
             break
         else
@@ -219,13 +227,12 @@ for it = 1:1:Nt
         S["comb_power"][probe]=(sum(abs.(Em_probe).^2))/Pin
         S["detuning"][probe] = Δω_pmp[Int(it)]/tR
    end
-   
 end
 S["Ewg"] = 1im*zeros(size(S["Em_probe"]))
 for ii=1:size(S["Em_probe"],1)
     S["Ewg"][ii,:] = Ein/length(μ)-S["Em_probe"][ii,:].*sqrt(θ)
 end
-S["ω"] = (ω0 + dω)
+S["ω"] = (ω0 .+ dω)
 
 # print("\n")
 # print("Congrats, everything has been solved.\n")
