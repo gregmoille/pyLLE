@@ -17,10 +17,10 @@ class MyInstall(install):
         if sys.platform == 'win32':
             julia = os.path.expanduser('~') + '\\AppData\\Local\\Julia-0.6.4\\bin\\julia.exe'
         sub.call([julia, 'InstallPkg.jl'])
-        
-      
+
+
 setup(name='pyLLE',
-      version='2.1.1',
+      version='2.1.2',
       description='LLE Solver',
       url='https://github.com/gregmoille/pyLLE',
       author='Greg Moille',
@@ -46,5 +46,3 @@ setup(name='pyLLE',
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ),)
-
-

@@ -442,7 +442,7 @@ class LLEsolver(object):
         if ind_aux == []:
             ind_aux = -1
         self.sim['ind_aux'] = ind_aux
-        print(ind_aux)
+        # print(ind_aux)
 
 
         self.sim['debug'] = int(self._debug)
@@ -604,7 +604,7 @@ class LLEsolver(object):
             self._logger.info('LLEsovler.SolveTemporal', time_taken)
 
 
-    def SolveSteadySteate(self):
+    def SolveSteadyState(self):
         '''
         Newton Method to find the root of the steady state equation
         '''
