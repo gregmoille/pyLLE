@@ -196,10 +196,10 @@ for it = 1:1:Nt
         uv = uhalf .* exp.(1im*L.*(half1 + half2)*dt/2)
         uv2 = ifft_plan*(halfprop.*(fft_plan*(uv)))
         if (LinearAlgebra.norm(uv2-u1,2)/LinearAlgebra.norm(u1,2) < tol)
-            u1 = uv2
+            u1 = uv2 +u0 #adding qunatum noise at every round
             break
         else
-            u1 = uv2
+            u1 = uv2 + u0 #adding qunatum noise at every round
         end
         cnt += 1
     end
