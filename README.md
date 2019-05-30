@@ -1,7 +1,8 @@
 # pyLLE ![NIST logo](images/NISTlogo32x32.jpg)
 
-![](https://readthedocs.org/projects/pylle/badge/?version=latest) 
-[![](https://img.shields.io/github/license/mashape/apistatus.svg)](licence.txt)
+[![](https://img.shields.io/static/v1.svg?label=docs&message=passing&color=success)](https://gregmoille.github.io/pyLLE/)
+[![](https://img.shields.io/static/v1.svg?label=version&message=2.1.1&color=bue?style=flat)]()
+
 
 pyLLE is a tool to solve the Lugiato Lefever Equations (LLE)<sup>[1](#ref1)</sup><sup>,</sup><sup>[2](#ref2)</sup><sup>,</sup><sup>[3](#ref3)</sup>in a fast and easy way. Thanks to a user-friendly front-end in python and an efficient back-end in Julia, solving this problem becomes easy and fast. 
 
@@ -134,14 +135,14 @@ One can also quickly solve the LLE through a steady-state method to find its roo
 
 ```python
 sim['δω'] =  -10e9,
-Ering, Ewg, f, ax = solver.SolveSteadySteate()
+Ering, Ewg, f, ax = solver.SolveSteadyState()
 ```
 
 ## How to Cite Us?
 
 You can cite our arXiv paper available [here](https://arxiv.org/abs/1903.10441): 
 
-> G. Moille, Q. Li, X. Lu and K. Srinivasan, _"pyLLE: a Fast and User Friendly Lugiato-Lefever Equation Solver"_, arXiv, 1903.10441 , 2019
+> Moille G, Li Q, Lu X, Srinivasan K (2019) pyLLE: A Fast and User Friendly Lugiato-Lefever Equation Solver. J Res Natl Inst Stan 124:124012. https://doi.org/10.6028/jres.124.012
 
 
 ## References
