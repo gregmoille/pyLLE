@@ -3,7 +3,7 @@
 [![](https://img.shields.io/static/v1.svg?label=docs&message=passing&color=success)](https://gregmoille.github.io/pyLLE/)
 [![](https://img.shields.io/static/v1.svg?label=version&message=2.1.1&color=bue?style=flat)]()
 
-#9888; **This is a &beta; version to update to Julia 1.1.1 to get LTS support. This is still under testing** &#9888
+**&#9888; This is a &beta; version to update to Julia 1.1.1 to get LTS support. This is still under testing &#9888;**
 
 
 pyLLE is a tool to solve the Lugiato Lefever Equations (LLE)<sup>[1](#ref1)</sup><sup>,</sup><sup>[2](#ref2)</sup><sup>,</sup><sup>[3](#ref3)</sup>in a fast and easy way. Thanks to a user-friendly front-end in python and an efficient back-end in Julia, solving this problem becomes easy and fast.
