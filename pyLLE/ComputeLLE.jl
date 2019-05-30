@@ -96,10 +96,7 @@ T = 1*tR
 θ = ω0/Qc*tR
 α= 1/2* (ω0/Q0 + ω0/Qc) * tR
 
-<<<<<<< HEAD
 # -- losses --
-=======
->>>>>>> 93230dac4268a8762b790cb960096c396711e76c
 dω = collect(μ_sim[1]:μ_sim[end])*2*pi/T
 Qc_disp=Qc*ones(size(dω))
 Qi_disp=Q0*ones(size(dω))
@@ -119,13 +116,8 @@ for ii=1:length(faux)
 end
 Ein_couple=sqrt(θ).*Ein
 
-<<<<<<< HEAD
 # -- Noise Background --
-Ephoton=ħ*(ω0+dω)
-=======
-# -- Noise Background -- 
 Ephoton=ħ*(ω0.+dω)
->>>>>>> 93230dac4268a8762b790cb960096c396711e76c
 phase=2*pi*(rand(1,length(μ)))
 array=rand(1,length(μ))
 Enoise=array'.*sqrt.(Ephoton/2).*exp.(1im*phase') .*length(μ)
@@ -141,16 +133,9 @@ t_ramp=t_end
 # -- Seting up Simulation --
 # ----------------------------------------------------
 
-<<<<<<< HEAD
 # -- Allocate FFT to go faster --
-ifft_plan = plan_ifft(zeros(size(Enoise)))
-fft_plan = plan_fft(zeros(size(Enoise)))
-=======
-# -- Allocate FFT to go faster -- 
 ifft_plan = FFTW.plan_ifft(zeros(size(Enoise)))
 fft_plan = FFTW.plan_fft(zeros(size(Enoise)))
->>>>>>> 93230dac4268a8762b790cb960096c396711e76c
-
 
 # -- Sim length --
 tol=1e-3
@@ -191,30 +176,14 @@ for it = 1:1:Nt
     global u0
     global probe
     global cnt_pbar
-    # print("coucouc\n")
-<<<<<<< HEAD
-    if it/Nt >=probe_pbar
-        cnt_pbar = cnt_pbar + 1
-=======
     if it/Nt >= probe_pbar
-        cnt_pbar = cnt_pbar + 1 
->>>>>>> 93230dac4268a8762b790cb960096c396711e76c
-        # print("\b"^103)
-        # print("coucou")
-        # print("="^cnt_pbar)
-        # print("."^(space-cnt_pbar))
-        # print(" ")
+        cnt_pbar = cnt_pbar + 1
         logfile =  open(tmp_dir * "log.log" ,"a")
         write(logfile,string(Int(round(probe_pbar*100))) * "\n")
         close(logfile)
-<<<<<<< HEAD
-        probe_pbar = probe_pbar + 0.01
-    end
-=======
         probe_pbar2 = probe_pbar + 0.01
         probe_pbar=probe_pbar2
-    end 
->>>>>>> 93230dac4268a8762b790cb960096c396711e76c
+    end
     u0=ifft_plan*(fft_plan*(u0) + Ein_couple*dt)
     u1=u0
     cbeta = -α  .+ 1im*Δω_pmp[Int(it)] .+  1im*L*dβ
@@ -223,17 +192,10 @@ for it = 1:1:Nt
     uhalf = ifft_plan*(halfprop.*(fft_plan*(u0)))
     half1 = ifft_plan*(γ*(fft_plan*( abs.(u0).^2 .*u0) ) )./u0
     for ii = 1:maxiter
-<<<<<<< HEAD
-        half2 = ifft_plan*(γ*(fft_plan*( abs.(u1).^2.*u1)))./u1
-        uv = uhalf .* exp.(1im*L.*(half1 + half2)*dt/2)
-        uv2 = ifft_plan*(halfprop.*(fft_plan*(uv))) + Enoise
-        if (norm(uv2-u1,2)/norm(u1,2) < tol)
-=======
         half2 = ifft_plan*(γ*(fft_plan*( abs.(u1).^2 .*u1)))./u1
-        uv = uhalf .* exp.(1im*L.*(half1 + half2)*dt/2)  
+        uv = uhalf .* exp.(1im*L.*(half1 + half2)*dt/2)
         uv2 = ifft_plan*(halfprop.*(fft_plan*(uv)))
         if (LinearAlgebra.norm(uv2-u1,2)/LinearAlgebra.norm(u1,2) < tol)
->>>>>>> 93230dac4268a8762b790cb960096c396711e76c
             u1 = uv2
             break
         else
@@ -259,10 +221,7 @@ for it = 1:1:Nt
         S["comb_power"][probe]=(sum(abs.(Em_probe).^2))/Pin
         S["detuning"][probe] = Δω_pmp[Int(it)]/tR
    end
-<<<<<<< HEAD
 
-=======
->>>>>>> 93230dac4268a8762b790cb960096c396711e76c
 end
 S["Ewg"] = 1im*zeros(size(S["Em_probe"]))
 for ii=1:size(S["Em_probe"],1)
