@@ -532,7 +532,7 @@ class LLEsolver(object):
         if sys.platform == 'linux2':
             julia = 'julia'
         if sys.platform == 'win32':
-            julia = os.path.expanduser('~') + '\\AppData\\Local\\Julia-0.6.4\\bin\\julia.exe'
+            julia = os.path.expanduser('~') + '\\AppData\\Local\\Julia-1.1.1\\bin\\julia.exe'
 
         command = [julia, path_juliaScript , tmp_dir, str(tol), str(maxiter), str(step_factor)]
         self.JuliaSolver = sub.Popen(command, stdout=sub.PIPE)
