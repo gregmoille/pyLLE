@@ -135,14 +135,14 @@ One can also quickly solve the LLE through a steady-state method to find its roo
 
 ```python
 sim['δω'] =  -10e9,
-Ering, Ewg, f, ax = solver.SolveSteadySteate()
+Ering, Ewg, f, ax = solver.SolveSteadyState()
 ```
 
 ## How to Cite Us?
 
 You can cite our arXiv paper available [here](https://arxiv.org/abs/1903.10441): 
 
-> G. Moille, Q. Li, X. Lu and K. Srinivasan, _"pyLLE: a Fast and User Friendly Lugiato-Lefever Equation Solver"_, arXiv, 1903.10441 , 2019
+> Moille G, Li Q, Lu X, Srinivasan K (2019) pyLLE: A Fast and User Friendly Lugiato-Lefever Equation Solver. J Res Natl Inst Stan 124:124012. https://doi.org/10.6028/jres.124.012
 
 
 ## References
