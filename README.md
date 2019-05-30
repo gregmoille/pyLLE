@@ -3,6 +3,8 @@
 [![](https://img.shields.io/static/v1.svg?label=docs&message=passing&color=success)](https://gregmoille.github.io/pyLLE/)
 [![](https://img.shields.io/static/v1.svg?label=version&message=2.1.1&color=bue?style=flat)]()
 
+#9888; **This is a &beta; version to update to Julia 1.1.1 to get LTS support. This is still under testing** &#9888
+
 
 pyLLE is a tool to solve the Lugiato Lefever Equations (LLE)<sup>[1](#ref1)</sup><sup>,</sup><sup>[2](#ref2)</sup><sup>,</sup><sup>[3](#ref3)</sup>in a fast and easy way. Thanks to a user-friendly front-end in python and an efficient back-end in Julia, solving this problem becomes easy and fast.
 
@@ -10,7 +12,7 @@ For a complete documentation of the package, please visit the [github page](http
 
 ## Instalation
 
-As pyLLE relies on a Julia back-end, please prior to installing this package be sure that Julia is installed on your machine or visit the julia [package download page](https://julialang.org/downloads/oldreleases.html) to install it by selecting &#9888; **v0.6.4** &#9888;. Due to issues handling the hdf5 file format, version 1.0.1 is not yet supported.
+As pyLLE relies on a Julia back-end, please prior to installing this package be sure that Julia is installed on your machine or visit the julia [package download page](https://julialang.org/downloads/) to install it by selecting &#9888; **v1.1.1** &#9888;.
 
 **Windows users**: Please, keep julia in the default directory during the installation (i.e. ~\AppData\Local\Julia-0.6.4\ for windows).
 
@@ -140,7 +142,7 @@ Ering, Ewg, f, ax = solver.SolveSteadyState()
 
 ## How to Cite Us?
 
-You can cite our paper published in the Journal of Research of National Institute of Standards and Technology available [here](https://arxiv.org/abs/1903.10441): 
+You can cite our paper published in the Journal of Research of National Institute of Standards and Technology available [here](https://arxiv.org/abs/1903.10441):
 
 > Moille G, Li Q, Lu X, Srinivasan K (2019) pyLLE: A Fast and User Friendly Lugiato-Lefever Equation Solver. J Res Natl Inst Stan 124:124012. https://doi.org/10.6028/jres.124.012
 
