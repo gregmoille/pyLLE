@@ -138,9 +138,6 @@ ifft_plan = FFTW.plan_ifft(zeros(size(Enoise)))
 fft_plan = FFTW.plan_fft(zeros(size(Enoise)))
 
 # -- Sim length --
-tol=1e-3
-# tol=1e-20
-maxiter=6
 Nt= round(t_ramp/tR/dt)
 t1=0
 
@@ -171,11 +168,16 @@ probe_pbar = parse(Float64,"0.01")
 cnt_pbar = 0
 # -- Main Solver --
 # ----------------------------------------------------
+
+
+
 for it = 1:1:Nt
     global probe_pbar
     global u0
     global probe
     global cnt_pbar
+    global cnt_pbar
+
     if it/Nt >= probe_pbar
         cnt_pbar = cnt_pbar + 1
         logfile =  open(tmp_dir * "log.log" ,"a")
@@ -196,10 +198,10 @@ for it = 1:1:Nt
         uv = uhalf .* exp.(1im*L.*(half1 + half2)*dt/2)
         uv2 = ifft_plan*(halfprop.*(fft_plan*(uv)))
         if (LinearAlgebra.norm(uv2-u1,2)/LinearAlgebra.norm(u1,2) < tol)
-            u1 = uv2 +u0 #adding qunatum noise at every round
+            u1 = uv2
             break
         else
-            u1 = uv2 + u0 #adding qunatum noise at every round
+            u1 = uv2
         end
         cnt += 1
     end
