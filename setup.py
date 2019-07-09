@@ -15,7 +15,7 @@ class MyInstall(install):
         if sys.platform == 'linux2':
             julia = 'julia'
         if sys.platform == 'win32':
-            julia = os.path.expanduser('~') + '\\AppData\\Local\\Julia-1.1.4\\bin\\julia.exe'
+            julia = os.path.expanduser('~') + '\\AppData\\Local\\Julia-1.1.1\\bin\\julia.exe'
         sub.call([julia, 'InstallPkg.jl'])
 
 
