@@ -45,6 +45,7 @@ Launch a julia console and within type the commands:
 
 ```julia
 using HDF5
+using FFTW
 using ProgressMeter
 ```
 
@@ -62,6 +63,7 @@ julia>]
 then 
 ```julia
 (v1.1) pkg>add HDF5
+(v1.1) pkg>add FFTW
 (v1.1) pkg>add ProgressMeter
 ```
 
