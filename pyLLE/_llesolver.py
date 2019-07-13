@@ -423,10 +423,16 @@ class LLEsolver(object):
                     'mu_sim': (u'\u03BC_sim',1, ''),
                     'mu_fit': (u'\u03BC_fit',1, ''),}
 
-        dic_res = {'R': ('R',1e6, 'µm'),
-                    'Qi': ('Qi',1e-6, 'M'),
-                    'Qc': ('Qc',1e-6, 'M'),
-                    'gamma': (u'\u03B3', 1, ''),}
+        if self.res['Qc'].size >1:
+            dic_res = {'R': ('R',1e6, 'µm'),
+                        'Qi': ('Qi',1e-6, 'M'),
+                        'gamma': (u'\u03B3', 1, ''),}
+        else:
+            dic_res = {'R': ('R',1e6, 'µm'),
+                        'Qi': ('Qi',1e-6, 'M'),
+                        'Qc': ('Qc',1e-6, 'M'),
+                        'gamma': (u'\u03B3', 1, ''),}
+
 
 
         if not type(self.sim['f_pmp'][1::]) == list:
@@ -535,12 +541,12 @@ class LLEsolver(object):
             julia = os.path.expanduser('~') + '\\AppData\\Local\\Julia-1.1.1\\bin\\julia.exe'
 
         command = [julia, path_juliaScript , tmp_dir, str(tol), str(maxiter), str(step_factor)]
-        self.JuliaSolver = sub.Popen(command, stdout=sub.PIPE)
-        print('Launching Julia....', end = '')
+        self.JuliaSolver = sub.Popen(command, stdout=sub.PIPE, stderr=sub.PIPE)
+        print('Launching Julia....')
         line = ''
         len_lin = len(line)
         fname = tmp_dir + 'log.log'
-        print(fname)
+        print('Temp file can be found in: {}'.format(fname))
         conv_err = False
 
         def Pbar(perc, pgrs, tb_up):
@@ -563,45 +569,56 @@ class LLEsolver(object):
         perc = -1
 
         line = ''
-
+        timenow = time.time()
         # wait for the solver to actually start
-        while not perc == 0:
+        while not perc == 0 and self.JuliaSolver.poll() == None:
             try:
                 perc = int(open(fname).readlines()[-1].strip())
             except Exception as e:
                 pass
 
-        print('\rLaunching Julia: Done')
-        perc = -1
-        while not perc == 100 and self.JuliaSolver.poll() == None:
-            try:
-                ll = open(fname).readlines()[-1].strip()
+        #fetch if any errors:
+        err = False
+        if not self.JuliaSolver.poll() == None:
+            _, err = self.JuliaSolver.communicate()
+            if not err.decode() == '':
+                print('!!! JULIA ERROR !!!')
+                print(err)
+                err = True
+            print("Error: {}".format(err))
+
+        if not err:
+            print('Launching Julia: Done')
+            perc = -1
+            while not perc == 100 and self.JuliaSolver.poll() == None:
                 try:
-                    perc = int(ll)
-                    if not perc_old == perc:
-                        line, length, pgrs, tb_up= Pbar(perc, pgrs, tb_up)
-                        print('\r' + line, end = '')
-                        perc_old = perc
+                    ll = open(fname).readlines()[-1].strip()
+                    try:
+                        perc = int(ll)
+                        if not perc_old == perc:
+                            line, length, pgrs, tb_up= Pbar(perc, pgrs, tb_up)
+                            print('\r' + line, end = '')
+                            perc_old = perc
 
+                    except Exception as e:
+                        if ll.split()[0] == 'Failed':
+                            conv_err = True
                 except Exception as e:
-                    if ll.split()[0] == 'Failed':
-                        conv_err = True
-            except Exception as e:
-                pass
+                    pass
 
-        time_taken = time.time() - start
-        end = time.time()
-        hours, rem = divmod(end-start, 3600)
-        minutes, seconds = divmod(rem, 60)
-        time_taken = "Simulation Time " + \
-            "{:0>2}h:{:0>2}min:{:0>4.1f}s".format(int(hours),
-                                                  int(minutes),
-                                                  seconds)
-        print('\n')
-        print(time_taken)
-        print('-'*70)
-        if self._debug:
-            self._logger.info('LLEsovler.SolveTemporal', time_taken)
+            time_taken = time.time() - start
+            end = time.time()
+            hours, rem = divmod(end-start, 3600)
+            minutes, seconds = divmod(rem, 60)
+            time_taken = "Simulation Time " + \
+                "{:0>2}h:{:0>2}min:{:0>4.1f}s".format(int(hours),
+                                                      int(minutes),
+                                                      seconds)
+            print('\n')
+            print(time_taken)
+            print('-'*70)
+            if self._debug:
+                self._logger.info('LLEsovler.SolveTemporal', time_taken)
 
 
     def SolveSteadyState(self):

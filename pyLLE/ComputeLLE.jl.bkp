@@ -1,5 +1,6 @@
 using HDF5
 using Base
+using ProgressMeter
 using FFTW
 using LinearAlgebra
 
@@ -43,7 +44,9 @@ end
 
 tmp_dir = ARGS[1]
 tol = parse(Float64,ARGS[2])
+#maxiter = Int(float(ARGS[3]))
 maxiter = parse(Int,ARGS[3])
+#stepFactor = float(ARGS[4])
 stepFactor = parse(Float64,ARGS[4])
 res, sim = Loadh5Param(tmp_dir)
 logfile =  open(tmp_dir * "Log.log" ,"w")
@@ -91,28 +94,17 @@ tR = L*ng/c0
 f0 = c0/ng/L
 T = 1*tR
 θ = ω0/Qc*tR
-
+α= 1/2* (ω0/Q0 + ω0/Qc) * tR
 
 # -- losses --
 dω = collect(μ_sim[1]:μ_sim[end])*2*pi/T
-if length(Qc) == 1
-    Qc_disp=Qc*ones(size(dω))
-else
-    Qc_disp=Qc
-end
-
-if length(Q0) == 1
-    Q0_disp=Q0*ones(size(dω))
-else
-    Q0_disp=Q0
-end
-
-α= 0.5.*(ω0./Q0_disp.+ ω0./Qc_disp).* tR
+Qc_disp=Qc*ones(size(dω))
+Qi_disp=Q0*ones(size(dω))
 
 # -- Dispersion --
 dβ=dφ/L
 dβ=dβ.-dβ[pmp_sim]
-dφ_Kerr=θ*Pin*γ*L./α.^2
+dφ_Kerr=θ*Pin*γ*L/α^2
 
 # -- Input Energy --
 Ein= zeros(size(μ))
@@ -166,6 +158,8 @@ S["detuning"] = zeros(num_probe,)
 
 # -- Progress Bar --
 probe=0
+# pb = Progress(Int(Nt),0.5, "Calculating temporal loop:", Int(25))
+
 space = "."^100
 logfile =  open(tmp_dir * "log.log" ,"a")
 write(logfile,string(Int(round(0))) * "\n")
@@ -174,6 +168,9 @@ probe_pbar = parse(Float64,"0.01")
 cnt_pbar = 0
 # -- Main Solver --
 # ----------------------------------------------------
+
+
+
 for it = 1:1:Nt
     global probe_pbar
     global u0
@@ -191,8 +188,8 @@ for it = 1:1:Nt
     end
     u0=ifft_plan*(fft_plan*(u0) + Ein_couple*dt)
     u1=u0
-    cbeta = -α.+ 1im*Δω_pmp[Int(it)] .+  1im*L.*dβ
-    halfprop = exp.(cbeta.*dt/2)
+    cbeta = -α  .+ 1im*Δω_pmp[Int(it)] .+  1im*L*dβ
+    halfprop = exp.(cbeta*dt/2)
     cnt = 0
     uhalf = ifft_plan*(halfprop.*(fft_plan*(u0)))
     half1 = ifft_plan*(γ*(fft_plan*( abs.(u0).^2 .*u0) ) )./u0
@@ -234,8 +231,13 @@ for ii=1:size(S["Em_probe"],1)
 end
 S["ω"] = (ω0 .+ dω)
 
+# print("\n")
+# print("Congrats, everything has been solved.\n")
+# print("Now we are going to save the results in a .h5 file\n")
+# print("Everything will be in: ")
 logfile =  open(tmp_dir * "log.log" ,"a")
 write(logfile,string(Int(round(100))) * "\n")
 close(logfile)
 
 SaveResults(tmp_dir, S)
+# write(logfile,"Great we have saved everything... Moving back to Python\n")
