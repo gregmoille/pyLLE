@@ -223,7 +223,7 @@ for it = 1:1:Nt
         write(logfile,"Failed to converge to N=" * string(it) * " over Nt=" * string(Nt))
         close(logfile)
     end
-    u0=u1
+    u0=u1+(ifft_plan*(Enoise))
 
    if (it*num_probe/Nt > probe)
         probe += 1
