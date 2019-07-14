@@ -411,9 +411,18 @@ class LLEsolver(object):
         # ------------------------------------------------------------
         try:
             os.remove(tmp_dir + 'ParamLLEJulia.h5')
+        except:
+            pass
+
+        try:
             os.remove(tmp_dir + 'ResultsJulia.h5')
         except:
             pass
+        try:
+            os.remove(tmp_dir + 'log.log')
+        except:
+            pass
+
 
         dic_sim = {'Pin': ('Pin',1e3, 'mW'),
                     'Tscan': ('Tscan',1e-6, 'x1e6 Round Trip'),
@@ -423,11 +432,17 @@ class LLEsolver(object):
                     'mu_sim': (u'\u03BC_sim',1, ''),
                     'mu_fit': (u'\u03BC_fit',1, ''),}
 
-        if self.res['Qc'].size >1:
-            dic_res = {'R': ('R',1e6, 'µm'),
-                        'Qi': ('Qi',1e-6, 'M'),
-                        'gamma': (u'\u03B3', 1, ''),}
-        else:
+        try:
+            if len(self.res['Qc']) >1:
+                dic_res = {'R': ('R',1e6, 'µm'),
+                            'Qi': ('Qi',1e-6, 'M'),
+                            'gamma': (u'\u03B3', 1, ''),}
+            else:
+                dic_res = {'R': ('R',1e6, 'µm'),
+                            'Qi': ('Qi',1e-6, 'M'),
+                            'Qc': ('Qc',1e-6, 'M'),
+                            'gamma': (u'\u03B3', 1, ''),}
+        except:
             dic_res = {'R': ('R',1e6, 'µm'),
                         'Qi': ('Qi',1e-6, 'M'),
                         'Qc': ('Qc',1e-6, 'M'),
@@ -583,7 +598,7 @@ class LLEsolver(object):
             _, err = self.JuliaSolver.communicate()
             if not err.decode() == '':
                 print('!!! JULIA ERROR !!!')
-                print(err)
+                print(err.decode())
                 err = True
             print("Error: {}".format(err))
 

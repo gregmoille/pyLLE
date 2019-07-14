@@ -45,8 +45,8 @@ tmp_dir = ARGS[1]
 tol = parse(Float64,ARGS[2])
 maxiter = parse(Int,ARGS[3])
 stepFactor = parse(Float64,ARGS[4])
+#
 res, sim = Loadh5Param(tmp_dir)
-logfile =  open(tmp_dir * "Log.log" ,"w")
 
 # -- Collect Data ---
 # ----------------------------------------------------
@@ -59,8 +59,8 @@ R = res["R"][1]
 γ = res["gamma"][1]
 L = 2*pi*R
 
-Q0 = res["Qi"][1]
-Qc = res["Qc"][1]
+Q0 = res["Qi"]
+Qc = res["Qc"]
 
 # -- sim parameters --
 debug = Bool(sim["debug"][1])
@@ -83,36 +83,38 @@ dφ = sim["dphi"]
 pmp_sim_nm = findall(μ .== 0)
 pmp_sim = pmp_sim_nm[1]
 ind_aux = sim["ind_aux"]
-write(logfile,string(ind_aux))
-print(string(ind_aux))
 # -- Setup the different Parameters --
 # ----------------------------------------------------
 tR = L*ng/c0
 f0 = c0/ng/L
 T = 1*tR
-θ = ω0/Qc*tR
+
 
 
 # -- losses --
 dω = collect(μ_sim[1]:μ_sim[end])*2*pi/T
 if length(Qc) == 1
-    Qc_disp=Qc*ones(size(dω))
+    Qc_disp=Qc[1]*ones(size(dω))
+elseif length(Qc) == length(dω)
+    Qc_disp=Qc[1]
 else
-    Qc_disp=Qc
+    throw(DomainError("Qc", "Wrong size for Coupling Q array"))
 end
+
 
 if length(Q0) == 1
-    Q0_disp=Q0*ones(size(dω))
+    Q0_disp=Q0[1]*ones(size(dω))
+elseif length(Q0) == length(dω)
+    Q0_disp=Q0[1]
 else
-    Q0_disp=Q0
+    throw(DomainError("Q0", "Wrong size for Intrisic Q array"))
 end
-
 α= 0.5.*(ω0./Q0_disp.+ ω0./Qc_disp).* tR
-
+θ = ω0./Qc_disp*tR
 # -- Dispersion --
 dβ=dφ/L
 dβ=dβ.-dβ[pmp_sim]
-dφ_Kerr=θ*Pin*γ*L./α.^2
+# dφ_Kerr=θ*Pin*γ*L./α.^2
 
 # -- Input Energy --
 Ein= zeros(size(μ))
@@ -122,7 +124,7 @@ Ein[pmp_sim]=sqrt.(Pin)*length(μ)
 for ii=1:length(faux)
     Ein[pmp_sim - ind_aux[ii]] = sqrt.(Paux[ii])*length(μ)
 end
-Ein_couple=sqrt(θ).*Ein
+Ein_couple=sqrt.(θ).*Ein
 
 # -- Noise Background --
 Ephoton=ħ*(ω0.+dω)
@@ -167,11 +169,18 @@ S["detuning"] = zeros(num_probe,)
 # -- Progress Bar --
 probe=0
 space = "."^100
-logfile =  open(tmp_dir * "log.log" ,"a")
-write(logfile,string(Int(round(0))) * "\n")
-close(logfile)
+# logfile =  open(tmp_dir * "log.log" ,"a")
+# write(logfile,string(Int(round(0))) * "\n")
+# close(logfile)
 probe_pbar = parse(Float64,"0.01")
 cnt_pbar = 0
+
+
+
+logfile =  open(tmp_dir * "log.log" ,"a")
+write(logfile,string(0) * "\n")
+close(logfile)
+
 # -- Main Solver --
 # ----------------------------------------------------
 for it = 1:1:Nt
@@ -230,7 +239,7 @@ for it = 1:1:Nt
 end
 S["Ewg"] = 1im*zeros(size(S["Em_probe"]))
 for ii=1:size(S["Em_probe"],1)
-    S["Ewg"][ii,:] = Ein/length(μ)-S["Em_probe"][ii,:].*sqrt(θ)
+    S["Ewg"][ii,:] = Ein/length(μ)-S["Em_probe"][ii,:].*sqrt.(θ)
 end
 S["ω"] = (ω0 .+ dω)
 
