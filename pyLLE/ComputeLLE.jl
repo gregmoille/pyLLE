@@ -110,7 +110,7 @@ else
     throw(DomainError("Q0", "Wrong size for Intrisic Q array"))
 end
 α= 0.5.*(ω0./Q0_disp.+ ω0./Qc_disp).* tR
-θ = ω0./Qc_disp*tR
+θ = tR.*(ω0./Qc_disp)
 # -- Dispersion --
 dβ=dφ/L
 dβ=dβ.-dβ[pmp_sim]
@@ -127,7 +127,7 @@ end
 Ein_couple=sqrt.(θ).*Ein
 
 # -- Noise Background --
-Ephoton=ħ*(ω0.+dω)
+Ephoton=ħ.*(ω0.+dω)
 phase=2*pi*(rand(1,length(μ)))
 array=rand(1,length(μ))
 Enoise=array'.*sqrt.(Ephoton/2).*exp.(1im*phase') .*length(μ)

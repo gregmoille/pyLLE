@@ -580,7 +580,7 @@ class LLEsolver(object):
 
         tb_up = 2
         pgrs = ''
-        perc_old = 0
+        perc_old = -1
         perc = -1
 
         line = ''
