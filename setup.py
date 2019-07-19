@@ -36,6 +36,7 @@ setup(name='pyLLE',
           'h5py',
           'prettytable',
           'matplotlib',
+          'ipdb'
       ],
       package_data={'': ['*.jl']},
       include_package_data=True,
