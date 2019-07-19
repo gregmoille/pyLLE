@@ -3,9 +3,6 @@
 [![](https://img.shields.io/static/v1.svg?label=docs&message=passing&color=success)](https://gregmoille.github.io/pyLLE/)
 [![](https://img.shields.io/static/v1.svg?label=version&message=2.1.1&color=bue?style=flat)]()
 
-**&#9888; This is a &beta; version to update to Julia 1.1.1 to get LTS support. This is still under testing &#9888;**
-
-
 pyLLE is a tool to solve the Lugiato Lefever Equations (LLE)<sup>[1](#ref1)</sup><sup>,</sup><sup>[2](#ref2)</sup><sup>,</sup><sup>[3](#ref3)</sup>in a fast and easy way. Thanks to a user-friendly front-end in python and an efficient back-end in Julia, solving this problem becomes easy and fast.
 
 For a complete documentation of the package, please visit the [github page](https://gregmoille.github.io/pyLLE/)
@@ -49,22 +46,21 @@ using FFTW
 using ProgressMeter
 ```
 
-if any of the previous command throw an issue, mostly it is because it is not installed. One way to fix it is to remove the installed packaged to remove the cache 
+if any of the previous command throw an issue, mostly it is because it is not installed. One way to fix it is to remove the installed packaged to remove the cache
 
 - for linux and mac os user: remove everything in ~/.julia/
 - for windows users: remove everything in C:\Users\<your user name>\.julia\
 
-Then enter the pacakge manager for julia by typing in the julia console: 
+Then enter the pacakge manager for julia by typing in the julia console:
 
 ```julia
 julia>]
 ```
 
-then 
+then
 ```julia
 (v1.1) pkg>add HDF5
 (v1.1) pkg>add FFTW
-(v1.1) pkg>add ProgressMeter
 ```
 
 ## Example
@@ -82,7 +78,7 @@ res = {'R': 23e-6, # ring radius
        'Qi': 1e6,  # intrinsic quality factor
        'Qc': 1e6,  # coupling quality factor
        'γ': 2, # non-linear coefficient
-       'dispfile': 'TestDispersion.txt' # name of the dispersion file
+       'dispfile': 'TestDispersion.csv' # name of the dispersion file
        }
 sim = {'Pin': 100e-3, #input power in W
        'Tscan': 1e6, # Total time for the simulation in unit of round trip
@@ -94,7 +90,7 @@ sim = {'Pin': 100e-3, #input power in W
         }
 ```
 
-It is important to note the format of the dispersion file *TestDispersion.txt*. It must be formatted such that each line represents a resonance, with first the azimuthal mode order listed and then the frequency of the resonance, separated by a comma ','
+It is important to note the format of the dispersion file *TestDispersion.csv*. It must be formatted such that each line represents a resonance, with first the azimuthal mode order listed and then the frequency of the resonance, separated by a comma ','
 
 - The simulation needs to be set up to create a .hdf5
 
@@ -175,7 +171,7 @@ Ering, Ewg, f, ax = solver.SolveSteadyState()
 
 ## How to Cite Us?
 
-You can cite our paper published in the Journal of Research of National Institute of Standards and Technology available [here](https://arxiv.org/abs/1903.10441):
+You can cite our paper published in the Journal of Research of National Institute of Standards and Technology available [here](https://doi.org/10.6028/jres.124.012):
 
 > Moille G, Li Q, Lu X, Srinivasan K (2019) pyLLE: A Fast and User Friendly Lugiato-Lefever Equation Solver. J Res Natl Inst Stan 124:124012. https://doi.org/10.6028/jres.124.012
 
