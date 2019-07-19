@@ -3,25 +3,28 @@
 [![](https://img.shields.io/static/v1.svg?label=docs&message=passing&color=success)](https://gregmoille.github.io/pyLLE/)
 [![](https://img.shields.io/static/v1.svg?label=version&message=2.1.1&color=bue?style=flat)]()
 
-
 pyLLE is a tool to solve the Lugiato Lefever Equations (LLE)<sup>[1](#ref1)</sup><sup>,</sup><sup>[2](#ref2)</sup><sup>,</sup><sup>[3](#ref3)</sup>in a fast and easy way. Thanks to a user-friendly front-end in python and an efficient back-end in Julia, solving this problem becomes easy and fast.
 
 For a complete documentation of the package, please visit the [github page](https://gregmoille.github.io/pyLLE/)
 
 ## Instalation
 
-As pyLLE relies on a Julia back-end, please prior to installing this package be sure that Julia is installed on your machine or visit the julia [package download page](https://julialang.org/downloads/oldreleases.html) to install it by selecting &#9888; **v0.6.4** &#9888;. Due to issues handling the hdf5 file format, version 1.0.1 is not yet supported.
+As pyLLE relies on a Julia back-end, please prior to installing this package be sure that Julia is installed on your machine or visit the julia [package download page](https://julialang.org/downloads/) to install it by selecting &#9888; **v1.1.1** &#9888;.
 
-**Windows users**: Please, keep julia in the default directory during the installation (i.e. ~\AppData\Local\Julia-0.6.4\ for windows).
+**Windows users**: Please, keep julia in the default directory during the installation (i.e. ~\AppData\Local\Julia-1.1.1\ for windows).
 
-If not, please go to the manual installation.
+**Mac Os User**: You would need to add the julia binary to the path. The easiest way to do it is to create a simlink in the terminal
+
+```bash
+ln -s /Applications/Julia-1.1.app/Contents/Resources/julia/bin/julia /usr/local/bin/julia
+```
+
 Once Julia installed, the different packages needed to run pyLLE, either python or julia related, will be automatically downloaded and installed. Just a heads up, the installation of the package can vary in time, especially because of Julia that might rebuild the cache.
 For a automatic install, just pip it :
 
 ```bash
 pip install pyLLE
 ```
-
 For a manual install, download the .zip of the repository or clone it and install with the setup.py script
 
 ```bash
@@ -31,6 +34,34 @@ python setup.py install
 ```
 
 If the julia location is custom, please before installing change in the setup.py, line 18 to the correct location, as in pyLLE/llesolver.py line 430 to point to the correct location. Thanks
+
+
+## Checking that everything works correctly
+
+Launch a julia console and within type the commands:
+
+```julia
+using HDF5
+using FFTW
+using ProgressMeter
+```
+
+if any of the previous command throw an issue, mostly it is because it is not installed. One way to fix it is to remove the installed packaged to remove the cache
+
+- for linux and mac os user: remove everything in ~/.julia/
+- for windows users: remove everything in C:\Users\<your user name>\.julia\
+
+Then enter the pacakge manager for julia by typing in the julia console:
+
+```julia
+julia>]
+```
+
+then
+```julia
+(v1.1) pkg>add HDF5
+(v1.1) pkg>add FFTW
+```
 
 ## Example
 
@@ -47,7 +78,7 @@ res = {'R': 23e-6, # ring radius
        'Qi': 1e6,  # intrinsic quality factor
        'Qc': 1e6,  # coupling quality factor
        'γ': 2, # non-linear coefficient
-       'dispfile': 'TestDispersion.txt' # name of the dispersion file
+       'dispfile': 'TestDispersion.csv' # name of the dispersion file
        }
 sim = {'Pin': 100e-3, #input power in W
        'Tscan': 1e6, # Total time for the simulation in unit of round trip
@@ -59,7 +90,7 @@ sim = {'Pin': 100e-3, #input power in W
         }
 ```
 
-It is important to note the format of the dispersion file *TestDispersion.txt*. It must be formatted such that each line represents a resonance, with first the azimuthal mode order listed and then the frequency of the resonance, separated by a comma ','
+It is important to note the format of the dispersion file *TestDispersion.csv*. It must be formatted such that each line represents a resonance, with first the azimuthal mode order listed and then the frequency of the resonance, separated by a comma ','
 
 - The simulation needs to be set up to create a .hdf5
 
@@ -140,7 +171,7 @@ Ering, Ewg, f, ax = solver.SolveSteadyState()
 
 ## How to Cite Us?
 
-You can cite our paper published in the Journal of Research of National Institute of Standards and Technology available [here](https://arxiv.org/abs/1903.10441): 
+You can cite our paper published in the Journal of Research of National Institute of Standards and Technology available [here](https://doi.org/10.6028/jres.124.012):
 
 > Moille G, Li Q, Lu X, Srinivasan K (2019) pyLLE: A Fast and User Friendly Lugiato-Lefever Equation Solver. J Res Natl Inst Stan 124:124012. https://doi.org/10.6028/jres.124.012
 
