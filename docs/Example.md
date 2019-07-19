@@ -157,7 +157,7 @@ It is import to note that all these quantity are subsampled in regards of the sp
 To have a better idea of what is happening for a given laser-cavity mode detuning, we can plot the spectrum and the temporal profile of the electric field in the resonator at a fixed LLE step:
 
 ```python
-ind = 740
+ind = 540
 _ = solver.PlotCombSpectra(ind)
 ```
 
