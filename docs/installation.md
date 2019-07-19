@@ -7,10 +7,11 @@ sidebar_sort_order: 1
 
 ## Requirement
 
+As pyLLE relies on a Julia back-end, please prior to installing this package be sure that Julia is installed on your machine or visit the julia [package download page](https://julialang.org/downloads/) to install it by selecting &#9888; **v1.1.1** &#9888;.
 
-pyLLE relies on a **python >3.4** front-end for a user friendly interface – either through script commands or GUI - and on a **Julia v1.1.1** back-end for fast computation. Hence, one needs to [download Julia 1.1.1](https://julialang.org)and install Julia first before running the installation of pyLLE. Please keep Julia in the default directory during the installation (i.e. ~\AppData\Local\Julia-1.1.1\). If not, please go to the manual installation.
+**Windows users**: Please, keep julia in the default directory during the installation (i.e. ~\AppData\Local\Julia-1.1.1\ for windows).
 
-The different Julia packages required for solving the LLE and interfacing with python will be installed while pyLLE is set up.
+**Mac Os User**: You would need to add the julia binary to the path. The easiest way to do it is to create a simlink in the terminal
 
 
 ## Auto installation
