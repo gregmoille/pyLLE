@@ -5,7 +5,7 @@ title: Home
 
 # Welcome to pyLLE documentation
 
-_Current version: v2.1_
+_Current version: v3.0.0_
 
 
 pyLLE is a tool to solve the Lugiato Lefever Equations (LLE) in a fast and easy way. Thanks to a user-friendly front-end in python and an efficient back end in Julia, solving this problem becomes easy and fast.
