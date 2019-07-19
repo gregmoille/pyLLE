@@ -85,7 +85,7 @@ One can solver the full temporal Lugiato Lefever equation
 
 $$
 \begin{align*}
-t_R \frac{\partial E(t, \tau)}{\partial t} = &- \left(\frac{\alpha'}{2} - i\delta_0 \right)E + \\ &i \cdot \mathrm{FT}^{-1}\left[ -t_R D_{int}(\omega) \cdot \mathrm{FT}\left[E(t, \tau)\right]\right] +\\& \gamma|E|^2 E + \sqrt{\theta}E_{in}
+t_R \frac{\partial E(t, \tau)}{\partial t} = &- \left(\frac{\alpha'}{2} - i\delta_0 \right)E + \\ &i \cdot \mathrm{FT}^{-1}\left[ -t_R D_{int}(\omega) \cdot \mathrm{FT}\left[E(t, \tau)\right]\right] +\\& \gamma|E|^2 E + \sqrt{\eta}E_{in}
 \end{align*}
 $$
 
@@ -142,15 +142,15 @@ solver.sol.keys()
 Everything in the `solver.sol` dictionarry is in SI units, except for the comb power, which is in dBm.
 
 - `solver.sol['u_probe']`, is the complex electric field relative to the fast time within the cavity, hence the complex number, probed by the solver. It is a matrix 1000 x [number of µ solved]
-- `solver.sol['Em_probe']` is the FFT of `solver.sol['u_probe']`, hence the complex spectra of the electric field. The comb spectra, within the cavity is given bu $10\times\mathrm{log10}(|\mathtt{Em\_probe}|^2)$ From Em_probe, it is easy to find the output comb power, given by Em_probe*sqrt(&eta;), where &eta; (in the Julia solver), is the coupling rate to the waveguide, given by Q<sub>c</sub>
-- `solver.sol['Ewg']` corresponding to $\mathtt{solver.sol['Em_probe']}\times\sqrt{\eta}$, hence the complex spectra envelop of the electric field at the output of the coupled waveguide.
+- `solver.sol['Em_probe']` is the FFT of `solver.sol['u_probe']`, hence the complex spectra of the electric field. The comb spectra, within the cavity is given bu $10\times\mathrm{log10}(\mathrm{abs}(\mathtt{Em\_probe})^2)$ From Em_probe, it is easy to find the output comb power, given by Em_probe*sqrt(&eta;), where &eta; (in the Julia solver), is the coupling rate to the waveguide, given by Q<sub>c</sub>
+- `solver.sol['Ewg']` corresponding to $\mathtt{solver.sol['Em\_probe']}\times\sqrt{\eta}$, hence the complex spectra envelop of the electric field at the output of the coupled waveguide.
 - `solver.sol['detuning']` is the detuning ramp used
 - `solver.sol['ω']` is the angular frequency
 - `solver.sol['ω']` is the optical frequency
 - `solver.sol['theta']` is the position within the cavity, in radian (between -π and +π).
 
 
-It is import to note that all these quantity are subsampled in regards of the split-Fourier total step taken. Indeed, the number of step to solver the temporal LLE would be to large to efficienlty save or display the results. Hence, we subsample the steps taken by the solver at a fix number of *1000* (hence why the different matrices have a size of 1000x [number of µ solved])
+It is import to note that all these quantity are subsampled in regards of the split-Fourier total step taken. Indeed, the number of step to solver the temporal LLE would be to large to efficienlty save or display the results. Hence, we subsample the steps taken by the solver at a fix number of **1000** (hence why the different matrices have a size of 1000x [number of µ solved])
 
 ### Displaying Results
 
@@ -209,7 +209,7 @@ One can solve the steady state Lugiato Lefever equation :
 $$
 \begin{align*}
 &- \left(\frac{\alpha'}{2} - i\delta_0 \right)E + i \cdot \mathrm{FT}^{-1}\left[ -t_R D_{int}(\omega) \cdot \mathrm{FT}\left[E(t, \tau)\right]\right] +\\
-& \gamma|E|^2 E + \sqrt{\theta}E_{in} = 0
+& \gamma|E|^2 E + \sqrt{\eta}E_{in} = 0
 \end{align*}
 $$
 
