@@ -165,7 +165,7 @@ solver.PlotCombSpectra(ind)
 One can also quickly solve the LLE through a steady-state method to find its roots
 
 ```python
-sim['δω'] =  -10e9,
+sim['δω'] =  -10e9
 Ering, Ewg, f, ax = solver.SolveSteadyState()
 ```
 
