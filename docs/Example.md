@@ -85,7 +85,7 @@ One can solver the full temporal Lugiato Lefever equation
 
 $$
 \begin{align*}
-t_R \frac{\partial E(t, \tau)}{\partial t} = &- \left(\frac{\alpha'}{2} - i\delta_0 \right)E + \\ &i \cdot \mathrm{FT}^{-1}\left[ -t_R D_{int}(\omega) \cdot \mathrm{FT}\left[E(t, \tau)\right]\right] +\\& \gamma|E|^2 E + \sqrt{\eta}E_{in}
+t_R \frac{\partial E(t, \tau)}{\partial t} = &- \left(\frac{\alpha'}{2} - i\delta_0 \right)E + \\ &i \cdot \mathrm{FT}^{-1}\left[ -t_R D_{int}(\omega) \cdot \mathrm{FT}\left[E(t, \tau)\right]\right] +\\& L \gamma|E|^2 E + \sqrt{\eta}E_{in}
 \end{align*}
 $$
 
@@ -209,7 +209,7 @@ One can solve the steady state Lugiato Lefever equation :
 $$
 \begin{align*}
 &- \left(\frac{\alpha'}{2} - i\delta_0 \right)E + i \cdot \mathrm{FT}^{-1}\left[ -t_R D_{int}(\omega) \cdot \mathrm{FT}\left[E(t, \tau)\right]\right] +\\
-& \gamma|E|^2 E + \sqrt{\eta}E_{in} = 0
+& L \gamma|E|^2 E + \sqrt{\eta}E_{in} = 0
 \end{align*}
 $$
 
