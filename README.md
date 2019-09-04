@@ -84,20 +84,14 @@ res = {'R': 23e-6, # ring radius
 sim = {'Pin': 100e-3, #input power in W
        'Tscan': 1e6, # Total time for the simulation in unit of round trip
        'f_pmp': 191e12, # frequency of the pump in Hz
-       'δω_init': -4, # start frequency of detuning ramp in Hz
-       'δω_end': 10, # stop frequency of detuning ramp in Hz
+       'δω_init': 4e9*2*np.pi, # start frequency of detuning ramp in Hz
+       'δω_end': -10e9*2*np.pi, # stop frequency of detuning ramp in Hz
        'μ_sim': [-70,170], # limit of the mode on the left and right side of the pump to simulate
        'μ_fit': [-60, 160], # limit of the mode on the left and right side of the pump to fit the dispersion with
         }
 ```
 
 It is important to note the format of the dispersion file *TestDispersion.csv*. It must be formatted such that each line represents a resonance, with first the azimuthal mode order listed and then the frequency of the resonance, separated by a comma ','
-
-- The simulation needs to be set up to create a .hdf5
-
-```python
-   solver.Setup()
-```
 
 <br>
 
@@ -140,7 +134,7 @@ OUT [1]: [-70,170]
 Then we can start the simulation
 
 ```python
-solver.Solve()
+solver.SolveTemporal()
 ```
 
 To retrieve the data computed by julia, we call the *RetrieveData* method
@@ -166,7 +160,7 @@ solver.PlotCombSpectra(ind)
 One can also quickly solve the LLE through a steady-state method to find its roots
 
 ```python
-sim['δω'] =  -10e9
+sim['δω'] =  -5e9*2*np.pi
 Ering, Ewg, f, ax = solver.SolveSteadyState()
 ```
 
