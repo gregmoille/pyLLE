@@ -901,7 +901,7 @@ class LLEsolver(object):
 
             return fig
 
-    def PlotCombSpectra(self, ind, f=None, ax=None, label=None, pwr='both', do_matplotlib = False, plot = True):
+    def PlotCombSpectra(self, ind, f=None, ax=None, label=None, pwr='both', do_matplotlib = False, plot = True, style = 'line'):
         '''
         Plot the spectra for a given index in the 1000 sub-sampled LLE steps
 
@@ -977,13 +977,43 @@ class LLEsolver(object):
             if pwr.lower() == 'both':
                 data = [trace1, trace0]
             if pwr.lower() == 'ring':
-                data = [trace0]
+                if style == 'stem':
+                    clr  = "#1f77b4"
+                    data = [go.Scatter(x = freq,y = Sring,
+                                    mode = 'markers' ,name = 'Res. Power',
+                                    legendgroup = 'Res. Power',
+                                    marker = {'color': clr})]
+                    mini = Sring.min()
+                    for xx, yy in zip(freq, Sring):
+                        data += [go.Scatter(x = [xx, xx],y = [mini, yy],
+                                        mode = 'lines' ,name = 'Res. Power',
+                                        showlegend = False,
+                                        legendgroup = 'Res. Power',
+                                        marker = {'color': clr})]
+                else:
+                    data = [trace0]
             if pwr.lower() == 'wg':
-                data = [trace1]
+
+                if style == 'stem':
+                    clr  = "#1f77b4"
+                    data = [go.Scatter(x = freq,y = Sout,
+                                    mode = 'markers' ,name = 'Res. Power',
+                                    legendgroup = 'Res. Power',
+                                    marker = {'color': clr})]
+                    mini = Sout.min()
+                    for xx, yy in zip(freq, Sout):
+                        data += [go.Scatter(x = [xx, xx],y = [mini, yy],
+                                        mode = 'lines' ,name = 'Res. Power',
+                                        showlegend = False,
+                                        legendgroup = 'Res. Power',
+                                        marker = {'color': clr})]
+                else:
+                    data = [trace1]
 
             layout = dict(xaxis = dict(title = 'Frequency (THz)'),
-                  yaxis = dict(title = 'Power (dBm)'),
-                  )
+                        yaxis = dict(title = 'Power (dBm)'),
+                        hovermode="closest",
+                    )
             fig = go.Figure(data=data, layout=layout)
             if plot:
                 iplot(fig)
