@@ -429,6 +429,7 @@ class LLEsolver(object):
                     'f_pmp': ('f_pmp',1e-12, 'THz'),
                     'domega_init': (u'\u03B4\u03C9_init',1e-9/(2*np.pi), u'x2\u03C0 GHz'),
                     'domega_end': (u'\u03B4\u03C9_end',1e-9/(2*np.pi), u'x2\u03C0 GHz'),
+                    'domega_stop': (u'\u03B4\u03C9_stop',1e-9/(2*np.pi), u'x2\u03C0 GHz'),
                     'mu_sim': (u'\u03BC_sim',1, ''),
                     'mu_fit': (u'\u03BC_fit',1, ''),}
 
@@ -508,6 +509,14 @@ class LLEsolver(object):
         h5f.create_group('sim')
         h5f.create_group('res')
         cnt = 0
+
+        if not ('domega_stop' or 'δω_stop') in self.sim.keys():
+            try:
+                self.sim['domega_stop'] = self.sim['domega_end']
+
+            except:
+                self.sim['δω_stop'] = self.sim['δω_end']
+
 
         for key, it in self.sim.items():
             if not key == 'δω_disp':
@@ -636,7 +645,7 @@ class LLEsolver(object):
                 self._logger.info('LLEsovler.SolveTemporal', time_taken)
 
 
-    def SolveSteadyState(self):
+    def SolveSteadyState(self, do_plot = True):
         '''
         Newton Method to find the root of the steady state equation
         '''
@@ -703,7 +712,7 @@ class LLEsolver(object):
         φ0 = np.arccos(np.sqrt(8*η)/np.pi/f)
         τ = np.linspace(-0.5,0.5, μ.size)*tR
         Φ0 =  f/η**2 -1j* f/η
-        ut0 = np.sqrt(α/γ/L) * (Φ0+ B0 * np.exp(1j*φ0) * sech(B0*np.sqrt(α/(np.abs(β2)*L))*τ))
+        ut0 = np.sqrt(α/γ/L) * (Φ0+ B0 * np.exp(1j*φ0) * sech(0.5*B0*np.sqrt(α/(np.abs(β2)*L))*τ))
         Em0 = fft.fftshift(fft.fft(ut0))
         x_init = np.concatenate((Em0.real, -Em0.imag))
 
@@ -715,31 +724,33 @@ class LLEsolver(object):
         fvec= lambda xx: np.concatenate((fm(xx).real, fm(xx).imag))
 
         # -- Solver the Steady State --
-        out = optm.root(fvec, x_init, method='lm', jac=None, tol=1e-20)
+        out = optm.root(fvec, x_init, method='lm', jac=None, tol=1e-8)
         Ering = Em(out.x)/μ.size
         Ewg = Ein/μ.size -Ering*np.sqrt(θ)
 
-        self.steady = {'Ering':Ering, 'Ewg':Ewg}
+        self.steady = {'Ering':Ering, 'Ewg':Ewg, 'Uring': fft.ifft(Ering), 'freq': ν, 'tau': τ}
         if not pyType == 'jupyter':
-            f, ax = plt.subplots(dpi=120)
-            ax.plot(1e-12*ν, 30 + 10*np.log10(np.abs(Ewg)**2), label='Waveguide')
-            ax.plot(1e-12*ν, 30 + 10*np.log10(np.abs(Ering)**2), label='Ring')
-            ax.legend()
-            f.show()
-            return f, ax
+            if do_plot:
+                f, ax = plt.subplots(dpi=120)
+                ax.plot(1e-12*ν, 30 + 10*np.log10(np.abs(Ewg)**2), label='Waveguide')
+                ax.plot(1e-12*ν, 30 + 10*np.log10(np.abs(Ering)**2), label='Ring')
+                ax.legend()
+                f.show()
+                return f, ax
 
         else:
-            trace0 = go.Scatter(x = 1e-12*ν,y = 30 + 10*np.log10(np.abs(Ering)**2),
-                            mode = 'lines', name='Res. Power')
-            trace1 = go.Scatter(x = 1e-12*ν,y = 30 + 10*np.log10(np.abs(Ewg)**2),
-                            mode = 'lines', name='Out Power')
-            data = [trace1, trace0]
-            layout = dict(xaxis = dict(title = 'Frequency (THz)'),
-                  yaxis = dict(title = 'Power (dBm)'),
-                  )
-            fig = go.Figure(data=data, layout=layout)
-            iplot(fig)
-            return fig
+            if do_plot:
+                trace0 = go.Scatter(x = 1e-12*ν,y = 30 + 10*np.log10(np.abs(Ering)**2),
+                                mode = 'lines', name='Res. Power')
+                trace1 = go.Scatter(x = 1e-12*ν,y = 30 + 10*np.log10(np.abs(Ewg)**2),
+                                mode = 'lines', name='Out Power')
+                data = [trace1, trace0]
+                layout = dict(xaxis = dict(title = 'Frequency (THz)'),
+                      yaxis = dict(title = 'Power (dBm)'),
+                      )
+                fig = go.Figure(data=data, layout=layout)
+                iplot(fig)
+                return fig
 
     def RetrieveData(self):
         '''

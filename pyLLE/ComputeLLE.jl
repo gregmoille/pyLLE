@@ -8,7 +8,7 @@ function Loadh5Param(dir)
     res = Dict()
     sim = Dict()
     sim_name = ["res", "sim"]
-    par = [["Qc", "R", "ng", "Qi", "gamma","dispfile"], ["dphi","Pin", "Tscan", "domega_init", "domega_end", "f_pmp", "mu_sim", "debug", "ind_aux"]]
+    par = [["Qc", "R", "ng", "Qi", "gamma","dispfile"], ["dphi","Pin", "Tscan", "domega_init", "domega_end", "domega_stop", "f_pmp", "mu_sim", "debug", "ind_aux"]]
     cnt = 1
     for sim_par = [res, sim]
         for it = par[cnt]
@@ -66,6 +66,7 @@ Qc = res["Qc"]
 debug = Bool(sim["debug"][1])
 δω_init = sim["domega_init"][1]
 δω_end = sim["domega_end"][1]
+δω_stop = sim["domega_stop"][1]
 t_end = sim["Tscan"][1]
 fpmp = sim["f_pmp"][1]
 Pin = sim["Pin"][1]
@@ -136,6 +137,7 @@ Enoise=array'.*sqrt.(Ephoton/2).*exp.(1im*phase') .*length(μ)
 dt=0.1/(sqrt(Pin))
 δω_init = δω_init * tR
 δω_end = δω_end * tR
+δω_stop = δω_stop*tR
 
 t_end = t_end*tR
 t_ramp=t_end
@@ -154,7 +156,8 @@ t1=0
 # -- Detuning ramp --
 xx = collect(1:Nt)
 Δω_pmp = δω_init.+ xx/Nt * (δω_end - δω_init)
-
+ind = Δω_pmp .< δω_stop
+Δω_pmp[ind] .= δω_stop
 # -- Initiial State --
 u0=ifft_plan*Enoise
 
