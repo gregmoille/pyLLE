@@ -20,7 +20,7 @@ class MyInstall(install):
 
 
 setup(name='pyLLE',
-      version='3.0.0',
+      version='3.0.1',
       description='LLE Solver',
       url='https://github.com/gregmoille/pyLLE',
       author='Greg Moille',
