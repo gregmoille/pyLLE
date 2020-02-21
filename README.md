@@ -6,7 +6,7 @@
 
 pyLLE is a tool to solve the Lugiato Lefever Equations (LLE)<sup>[1](#ref1)</sup><sup>,</sup><sup>[2](#ref2)</sup><sup>,</sup><sup>[3](#ref3)</sup>in a fast and easy way. Thanks to a user-friendly front-end in python and an efficient back-end in Julia, solving this problem becomes easy and fast.
 
-For a complete documentation of the package, please visit the [github page](https://usnistgov.github.io/pyLLE/)
+For a complete documentation of the package, please visit the [github page](https://gregmoille.github.io/pyLLE/)
 
 ## Instalation
 
