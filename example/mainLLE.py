@@ -42,8 +42,8 @@ if to_run == 'Temporal':
     solver.RetrieveData()
     solver.PlotCombPower()
     ind = 450
-    fig = solver.PlotCombSpectra(ind)
-    fig = solver.PlotSolitonTime(ind)
+    figSpectra = solver.PlotCombSpectra(ind)
+    figTime = solver.PlotSolitonTime(ind)
 
 elif to_run == 'Steady'
     solver.sim['δω'] = -3.6e9*2*np.pi # more or less what it is as the end of the soliton step
