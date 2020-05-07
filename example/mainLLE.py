@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-import pyLLE_backup as pyLLE_backup
+import pyLLE
 
 plt.close('all')
 try:
@@ -25,8 +25,8 @@ sim = {'Pin': 100e-3,
         }
 
 # --  Setup thte Solver --
-solver = pyLLE_backup.LLEsolver(sim=sim,
-                       res=res)
+solver = pyLLE.LLEsolver(sim=sim,
+                         res=res)
 f = solver.Analyze(plot=True,
                plottype='all')
 solver.Setup()
