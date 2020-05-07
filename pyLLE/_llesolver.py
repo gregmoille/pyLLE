@@ -559,7 +559,7 @@ class LLEsolver(object):
 
         if sys.platform == 'darwin':
             julia = 'julia'
-        if sys.platform == 'linux2':
+        if sys.platform == 'linux2' or sys.platform == 'linux':
             julia = 'julia'
         if sys.platform == 'win32':
             julia = os.path.expanduser('~') + '\\AppData\\Local\\Julia-1.1.1\\bin\\julia.exe'
