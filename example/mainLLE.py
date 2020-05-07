@@ -33,7 +33,7 @@ if to_run == 'Temporal':
     # --  Setup thte Solver --
     solver = pyLLE.LLEsolver(sim=sim,
                            res=res)
-    f, ax = solver.Analyze(plot=True,
+    f = solver.Analyze(plot=True,
                    plottype='all')
     solver.Setup()
 
