@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import time
 import pyLLE
 
 plt.close('all')
@@ -30,9 +31,10 @@ solver = pyLLE.LLEsolver(sim=sim,
 f = solver.Analyze(plot=True,
                plottype='all')
 solver.Setup()
-
+time.sleep(1)
 # --  Solver the Temporal LLE --
 solver.SolveTemporal()
+time.sleep(1)
 solver.RetrieveData()
 solver.PlotCombPower()
 ind = 450
