@@ -176,6 +176,9 @@ You can cite our paper published in the Journal of Research of National Institut
 - Gregory Moille, Xiyuan Lu, Ashutosh Rao, Qing Li, Daron A. Westly, Leonardo Ranzani, Scott B. Papp, Mohammad Soltani, and Kartik Srinivasan "_Kerr-Microresonator Soliton Frequency Combs at Cryogenic Temperatures_," Phys. Rev. Applied 12, 034057 (2019)
 - Gregory Moille, Qing Li, Travis C. Briles, Su-Peng Yu, Tara Drake, Xiyuan Lu, Ashutosh Rao, Daron Westly, Scott B. Papp, and Kartik Srinivasan "_Broadband resonator-waveguide coupling for efficient extraction of octave-spanning microcombs_," Optics Letters Vol. 44, Issue 19, pp. 4737-4740 (2019)
 - Lin Chang, Weiqiang Xie, Haowen Shu, Qifan Yang, Boqiang Shen, Andreas Boes, Jon D. Peters, Warren Jin, Songtao Liu, Gregory Moille, Su-Peng Yu, Xingjun Wang, Kartik Srinivasan, Scott B. Papp, Kerry Vahala, John E. Bowers "_Ultra-efficient frequency comb generation in AlGaAs-on-insulator microresonators_," arXiv:1909.09778 (2019)
+- Schuttrups, B. (2020). "_Modelling nonlinear optical pulse propagation using pseudo-spectral methods_" (Master's thesis, University of Twente).
+- Weng, H., Liu, J., Afridi, A. A., Li, J., Dai, J., Ma, X. _et al._ "_Octave-spanning Kerr frequency comb generation with stimulated Raman scattering in an AlN microresonator_". Optics Letters, 46(3), 540-543. (2021)
+- Weng, H., Liu, J., Afridi, A. A., Li, J., Dai, J., Ma, X. _et al._ "_Directly accessing octave-spanning dissipative Kerr soliton frequency combs in an AlN microring resonator_" Photonics Research (2021)
 
 ## References
 
