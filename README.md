@@ -6,7 +6,30 @@
 
 pyLLE is a tool to solve the Lugiato Lefever Equations (LLE)<sup>[1](#ref1)</sup><sup>,</sup><sup>[2](#ref2)</sup><sup>,</sup><sup>[3](#ref3)</sup>in a fast and easy way. Thanks to a user-friendly front-end in python and an efficient back-end in Julia, solving this problem becomes easy and fast.
 
-For a complete documentation of the package, please visit the [github page](https://gregmoille.github.io/pyLLE/)
+For a complete documentation of the package, please visit the [github page](https://gregmoille.github.io/pyLLE/). 
+
+If you find this package to be of us for your research, don't forget to cite the paper describing this pacakge
+
+
+## How to Cite Us?
+
+You can cite our paper published in the Journal of Research of National Institute of Standards and Technology available [here](https://doi.org/10.6028/jres.124.012):
+
+> Moille G, Li Q, Lu X, Srinivasan K (2019) pyLLE: A Fast and User Friendly Lugiato-Lefever Equation Solver. J Res Natl Inst Stan 124:124012. https://doi.org/10.6028/jres.124.012
+
+You can also use the bibtex entry: 
+```latex
+@article{moille_pyLLE,
+      author = {Gregory Moille and Qing Li and Xiyuan Lu and Kartik Srinivasan},
+      title = {pyLLE: a Fast and User Friendly Lugiato-Lefever Equation Solver},
+      year = {2019},
+      volume = {124},
+      pages = {124012},
+      month = {2019-05-24},
+      journal = {Journal of Research of NIST},
+       doi = {https://doi.org/10.6028/jres.124.012},
+     }
+```
 
 ## Instalation
 
@@ -164,25 +187,6 @@ sim['δω'] =  -5e9*2*np.pi
 Ering, Ewg, f, ax = solver.SolveSteadyState()
 ```
 
-## How to Cite Us?
-
-You can cite our paper published in the Journal of Research of National Institute of Standards and Technology available [here](https://doi.org/10.6028/jres.124.012):
-
-> Moille G, Li Q, Lu X, Srinivasan K (2019) pyLLE: A Fast and User Friendly Lugiato-Lefever Equation Solver. J Res Natl Inst Stan 124:124012. https://doi.org/10.6028/jres.124.012
-
-You can also use the bibtex entry: 
-```latex
-@article{moille_pyLLE,
-      author = {Gregory Moille and Qing Li and Xiyuan Lu and Kartik Srinivasan},
-      title = {pyLLE: a Fast and User Friendly Lugiato-Lefever Equation Solver},
-      year = {2019},
-      volume = {124},
-      pages = {124012},
-      month = {2019-05-24},
-      journal = {Journal of Research of NIST},
-       doi = {https://doi.org/10.6028/jres.124.012},
-     }
-```
 
 ## Works Using pyLLE 
 
