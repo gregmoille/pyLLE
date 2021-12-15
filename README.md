@@ -1,6 +1,6 @@
 # pyLLE
 
-New version for mutlipled pumps!! Readme and exmaple in progress
+New version for mutlipled pumps!! Readme and example in progress
 
 ## How to Cite Us?
 
