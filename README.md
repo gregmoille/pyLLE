@@ -5,7 +5,7 @@
 
 # Update ETA 
 
-A version 4.0 is currently being pushed on github abd can be accessed through this [branch](https://github.com/jasonhcc/pyLLE/tree/4.0.0). At the moment there is no real tutorial or readme about it, and **a lot** has been changed -- from the core code much more user friendly in the algorithm, and introducing as many driving force (i.e. pumps) as needed (see my recent Nat Com paper to understand why) -- so if you need help at the moment just reach out and I'll follow up with you
+A version 4.0 is currently being pushed on github abd can be accessed through this [branch](https://github.com/jasonhcc/pyLLE/tree/4.0.0). At the moment there is no real tutorial or readme about it, and **a lot** has been changed -- from the core code much more user friendly in the algorithm, and introducing as many driving force (i.e. pumps) as needed (see my recent [Nat Com paper](https://www.nature.com/articles/s41467-021-27469-0) to understand why) -- so if you need help at the moment just reach out and I'll follow up with you
 
 # Intro
 
