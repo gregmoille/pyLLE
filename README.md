@@ -1,8 +1,15 @@
 # pyLLE ![NIST logo](images/NISTlogo32x32.jpg)
-
 [![](https://img.shields.io/static/v1.svg?label=docs&message=passing&color=green&style=flat)](https://gregmoille.github.io/pyLLE/)
 ![](https://img.shields.io/static/v1.svg?label=version&message=3.0.0&color=9cf&style=flat)
 [![](https://img.shields.io/static/v1.svg?label=DOI&message=10.6028/jres.124.012&color=blue&style=flat)](https://doi.org/10.6028/jres.124.012)
+
+# Update ETA 
+
+A version 4.0 is currently being pushed on github abd can be accessed through this [branch](https://github.com/jasonhcc/pyLLE/tree/4.0.0). At the moment there is no real tutorial or readme about it, and **a lot** has been changed -- from the core code much more user friendly in the algorithm, and introducing as many driving force (i.e. pumps) as needed (see my recent Nat Com paper to understand why) -- so if you need help at the moment just reach out and I'll follow up with you
+
+# Intro
+
+
 
 pyLLE is a tool to solve the Lugiato Lefever Equations (LLE)<sup>[1](#ref1)</sup><sup>,</sup><sup>[2](#ref2)</sup><sup>,</sup><sup>[3](#ref3)</sup>in a fast and easy way. Thanks to a user-friendly front-end in python and an efficient back-end in Julia, solving this problem becomes easy and fast.
 
