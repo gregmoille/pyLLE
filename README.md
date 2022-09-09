@@ -82,7 +82,7 @@ then
 (v1.1) pkg>add FFTW
 ```
 
-## Example [![NBviewer](https://custom-icon-badges.demolab.com/badge/jupyter-notebook-blue.svg?logo=eye&logoColor=white)](https://mybinder.org/v2/gh/gregmoille/pyLLE/HEAD?labpath=example%2FTemporalDualPump.ipynb)
+## Example [![NBviewer](https://custom-icon-badges.demolab.com/badge/jupyter-notebook-blue.svg?logo=eye&logoColor=white)](https://nbviewer.org/github/gregmoille/pyLLE/blob/master/example/TemporalDualPump.ipynb)
 
 A complete example is available in the example directory [notebook](https://github.com/gregmoille/pyLLE/blob/master/example/TemporalDualPump.ipynb) with the corresponding file needed in the folder. 
 You can also access the [nbviewer](https://nbviewer.org/github/gregmoille/pyLLE/blob/master/example/TemporalDualPump.ipynb) example to have a better idea of what's going on: 
