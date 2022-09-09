@@ -3,7 +3,7 @@
 ![](https://img.shields.io/static/v1.svg?label=version&message=4.0.0&color=9cf&style=flat)
 [![](https://img.shields.io/static/v1.svg?label=DOI&message=10.6028/jres.124.012&color=blue&style=flat)](https://doi.org/10.6028/jres.124.012)
 
-## How to Cite Us?
+## What's new
 
 Quite of a new version, v4.0.0 introduce a lot of new stuff including: 
 - Complete recoding of the core with better codding and commenting which hopefully makes it easier to implement custom features 
@@ -30,7 +30,7 @@ You can cite our paper published in the Journal of Research of National Institut
      }
 ```
 
-## Example 
+## Example [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/gregmoille/pyLLE/HEAD?labpath=example%2FTemporalDualPump.ipynb)
 
 As pyLLE relies on a Julia back-end, please prior to installing this package be sure that Julia is installed on your machine or visit the julia [package download page](https://julialang.org/downloads/) to install it. The code should now work with any recent version of Julia.
 
@@ -83,10 +83,10 @@ then
 (v1.1) pkg>add FFTW
 ```
 
-## Example
+## Example [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/gregmoille/pyLLE/HEAD?labpath=example%2FTemporalDualPump.ipynb)
 
-A complete example is available in the example directory [notebook](https://github.com/gregmoille/pyLLE/tree/master/example/NotebookExample.ipynb) with the corresponding file needed in the folder. 
-You can also access the interactive binder example to have a better idea of what's going on: 
+A complete example is available in the example directory [notebook](https://github.com/gregmoille/pyLLE/blob/master/example/TemporalDualPump.ipynb) with the corresponding file needed in the folder. 
+You can also access the [interactive binder](https://mybinder.org/v2/gh/gregmoille/pyLLE/HEAD?labpath=example%2FTemporalDualPump.ipynb) example to have a better idea of what's going on: 
 
 ## Works Using pyLLE 
 
