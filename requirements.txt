@@ -1,6 +1,4 @@
 plotly 
 numpy 
 scipy 
-pickle
 pandas
-scipy
