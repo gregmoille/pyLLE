@@ -40,7 +40,7 @@ end
 # ----------------------------------------------------
 # -- STARTING MAIN SCRIPT --
 # ----------------------------------------------------
-tmp_dir = ARGS[1] # "/var/folders/_v/2zfybdtj589c1fwk78q_q5qr0000gn/T/tmpqmatmei5" #
+tmp_dir = ARGS[1] #"/var/folders/_v/2zfybdtj589c1fwk78q_q5qr0000gn/T/tmpqmatmei5" #
 tol = parse(Float64,ARGS[2]) #1e-3 #
 maxiter = parse(Int,ARGS[3]) #10 #
 stepFactor =  parse(Float64,ARGS[4]) #1#
@@ -256,7 +256,11 @@ function Fdrive(it)
         # The phase shift iμjθ has already been taken into account previously in
         # Ain (due to noise, it needs to be initilized throug FFT)
         # ---------------------------------------------------------------------
-        σ = (δω_all[ii][it] .+ Dint[μ0+ind_pmp[ii]-1] .- δω_all[ind_sweep[1]][it] ) .* t_sim[it]
+        if ii > 1  
+            σ = (δω_all[ii][it] .+ Dint[μ0+ind_pmp[ii]-1] .-  2 .* δω_all[ind_sweep[1]][it] ) .* t_sim[it]
+        else
+            σ = 0
+        end
         # σ = (δω_all[ii][it] .+ Dint[μ0+ind_pmp[ii]-1]) .* t_sim[it]
         Force .= Force .- 1im .* Ain[ii] .*exp(1im .*σ)
     end
