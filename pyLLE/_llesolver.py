@@ -296,6 +296,9 @@ class LLEsolver(object):
         assert 'Tscan' in self._sim.keys(), 'Please provide Tscan'
         assert 'dispfile' in self._res.keys(), 'Please provide dispfile'
 
+        if not "D1_manual" in self._sim.keys():
+            self._sim["D1_manual"] = None
+
         # -- check if wavelength or frequency
         # ------------------------------------------------------------
         if not('f_pmp' in self._sim.keys()):
@@ -305,12 +308,14 @@ class LLEsolver(object):
 
 
         # -- Make sur than each pump has a power --
-
         if not type(self._sim['f_pmp'])==list:
             self._sim['f_pmp']= [self._sim['f_pmp']]
         if not type(self._sim['Pin'])==list:
             self._sim['Pin']= [self._sim['Pin']]
         assert len(self._sim['Pin']) == len(self._sim['f_pmp']), "The number of *pump* and *pump power* has to be the same"
+
+
+
 
         # -- Translate the dict from greek sign =--
         # ------------------------------------------------------------
@@ -431,7 +436,7 @@ class LLEsolver(object):
                                      rM_fit = self._sim['mu_fit'],
                                      rM_sim = self._sim['mu_sim'],
                                      R = self._res['R'],
-                                     D1_manual = self._sim.get("D1_manual", None),
+                                     D1_manual = self._sim["D1_manual"],
                                      fig = fig,
                                      plottype = plottype,
                                      logger = self._logger,
@@ -445,7 +450,8 @@ class LLEsolver(object):
 
 
         #
-        self._sim['Dint'] = self._analyze.Dint_sim[-1]
+        self._sim['Dint'] = self._analyze.Dint_sim[0]
+        self._sim['D1'] = self._analyze.D1[0]
         self._res['ng'] = self._analyze.ng_pmp
         self._sim['ind_pmp'] = self._analyze.pmp_ind
         self._sim['f_center'] = self._analyze.fpmp[-1]
@@ -457,9 +463,15 @@ class LLEsolver(object):
         self._sim['FSR_center'] = self._analyze.D1[-1]/(2*np.pi)
 
 
+        
+        if not "DKS_init" in self._sim.keys():
+            self._sim['DKS_init']= np.zeros(self._analyze.Dint_sim[0].size)
+
+
         disp = {
                 'ng': self._analyze.ng,
                 'D': self._analyze.D*1e6,
+                "D1": self._analyze.D1[0],
                 'neff': self._analyze.neff,
                 'freq': self._analyze.rf,
                 'freq_sim': self._analyze.freq_fit,
@@ -492,6 +504,7 @@ class LLEsolver(object):
             "ind_pmp": self._sim['ind_pmp'],
             "ind_pump_sweep": self._sim['ind_pump_sweep'],
             "phi_pmp": self._sim['phi_pmp'],
+            "DKS_init": self._sim['DKS_init'],
         }
 
 
@@ -645,7 +658,18 @@ class LLEsolver(object):
                                 it = 0
                         except:
                             pass
-                    h5f.create_dataset('sim/{}'.format(key), data=[it])
+                    dset = key
+                    h5f.create_dataset(f'sim/{dset}', data=[it])
+                if key == "DKS_init":
+
+                    dset = 'DKSinit_real'
+                    h5f.create_dataset(f'sim/{dset}', data=np.real(it))
+                    dset = 'DKSinit_imag'
+                    h5f.create_dataset(f'sim/{dset}', data=np.imag(it))
+
+
+
+                    
             for key, it in self._res.items():
                 if not key == 'domega_disp':
                     if type(it) is str:
@@ -918,22 +942,22 @@ class LLEsolver(object):
 
         time.sleep(2)
         drct = self.tmp_dir
-        S = h5py.File(self.tmp_dir + 'ResultsJulia.h5', 'r')
-        if self._debug:
-            self._logger.info('LLEsovler.RetrieveData','Retrieving results from Julia in {}'.format(self.tmp_dir + 'ResultsJulia.h5'))
-        self._sol = {}
-        keys = ['u_probe', 'driving_force']
-        for k in keys:
-            rl = 'Results/{}Real'.format(k)
-            im = 'Results/{}Imag'.format(k)
-            self._sol[k] = S[rl][:] + 1j*S[im][:]
+        with h5py.File(self.tmp_dir + 'ResultsJulia.h5', 'r') as S:
+            if self._debug:
+                self._logger.info('LLEsovler.RetrieveData','Retrieving results from Julia in {}'.format(self.tmp_dir + 'ResultsJulia.h5'))
+            self._sol = {}
+            keys = ['u_probe', 'driving_force']
+            for k in keys:
+                rl = 'Results/{}Real'.format(k)
+                im = 'Results/{}Imag'.format(k)
+                self._sol[k] = S[rl][:] + 1j*S[im][:]
 
-        self._sol['detuning'] = S["Results/detuningReal"][:]
-        self._sol['time'] = S["Results/t_simReal"][:]
-        self._sol['kappa_ext'] = S["Results/kappa_extReal"][:]
-        self._sol['kappa0'] = S["Results/kappa_0Real"][:]
+            self._sol['detuning'] = S["Results/detuningReal"][:]
+            self._sol['time'] = S["Results/t_simReal"][:]
+            self._sol['kappa_ext'] = S["Results/kappa_extReal"][:]
+            self._sol['kappa0'] = S["Results/kappa_0Real"][:]
 
-        S.close()
+        
         os.remove(self.tmp_dir + 'ParamLLEJulia.h5')
         os.remove(self.tmp_dir + 'ResultsJulia.h5')
 
@@ -1450,6 +1474,8 @@ class _dic2struct():
         table.add_row(['Dint_sim', '[array for each pump]', 'Integrated Dispersion at the pumps from fit', 'Hz'])
         Dint0 = '[{:.3f} ... {:.3f}]'.format(self._dic['Dint0'][1]*1e-9, self._dic['Dint0'][-2]*1e-9)
         table.add_row(['Dint0', Dint0 + ' (GHz)', 'Dint at the center of sim domain', 'Hz'])
+        D1 = f'{self._dic["D1"]*1e-12 :.3f}'
+        table.add_row(['D1', D1, 'angular repetition rate', '(x1e12  THz)'])
         FSR = ['{:.3f}'.format(ii*1e-9) for ii in self._dic['FSR']]
         FSR = '[' + ', '.join(FSR)+ ']'
         table.add_row(['FSR', FSR + ' (GHz)', 'Free Spectra Range at the pumps', 'Hz'])

@@ -8,7 +8,7 @@ function Loadh5Param(dir)
     res = Dict()
     sim = Dict()
     sim_name = ["res", "sim"]
-    par = [["Qc", "R", "ng", "Qi", "gamma","dispfile"], ["Pin", "Tscan", "domega_init", "domega_end", "domega", "f_pmp", "mu_sim_center", "ind_pmp", "Dint", "ind_pump_sweep","f_center", "phi_pmp"]]
+    par = [["Qc", "R", "ng", "Qi", "gamma","dispfile"], ["Pin", "Tscan", "domega_init", "domega_end", "domega", "f_pmp", "mu_sim_center", "ind_pmp", "Dint", "ind_pump_sweep","f_center", "phi_pmp", "D1", "DKSinit_imag","DKSinit_real" ]]
     cnt = 1
     for sim_par = [res, sim]
         for it = par[cnt]
@@ -26,24 +26,24 @@ function SaveResultsToFile(dir, S)
     print(h5file)
     print("\n")
     h5open(h5file, "w") do file
-        g = g_create(file, "Results") # create a group
+        g = create_group(file, "Results") # create a group
         for ii in S
             print(ii[1])
             print("\n")
-
+            g[ii[1]*"Real"] = real(ii[2])              # create a scalar dataset inside the group
             g[ii[1]*"Imag"] = imag(ii[2])
         end
-        attrs(g)["Description"] = "This group contains only a single dataset"
+        # attrs(g)["Description"] = "This group contains only a single dataset"
     end
 end
 
 # ----------------------------------------------------
 # -- STARTING MAIN SCRIPT --
 # ----------------------------------------------------
-tmp_dir = ARGS[1]
-tol = parse(Float64,ARGS[2])
-maxiter = parse(Int,ARGS[3])
-stepFactor = parse(Float64,ARGS[4])
+tmp_dir = ARGS[1] # "/var/folders/_v/2zfybdtj589c1fwk78q_q5qr0000gn/T/tmpqmatmei5" #
+tol = parse(Float64,ARGS[2]) #1e-3 #
+maxiter = parse(Int,ARGS[3]) #10 #
+stepFactor =  parse(Float64,ARGS[4]) #1#
 
 # tmp_dir = "/tmp/tmpbyi6lbwx"
 res, sim = Loadh5Param(tmp_dir)
@@ -67,13 +67,20 @@ fpmp = sim["f_pmp"]
 Ppmp = sim["Pin"]
 φpmp = sim["phi_pmp"]
 fcenter= sim["f_center"][1]
-ω0 = 2*pi*fpmp
-ωcenter = 2*pi*fcenter
+
+DKSinit_real = sim["DKSinit_real"]
+DKSinit_imag = sim["DKSinit_imag"]
+
+DKSinit = DKSinit_real .+ 1im .* DKSinit_imag
+
+D1= sim["D1"][1]
+FSR = D1/2π
+ω0 = 2π*fpmp
+ωcenter = 2π*fcenter
 
 # -- Setup the different Parameters --
 # ----------------------------------------------------
-tR = L*ng/c0
-FSR= c0/ng/L
+tR = 1/FSR
 T = 1*tR
 κext = ω0[1]/Qc*tR
 κ0 = ω0[1]/Q0*tR
@@ -108,8 +115,8 @@ Ptot = 0
 for ii=1:length(fpmp)
     global Ptot += Ppmp[ii]
 end
-dt=0.2/(sqrt(Ptot))
-# dt = 1
+# dt=0.2/(sqrt(Ptot))
+dt = 1
 t_end = t_end*tR
 t_ramp = t_end
 
@@ -175,7 +182,8 @@ for ii in collect(1:length(fpmp))
 end
 # -- Initial State --
 # ---------------------------------------------------------------
-u0 = Noise()
+u0 = 1im * zeros(length(μ),1)
+u0[:, 1] = DKSinit
 
 # -- Output Dict --
 # ---------------------------------------------------------------
@@ -248,13 +256,36 @@ function Fdrive(it)
         # The phase shift iμjθ has already been taken into account previously in
         # Ain (due to noise, it needs to be initilized throug FFT)
         # ---------------------------------------------------------------------
-        σ = (δω_all[ii][it] + Dint[μ0+ind_pmp[ii]-1]) * t_sim[it]
-        Force = Force .- 1im * Ain[ii] *exp(1im*σ)
+        σ = (δω_all[ii][it] .+ Dint[μ0+ind_pmp[ii]-1] .- δω_all[ind_sweep[1]][it] ) .* t_sim[it]
+        # σ = (δω_all[ii][it] .+ Dint[μ0+ind_pmp[ii]-1]) .* t_sim[it]
+        Force .= Force .- 1im .* Ain[ii] .*exp(1im .*σ)
     end
-    return Force .- 1im*Noise()
+    return Force #.- 1im*Noise()
 end
 
-function SSFM(u0, it, param)
+
+tol = 1e-2
+maxiter = 10
+success = false
+
+
+L½prop = 1im .*zeros(length(μ),1)
+L½prop_cpl = 1im .*zeros(length(μ),1)
+A_L½prop = 1im .*zeros(length(μ),1)
+NL½prop_0 = 1im .*zeros(length(μ),1)
+CPL½prop_0 = 1im .*zeros(length(μ),1)
+A½prop = 1im .*zeros(length(μ),1)
+Aprop = 1im .*zeros(length(μ),1)
+NL½prop_1 = 1im .*zeros(length(μ),1)
+NLprop = 1im .*zeros(length(μ),1)
+Force = 1im .*zeros(length(μ),1)
+retL = 1im .*zeros(length(μ),1)
+Eout = 1im .*zeros(length(μ),1)
+Aout = 1im .*zeros(length(μ),1)
+retNL = 1im .*zeros(length(μ),1)
+retcpl = 1im .*zeros(length(μ),1)
+
+function SSFM½step(A0, it, param)
     # ----------------------------------------------------------------------------------------
     # Standard split step fourier method
     # ∂A/∂t (t, τ)= [L + NL]A + Fdrive
@@ -293,20 +324,50 @@ function SSFM(u0, it, param)
     # ----------------------------------------------------------------------------------------
     # -- Define the Linear, Non-Linear and drive Force ---
     # Purpose is for easy modification to ad NL or other terms
-    function FFT_Lin(it)
-        return -α/2 .+ 1im*Dint_shift*tR
+    function FFT_Lin(it) 
+        return -α/2 .+ 1im .* (Dint_shift .- δω_all[ind_sweep[1]][it] .* 2 )*tR
     end
 
-    function Nlin(uu, it)
+    function NL(uu, it)
         return -1im*( γ*L* abs.(uu).^2 )
-        # return 0
     end
 
-    u0 = u0 #.+ Fdrive(Int(it),true)*dt #.- 1im*Noise()*dt
-    An = exp.(Nlin(u0, Int(it))*dt).* u0
-    Atild = fft_plan*(An).* exp.(FFT_Lin(Int(it))*dt)
-    u0 = ifft_plan*(Atild) .+ Fdrive(Int(it))*sqrt(κext)*dt
-    return u0
+    # --- Linear propagation ---
+    
+    A0 = A0 .+ Fdrive(Int(it)) .*sqrt(κext) .* dt;        
+    
+    L½prop .= exp.(FFT_Lin(Int(it)) .* dt/2);
+    A_L½prop .= ifft_plan* (fft_plan*(A0) .* L½prop);
+    NL½prop_0 .= NL(A0, it);
+    A½prop .= A0;
+    Aprop .= 1im .* zeros(size(A0));
+    
+    # --- iterative procedur to find ^LN^(t + δt, ω) ---
+    success = false;
+    for ii in collect(1:maxiter)
+        err = 0.0
+        success = false
+        NL½prop_1 .= NL(A½prop, it);
+        NLprop .= (NL½prop_0 .+ NL½prop_1) .* dt/2;
+        Aprop .= ifft_plan*( fft_plan*(A_L½prop .* exp.(NLprop) ) .* L½prop )
+
+        # --- check if we concerge or not ---
+        err = LinearAlgebra.norm(Aprop-A½prop,2)/LinearAlgebra.norm(A½prop,2)
+        if (err < tol)
+            success = true
+            break
+        else
+            success = false
+            A½prop .= Aprop
+        end
+    end
+
+    if success
+        u0 = Aprop
+        return u0
+    else
+        print("Convergence Error")
+    end
 end
 
 function MainSolver(Nt, S, u0)
@@ -338,7 +399,9 @@ function MainSolver(Nt, S, u0)
 
     for it in loops
         # -- Solve the Split Step Fourier Step --
-        u0 = SSFM(u0, it, param)
+        # u0 = SSFM(u0, it, param)
+        u0 = SSFM½step(u0, it, param)
+        
         # -- Update the Progress bar --
         param = ProgressBar_CallBack(Int(it), Nt, S, u0, param)
         # -- Save the Data in the dict --
@@ -350,7 +413,7 @@ end
 
 # -- Start the solver
 # ----------------------------------------------------
-logfile =  open(tmp_dir * "log.log" ,"a")
+logfile =  open(tmp_dir * "log.log" ,"w")
 write(logfile,string(Int(round(0))) * "\n")
 close(logfile)
 MainSolver(Nt, S, u0)

@@ -33,7 +33,7 @@ class AnalyzeDisp(object):
         self.R = kwargs.get('R', 23e-6)
         self.f_center = kwargs.get('f_center', None)
         self.fpmp = kwargs.get('fpmp', None)
-        self.D1_maunal = kwargs.get('D1_maunal', None)
+        self.D1_manual = kwargs.get('D1_manual', None)
         self.rM_fit = kwargs.get('rM_fit', [])
         self.rM_sim = kwargs.get('rM_sim', [])
         self.debug = kwargs.get('debug', False)
@@ -97,7 +97,7 @@ class AnalyzeDisp(object):
             Dfit = np.polyfit(dm, drf[ind_pmp+dm], 2)
             self.FSR = Dfit[1]
             self.D2 = Dfit[0]*2*np.pi
-            if self.D1_maunal:
+            if not self.D1_manual:
                 D1 = self.FSR * 2*np.pi
             else:
                 D1 = self.D1_manual
@@ -252,7 +252,7 @@ class AnalyzeDisp(object):
 
             self._logger.info('AnalyzeDisp', Info)
 
-    def DisplayPlot(self, display_center = True):
+    def DisplayPlot(self, display_center= False):
 
         def PlotJupyter():
             init_notebook_mode(connected=True)
@@ -269,7 +269,7 @@ class AnalyzeDisp(object):
 
                 trace += [go.Scatter(
                             x = rf*1e-12,
-                            y = self.Dint[ii]*1e-9/(2*np.pi),
+                            y = (self.Dint[0] - self.Dint[0][self.ind_pmp_fit[ii]] )*1e-9/(2*np.pi),
                             legendgroup = 'Pump #{:.0f}'.format(ii),
                             mode = 'markers',
                             name = 'FEM Simulation')]
@@ -277,13 +277,13 @@ class AnalyzeDisp(object):
 
                     trace += [go.Scatter(
                                 x = rf_fit*1e-12,
-                                y = self.Dint_fit[ii]*1e-9/(2*np.pi),
+                                y = (self.Dint_fit[0]- self.Dint[0][self.ind_pmp_fit[ii]])*1e-9/(2*np.pi),
                                 line = dict(width = 2, dash = 'dash'),
                                 legendgroup = 'Pump #{:.0f}'.format(ii),
                                 name = 'Fit')]
                     trace += [go.Scatter(
                                 x = rf_sim*1e-12,
-                                y = self.Dint_sim[ii]*1e-9/(2*np.pi),
+                                y = (self.Dint_sim[0] - self.Dint[0][self.ind_pmp_fit[ii]])*1e-9/(2*np.pi),
                                 legendgroup = 'Pump #{:.0f}'.format(ii),
                                 mode = 'lines',
                                 name = 'LLE simulation')]
@@ -309,65 +309,10 @@ class AnalyzeDisp(object):
                 if self.plottype.lower() == 'fem':
                     pass
 
-
-            if display_center:
-                ii = len(self.fpmp)-1
-                μfit = self.μfit[ii] #+ self.ind_pmp_fit[ii]
-                μsim = self.μsim[ii] #+ self.ind_pmp_sim[ii]
-                dν_fit = np.arange(μfit[0], μfit[-1]+1)*self.D1[0]/(2*np.pi)
-                dν_sim = np.arange(μsim[0], μsim[-1]+1)*self.D1[0]/(2*np.pi)
-                ν0 = self.fpmp[ii]
-                rf = self.rf
-                rf_fit = (ν0+dν_fit)
-                rf_sim = (ν0+dν_sim)
-
-                trace += [go.Scatter(
-                            x = rf*1e-12,
-                            y = self.Dint[ii]*1e-9/(2*np.pi),
-                            legendgroup = 'Pump #{:.0f}'.format(ii),
-                            mode = 'markers',
-                            name = 'FEM Simulation')]
-                if self.plottype.lower() == 'all':
-
-                    trace += [go.Scatter(
-                                x = rf_fit*1e-12,
-                                y = self.Dint_fit[ii]*1e-9/(2*np.pi),
-                                line = dict(width = 2, dash = 'dash'),
-                                legendgroup = 'Pump #{:.0f}'.format(ii),
-                                name = 'Fit')]
-                    trace += [go.Scatter(
-                                x = rf_sim*1e-12,
-                                y = self.Dint_sim[ii]*1e-9/(2*np.pi),
-                                legendgroup = 'Pump #{:.0f}'.format(ii),
-                                mode = 'lines',
-                                name = 'LLE simulation')]
-
-
-                if self.plottype.lower() == 'sim':
-
-                    trace += [go.Scatter(
-                                x = rf_sim*1e-12,
-                                y = self.Dint_sim[ii]*1e-9/(2*np.pi),
-                                legendgroup = 'Pump #{:.0f}'.format(ii),
-                                mode = 'lines',
-                                name = 'LLE simulation')]
-
-                if self.plottype.lower() == 'fit':
-
-                    trace += [go.Scatter(
-                                x = rf_fit*1e-12,
-                                y = self.Dint_fit[ii]*1e-9/(2*np.pi),
-                                line = dict(width = 2, dash = 'dash'),
-                                legendgroup = 'Pump #{:.0f}'.format(ii),
-                                name = 'Fit')]
-
-                trace += [go.Scatter(
-                            x = [ν0*1e-12],
-                            y = [0],
-                            mode = 'markers',
-                            marker = dict(color = 'black', size = 8),
-                            name = 'center domain')]
             self.fig = go.FigureWidget(data=trace)
+
+            self.fig.add_hline(y=0, line_width=3,line_color="white", opacity = 1)
+
             self.fig.update_layout(xaxis = dict(title = 'Frequency (THz)'),
                               yaxis = dict(title = 'D<sub>int</sub> (GHz)'))
 
