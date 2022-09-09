@@ -3,6 +3,7 @@ from ._analyzedisp import AnalyzeDisp
 import scipy.interpolate as itp
 import scipy.optimize as optm
 import scipy.fftpack as fft
+from scipy import constants as cts
 import matplotlib.pyplot as plt
 import time
 import sys
@@ -20,6 +21,7 @@ import matplotlib.gridspec as gridspec
 from matplotlib import ticker
 import matplotlib.font_manager as font_manager
 from datetime import datetime
+from prettytable import PrettyTable
 from plotly import tools
 from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
 import plotly.graph_objs as go
@@ -27,15 +29,21 @@ import plotly.graph_objs as go
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=FutureWarning)
     import h5py
-
 import ipdb
 
 
 backend = mpl.get_backend()
 path_juliaScript = os.path.dirname(os.path.abspath(__file__))
 path_juliaScript = os.path.join(path_juliaScript, 'ComputeLLE.jl')
-tmp_dir = tempfile.mkdtemp()
-os.rmdir(tmp_dir) # delete folder as the temp file will not be in it but will be used as a prefix
+
+print('*'*60)
+print('Julia solver:')
+print(path_juliaScript)
+print('*'*60)
+
+
+
+# delete folder as the temp file will not be in it but will be used as a prefix
 # print('-'*50)
 # print('Path to temporary dir to save .h5 files with prefix:')
 # print(tmp_dir)
@@ -45,7 +53,7 @@ os.rmdir(tmp_dir) # delete folder as the temp file will not be in it but will be
 # print('-'*50)
 
 
-
+main_tmp_dir = tempfile.mkdtemp()
 # Check which type of python we are launching
 
 try:
@@ -270,9 +278,9 @@ class LLEsolver(object):
     __status__ = "Development"
 
     def __init__(self, **kwargs):
-        self.res = kwargs.get('res', {})
-        self.sim = kwargs.get('sim', {})
-        self.sim_norm = kwargs.get('sim_norm', None)
+        self._res = kwargs.get('res', {})
+        self._sim = kwargs.get('sim', {})
+        # self._sim_norm = kwargs.get('sim_norm', None)
         self._debug = kwargs.get('debug', False)
         self._plotPower = None
         self._plotSpecta = None
@@ -281,13 +289,89 @@ class LLEsolver(object):
         self._indTime = 0
 
         # find all the needed parameters
-        assert 'Qi' in self.res.keys(), 'Please provide Qi'
-        assert 'Qc' in self.res.keys(), 'Please provide Qc'
-        assert 'R' in self.res.keys(), 'Please provide R'
-        assert 'Tscan' in self.sim.keys(), 'Please provide Tscan'
-        assert 'dispfile' in self.res.keys(), 'Please provide dispfile'
+        # ------------------------------------------------------------
+        assert 'Qi' in self._res.keys(), 'Please provide Qi'
+        assert 'Qc' in self._res.keys(), 'Please provide Qc'
+        assert 'R' in self._res.keys(), 'Please provide R'
+        assert 'Tscan' in self._sim.keys(), 'Please provide Tscan'
+        assert 'dispfile' in self._res.keys(), 'Please provide dispfile'
+
+        if not "D1_manual" in self._sim.keys():
+            self._sim["D1_manual"] = None
+
+        # -- check if wavelength or frequency
+        # ------------------------------------------------------------
+        if not('f_pmp' in self._sim.keys()):
+            self._sim['f_pmp'] = self._c0/self._sim['lbd_pmp']
+        if not('mu_fit' in self._sim.keys()):
+            self._sim['mu_fit'] = [None, None]
+
+
+        # -- Make sur than each pump has a power --
+        if not type(self._sim['f_pmp'])==list:
+            self._sim['f_pmp']= [self._sim['f_pmp']]
+        if not type(self._sim['Pin'])==list:
+            self._sim['Pin']= [self._sim['Pin']]
+        assert len(self._sim['Pin']) == len(self._sim['f_pmp']), "The number of *pump* and *pump power* has to be the same"
+
+
+
+
+        # -- Translate the dict from greek sign =--
+        # ------------------------------------------------------------
+        self._sim = self._Translator(self._sim)
+        self._res = self._Translator(self._res)
+
+
+        # -- Fix missing keys --
+        # ------------------------------------------------------------
+        if not ('domega_stop' or 'δω_stop') in self._sim.keys():
+            try:
+                self._sim['domega_stop'] = self._sim['domega_end']
+
+            except:
+                self._sim['δω_stop'] = self._sim['δω_end']
+
+
+
+        if not np.diff(self._sim['mu_sim'])[0] % 2 == 0:
+            print(r"/!\ Simulation modes length need to be odd")
+            print('Modification of the simulation modes suchat that:')
+            self._sim['mu_sim'] = [self._sim['mu_sim'][0], self._sim['mu_sim'][1]+1]
+            print('μ_sim = [{:.0f} {:.0f}]'.format(self._sim['mu_sim'][0],
+                                                  self._sim['mu_sim'[1]] ))
+
+
+        # -- handle the detuning of aux pump--
+        # ------------------------------------------------------------
+        if not 'domega' in self._sim.keys():
+            self._sim['domega']  = [0]*len(self._sim['f_pmp'])
+            self._sim['ind_pump_sweep'] = 0
+        else:
+            domega = self._sim['domega']
+            id_sweep = [ii for ii in range(len(domega)) if domega[ii] == None]
+            assert len(id_sweep)>=1, 'Need to provide at least None possition in domega to determine which pump is swept'
+
+            self._sim['ind_pump_sweep'] = id_sweep
+        assert len(self._sim['f_pmp']) == len(self._sim['domega']), "Please provide the same number of pump fixed detuning than pump frequencies. Detuning = None for the pump which is swept"
+        assert len(self._sim['Pin']) == len(self._sim['domega']), "Please provide the same number of pump fixed detuning than pump power. Detuning = None for the pump which is swept"
+
+        if not type(self._sim['ind_pump_sweep'])==list:
+            self._sim['ind_pump_sweep'] = [self._sim['ind_pump_sweep']]
+
+        # -- handle the phase of the pump--
+        # ------------------------------------------------------------
+        if not 'phi_pmp' in self._sim.keys():
+            self._sim['phi_pmp']  = [0]*len(self._sim['f_pmp'])
+        else:
+            if not type(self._sim['phi_pmp'])==list:
+                self._sim['phi_pmp'] = [self._sim['phi_pmp']]
+        assert len(self._sim['f_pmp']) == len(self._sim['phi_pmp']), "Please provide the same number of pump phase than pump frequencies. Detuning = None for the pump which is swept"
+
+
 
         # -- Setup the Logger ---
+        # ------------------------------------------------------------
         if self._debug:
             self._logger = MyLogger("LLE.log")
             self._logger.info('__init__', 'New LLE')
@@ -296,6 +380,7 @@ class LLEsolver(object):
 
     def _Translator(self,D):
         Dnew = {}
+        self._did_translate = False
         self._greek ={'α': 'alpha',
                 'β':'beta',
                 'γ': 'gamma',
@@ -310,270 +395,355 @@ class LLEsolver(object):
             new_k = ''
             for char in list(k):
                 if char in list(self._greek.keys()):
+                    self._did_translate = True
                     new_k += self._greek[char]
                 else:
                     new_k += char
             Dnew[new_k] = D[k]
+
         return Dnew
 
-    def Analyze(self, plot=False, f=None, ax=None, label=None, plottype='all', zero_lines = True, mu_sim = None):
+    def Analyze(self, plot=True, display_center = True, label=None, plottype='all', verbose = False):
         '''
         Call pyLLE.analyzedisp.AnalyzeDisp to get the dispersion of the resonator we want to simulate
         '''
 
-        if plot and (not pyType == 'jupyter'):
-            if f is None and ax is None:
-                f, ax = plt.subplots(dpi=120)
-            elif f is None and not(ax is None):
-                if not type(ax) is list:
-                    f = ax.figure
-                else:
-                    f, ax = plt.subplots(dpi=120)
-                    print('Only 1 subplots supported, created a new figure')
-            elif not(f is None) and ax is None:
-                ax = f.axes[0]
-            else:
-                if type(ax) is list:
-                    f, ax = plt.subplots(dpi=120)
-        else:
-            f = None
-            ax = None
-        if not('f_pmp' in self.sim.keys()):
-            self.sim['f_pmp'] = self._c0/self.sim['lbd_pmp']
+        fig = None
 
-
-        ## modification 12/21/2018
-        if not type(self.sim['f_pmp'])==list:
-            self.sim['f_pmp']= [self.sim['f_pmp']]
-
-        do_plot = plot
 
         if self._debug:
-            Info = '\n\tFilename: {}\n'.format(self.res['dispfile'])
-            for ff in self.sim['f_pmp']:
+            Info = '\n\tFilename: {}\n'.format(self._res['dispfile'])
+            for ff in self._sim['f_pmp']:
                 Info += '\tf_pmp: {:.3f} THz'.format(ff*1e-12)
             self._logger.info('LLEsovler.Analyze', "Analyzing dispersion file" + Info)
 
-        self.sim = self._Translator(self.sim)
-        self.res = self._Translator(self.res)
 
-        if mu_sim is None:
-            μsim = self.sim['mu_sim']
-        else:
-            μsim = mu_sim
+        # -- Initialized usufu diserspions data --
+        # ------------------------------------------------------------
+        self._sim['ind_pmp'] = []
+        self._sim['Dint'] = []
+        # self._res['ng'] = []
+        # self._res['neff'] = []
 
-        self._analyze  = AnalyzeDisp(file=self.res['dispfile'],
-                                    f_center=self.sim['f_pmp'][0], # modification 12/21/2018
-                                    rM_fit=self.sim['mu_fit'],
-                                    rM_sim=μsim,
-                                    R=self.res['R'],
-                                    debug=do_plot,
-                                    f=f,
-                                    ax=ax,
-                                    label=label,
-                                    plottype=plottype,
-                                    zero_lines = zero_lines,
-                                    logger = self._logger,
-                                    pyType = pyType)
-        if do_plot and (not pyType == 'jupyter'):
-            f.canvas.draw()
-            plt.pause(0.25)
-            f.show()
 
-        PrM_fit, Dint_fit, neff_pmp, ng_pmp, f, ax = self._analyze.GetDint()
-        self._PrM_fit = PrM_fit
-        self.sim['Dint'] = Dint_fit
-        self.res['ng'] = ng_pmp
-        self.res['neff'] = neff_pmp
 
-        self.disp = {}
-        self.disp['freq'] = self._analyze.rf
-        self.disp['ng'] = self._analyze.ng
-        self.disp['neff'] = self._analyze.neff
-        self.disp['D'] = self._analyze.D
-        self.disp['Dint'] = self._analyze.Dint
-        self.disp['dphi'] = self._analyze.dφ
-        self.sim['dphi'] = self._analyze.dφ
+        # -- Get dispersion for each pump --
+        # ------------------------------------------------------------
+        # for ff in self._sim['f_pmp']:
+        fpmp = copy(self._sim['f_pmp'])
+        self._analyze = AnalyzeDisp(file= self._res['dispfile'],
+                                     fpmp = fpmp,
+                                     rM_fit = self._sim['mu_fit'],
+                                     rM_sim = self._sim['mu_sim'],
+                                     R = self._res['R'],
+                                     D1_manual = self._sim["D1_manual"],
+                                     fig = fig,
+                                     plottype = plottype,
+                                     logger = self._logger,
+                                     pyType = pyType)
 
-        if (not pyType == 'jupyter'):
-            self.fDint = f
-            self.axDint = ax
-            return f, ax
-        else:
-            return f
+        self._analyze.GetDint()
+        # if verbose:
+        #     self._analyze.DisplayParam()
+        if plot:
+            fig = self._analyze.DisplayPlot(display_center)
 
-    def Setup(self):
+
+        #
+        self._sim['Dint'] = self._analyze.Dint_sim[0]
+        self._sim['D1'] = self._analyze.D1[0]
+        self._res['ng'] = self._analyze.ng_pmp
+        self._sim['ind_pmp'] = self._analyze.pmp_ind
+        self._sim['f_center'] = self._analyze.fpmp[-1]
+        self._sim['f_pmp'] = self._analyze.fpmp[:-1]
+        self._sim['mu_sim_center'] = [self._sim['mu_sim'][0]+self._sim['ind_pmp'][0],
+                                    self._sim['mu_sim'][1]+self._sim['ind_pmp'][0]]
+        self._sim['D1_center'] = self._analyze.D1[-1]
+        self._sim['FSR'] = [dd/(2*np.pi) for dd in self._analyze.D1[:-1]]
+        self._sim['FSR_center'] = self._analyze.D1[-1]/(2*np.pi)
+
+
+        
+        if not "DKS_init" in self._sim.keys():
+            self._sim['DKS_init']= np.zeros(self._analyze.Dint_sim[0].size)
+
+
+        disp = {
+                'ng': self._analyze.ng,
+                'D': self._analyze.D*1e6,
+                "D1": self._analyze.D1[0],
+                'neff': self._analyze.neff,
+                'freq': self._analyze.rf,
+                'freq_sim': self._analyze.freq_fit,
+                'Dint': self._analyze.Dint[:-1],
+                'Dint_sim': self._analyze.Dint_sim[:-1],
+                'Dint0': self._analyze.Dint_sim[-1],
+                'FSR': self._sim['FSR'],
+                'FSR_center': self._sim['FSR_center']
+                }
+
+        res = {
+            'R': self._res['R'],
+            'Qi': self._res['Qi'],
+            'Qc': self._res['Qc'],
+            'γ': self._res['gamma'],
+            'dispfile': self._res['dispfile'],
+            }
+
+        sim = {
+            "Pin": self._sim['Pin'],
+            "Tscan": self._sim['Tscan'],
+            "f_pmp": self._sim['f_pmp'],
+            "f_center": self._sim['f_center'],
+            "δω_init": self._sim['domega_init'],
+            "δω_end": self._sim['domega_end'],
+            "δω": self._sim['domega'],
+            "μ_sim": self._sim['mu_sim'],
+            "μ_fit": self._sim['mu_fit'],
+            "μcenter": int(-1*self._sim['mu_sim_center'][0]),
+            "ind_pmp": self._sim['ind_pmp'],
+            "ind_pump_sweep": self._sim['ind_pump_sweep'],
+            "phi_pmp": self._sim['phi_pmp'],
+            "DKS_init": self._sim['DKS_init'],
+        }
+
+
+
+        did_translate = not(self._did_translate)
+
+        if not self._did_translate:
+            sim = self._Translator(sim)
+
+        self.sim = _dic2struct(sim,which = 'sim', do_tr = did_translate)
+        self.disp = _dic2struct(disp,which = 'disp', do_tr = did_translate)
+        self.res = _dic2struct(res, which = 'res', do_tr = did_translate)
+
+        return fig
+
+    def Setup(self, tmp_dir = None, verbose = False):
         '''
         Setup the simulation for the Julia back-end.
-        Save the two main dictionary self.sim and self.res into a readable hdf5 file for Julia in the temporary location define by the os
+        Save the two main dictionary self._sim and self._res into a readable hdf5 file for Julia in the temporary location define by the os
         '''
-        # -- Make the hdf5 file --
-        # ------------------------------------------------------------
-        try:
-            os.remove(tmp_dir + 'ParamLLEJulia.h5')
-        except:
-            pass
+        if tmp_dir == None:
+            self.tmp_dir = main_tmp_dir
+            # os.rmdir(os.path.join(tmp_dir')
+        else:
+            self.tmp_dir = tmp_dir
 
-        try:
-            os.remove(tmp_dir + 'ResultsJulia.h5')
-        except:
-            pass
-        try:
-            os.remove(tmp_dir + 'log.log')
-        except:
-            pass
+        def CleanUpHDF5():
 
+            try:
+                os.remove(self.tmp_dir + 'ParamLLEJulia.h5')
+            except:
+                pass
 
-        dic_sim = {'Pin': ('Pin',1e3, 'mW'),
-                    'Tscan': ('Tscan',1e-6, 'x1e6 Round Trip'),
-                    'f_pmp': ('f_pmp',1e-12, 'THz'),
-                    'domega_init': (u'\u03B4\u03C9_init',1e-9/(2*np.pi), u'x2\u03C0 GHz'),
-                    'domega_end': (u'\u03B4\u03C9_end',1e-9/(2*np.pi), u'x2\u03C0 GHz'),
-                    'domega_stop': (u'\u03B4\u03C9_stop',1e-9/(2*np.pi), u'x2\u03C0 GHz'),
-                    'mu_sim': (u'\u03BC_sim',1, ''),
-                    'mu_fit': (u'\u03BC_fit',1, ''),}
+            try:
+                os.remove(self.tmp_dir + 'ResultsJulia.h5')
+            except:
+                pass
+            try:
+                os.remove(self.tmp_dir + 'log.log')
+            except:
+                pass
 
-        try:
-            if len(self.res['Qc']) >1:
-                dic_res = {'R': ('R',1e6, 'µm'),
-                            'Qi': ('Qi',1e-6, 'M'),
-                            'gamma': (u'\u03B3', 1, ''),}
-            else:
+        def LoggerDic():
+            dic_sim = {'Pin': ('Pin',1e3, 'mW'),
+                        'Tscan': ('Tscan',1e-6, 'x1e6 Round Trip'),
+                        'domega_init': (u'\u03B4\u03C9_init',1e-9/(2*np.pi), u'x2\u03C0 GHz'),
+                        'domega_end': (u'\u03B4\u03C9_end',1e-9/(2*np.pi), u'x2\u03C0 GHz'),
+                        'domega_stop': (u'\u03B4\u03C9_stop',1e-9/(2*np.pi), u'x2\u03C0 GHz'),
+                        'f_pmp': ('f_pmp',1e-12, 'THz'),
+                        'domega_aux': (u'\u03B4\u03C9_aux',1e-9/(2*np.pi), u'x2\u03C0 GHz'),
+                        'ind_pump_sweep': ('ind_pump_sweep',1, ''),
+                        'mu_sim': (u'\u03BC_sim',1, ''),
+                        'mu_fit': (u'\u03BC_fit',1, ''),}
+
+            try:
+                if len(self._res['Qc']) >1:
+                    dic_res = {'R': ('R',1e6, 'µm'),
+                                'Qi': ('Qi',1e-6, 'M'),
+                                'gamma': (u'\u03B3', 1, ''),}
+                else:
+                    dic_res = {'R': ('R',1e6, 'µm'),
+                                'Qi': ('Qi',1e-6, 'M'),
+                                'Qc': ('Qc',1e-6, 'M'),
+                                'gamma': (u'\u03B3', 1, ''),}
+            except:
                 dic_res = {'R': ('R',1e6, 'µm'),
                             'Qi': ('Qi',1e-6, 'M'),
                             'Qc': ('Qc',1e-6, 'M'),
                             'gamma': (u'\u03B3', 1, ''),}
-        except:
-            dic_res = {'R': ('R',1e6, 'µm'),
-                        'Qi': ('Qi',1e-6, 'M'),
-                        'Qc': ('Qc',1e-6, 'M'),
-                        'gamma': (u'\u03B3', 1, ''),}
+
+            return dic_sim, dic_res
+
+        def PrintLogger(dic_sim, dic_res):
+            self._sim['debug'] = int(self._debug)
+            Info = '-- Solving standard LLE --\n'
+            Info += '\tSimulation Parameters\n'
+            for k, it in self._res.items():
+                if k in dic_res.keys():
+                    if it == None:
+                        Info +='\t\t{} = {}\n'.format(dic_res[k][0], 'None')
+                    else:
+                        Info +='\t\t{} = {:.2f} {}\n'.format(dic_res[k][0], it*dic_res[k][1],dic_res[k][2])
+
+
+            Info += '\tSimulation Parameters\n'
+            for k, it in self._sim.items():
+                if k in dic_sim.keys():
+                    if type(it) is list:
+                        if dic_sim[k][0] == u'\u03BC_sim' or dic_sim[k][0] == u'\u03BC_fit':
+                            if it == [None, None]:
+                                Info += '\t\t{} = [None,None] {}\n'.format(dic_sim[k][0],
+                                                                    dic_sim[k][2])
+                            else:
+                                Info += '\t\t{} = [{:.2f},{:.2f}] {}\n'.format(dic_sim[k][0],
+                                                                    it[0]*dic_sim[k][1],
+                                                                    it[1]*dic_sim[k][1],
+                                                                    dic_sim[k][2])
+                        else:
+                            cnt = 0
+                            for iitt in it:
+                                if iitt == None:
+                                    Info += '\t\t{}[{}] = {}\n'.format(dic_sim[k][0],
+                                                                        cnt,
+                                                                       'None')
+                                else:
+                                    Info += '\t\t{}[{}] = {:.2f} {}\n'.format(dic_sim[k][0],
+                                                                            cnt,
+                                                                            iitt*dic_sim[k][1],
+                                                                            dic_sim[k][2])
+                                cnt += 1
+                    else:
+                        if it == None:
+                            Info +='\t\t{} = {} {}\n'.format(dic_sim[k][0], 'None',dic_sim[k][2])
+                        else:
+                            Info +='\t\t{} = {:.2f} {}\n'.format(dic_sim[k][0], it*dic_sim[k][1],dic_sim[k][2])
+
+            print(Info)
+            if self._debug:
+                try:
+                    self._logger.info('LLEsovler.Setup', Info)
+                except:
+                    Info = ''.join([self._greek[ii] if ii in self._greek.keys() else ii for ii in Info])
+                    self._logger.info('LLEsovler.Setup', Info)
+
+        def SetupHDF5():
+            # -- create h5file --
+            if verbose:
+                print('HDF5 parameter file can be foud in: {}'.format(self.tmp_dir + 'ParamLLEJulia.h5'))
+            h5f = h5py.File(self.tmp_dir + 'ParamLLEJulia.h5', 'w')
+            if self._debug:
+                self._logger.info('LLEsovler.Setup','Saving parameters in: {}'.format(self.tmp_dir + 'ParamLLEJulia.h5'))
+
+
+            h5f.create_group('sim')
+            h5f.create_group('res')
+
+            for key, it in self._sim.items():
+                if not key == 'domega_disp':
+                    if type(it) is str:
+                        it = np.string_(it)
+                    if type(it) is list:
+                        try:
+                            if None in it:
+                                it = [0 if iitt is None else iitt for iitt in it]
+                        except:
+                            pass
+                    else:
+
+                        try:
+                            if it == None:
+                                it = 0
+                        except:
+                            pass
+                    dset = key
+                    h5f.create_dataset(f'sim/{dset}', data=[it])
+                if key == "DKS_init":
+
+                    dset = 'DKSinit_real'
+                    h5f.create_dataset(f'sim/{dset}', data=np.real(it))
+                    dset = 'DKSinit_imag'
+                    h5f.create_dataset(f'sim/{dset}', data=np.imag(it))
 
 
 
-        if not type(self.sim['f_pmp'][1::]) == list:
-            self.sim['f_pmp'] = [self.sim['f_pmp']]
-
-        ind_aux = []
-        ind_pmp = np.argmin(np.abs(self.disp['freq']- self.sim['f_pmp'][0]))
-        # ipdb.set_trace()
-        for ii in range(len(self.sim['f_pmp'][1::])):
-            dummy = np.argmin(np.abs(self.disp['freq']- self.sim['f_pmp'][ii+1]))
-            ind_aux += [ind_pmp - dummy]
-
-        if ind_aux == []:
-            ind_aux = -1
-        self.sim['ind_aux'] = ind_aux
-        # print(ind_aux)
-
-
-        self.sim['debug'] = int(self._debug)
-        Info = '-- Solving standard LLE --\n'
-        Info += '\tSimulation Parameters\n'
-        for k, it in self.res.items():
-            if k in dic_res.keys():
-                Info +='\t\t{} = {:.2f} {}\n'.format(dic_res[k][0], it*dic_res[k][1],dic_res[k][2])
+                    
+            for key, it in self._res.items():
+                if not key == 'domega_disp':
+                    if type(it) is str:
+                        it = np.string_(it)
+                    if type(it) is list:
+                        if None in it:
+                            it = [0 if iitt is None else iitt for iitt in it]
+                    else:
+                        if it == None:
+                            it = 0
+                    h5f.create_dataset('res/{}'.format(key), data=[it])
+            h5f.close()
 
 
-        Info += '\tSimulation Parameters\n'
-        for k, it in self.sim.items():
-            if k in dic_sim.keys():
-                if type(it) is list:
-                    try:
-                        Info += '\t\t{} = [{:.2f},{:.2f}] {}\n'.format(dic_sim[k][0],
-                                                                it[0]*dic_sim[k][1],
-                                                                it[1]*dic_sim[k][1],
-                                                                dic_sim[k][2])
-                    except:
-                         Info += '\t\t{} = {:.2f} {}\n'.format(dic_sim[k][0],
-                                                                it[0]*dic_sim[k][1],
-                                                                dic_sim[k][2])
-                else:
-                    Info +='\t\t{} = {:.2f} {}\n'.format(dic_sim[k][0], it*dic_sim[k][1],dic_sim[k][2])
 
-        print(Info)
-        if self._debug:
-            try:
-                self._logger.info('LLEsovler.Setup', Info)
-            except:
-                Info = ''.join([self._greek[ii] if ii in self._greek.keys() else ii for ii in Info])
-                self._logger.info('LLEsovler.Setup', Info)
+        # delay a bit the start
+        time.sleep(0.5)
+        CleanUpHDF5()
+        # make sure the cleanup happened
+        time.sleep(1)
+        dic_sim, dic_res = LoggerDic()
+        if verbose or self._debug:
+            PrintLogger(dic_sim, dic_res)
+        SetupHDF5()
 
-
-        # -- create h5file --
-        h5f = h5py.File(tmp_dir + 'ParamLLEJulia.h5', 'w')
-        if self._debug:
-            self._logger.info('LLEsovler.Setup','Saving parameters in: {}'.format(tmp_dir + 'ParamLLEJulia.h5'))
-
-
-        h5f.create_group('sim')
-        h5f.create_group('res')
-        cnt = 0
-
-        if not ('domega_stop' or 'δω_stop') in self.sim.keys():
-            try:
-                self.sim['domega_stop'] = self.sim['domega_end']
-
-            except:
-                self.sim['δω_stop'] = self.sim['δω_end']
-
-
-        for key, it in self.sim.items():
-            if not key == 'δω_disp':
-                if type(it) is str:
-                    it = np.string_(it)
-                h5f.create_dataset('sim/{}'.format(key), data=[it])
-        for key, it in self.res.items():
-            if not key == 'δω_disp':
-                if type(it) is str:
-                    it = np.string_(it)
-                h5f.create_dataset('res/{}'.format(key), data=[it])
-
-        h5f.close()
-
-    def SolveTemporal(self, tol = 1e-3, maxiter = 6, step_factor = 0.1):
+    def SolveTemporal(self, verbose = False, tol = 1e-3, maxiter = 6, step_factor = 0.1):
         '''
         Call Julia to solve the LLE
         '''
         self._solver = 'temporal'
 
-        if self._debug:
-            self._logger.info('LLEsovler.SolveTemporal','Solving Temporal LLE with Julia....')
-            Info = 'tol = {} -- maxiter = {} step_factpr = {}'.format(tol, maxiter, step_factor)
-            self._logger.info('LLEsovler.SolveTemporal',Info)
+
+        def DisplaySim():
+
+            if self._debug:
+                self._logger.info('LLEsovler.SolveTemporal','Solving Temporal LLE with Julia....')
+                Info = 'tol = {} -- maxiter = {} step_factpr = {}'.format(tol, maxiter, step_factor)
+                self._logger.info('LLEsovler.SolveTemporal',Info)
 
 
-        hLine = '-'*70
+            hLine = '-'*70
 
-        print(hLine)
+            print(hLine)
 
-        date = time.localtime()
-        date = "{}-{:0>2}-{:0>2} ".format(date.tm_year,
-                                          date.tm_mon,
-                                          date.tm_mday) +\
-            "{:0>2}:{:0>2}:{:0>2}".format(date.tm_hour,
-                                          date.tm_min,
-                                          date.tm_sec)
-        start = time.time()
-        print(date)
+            date = time.localtime()
+            date = "{}-{:0>2}-{:0>2} ".format(date.tm_year,
+                                              date.tm_mon,
+                                              date.tm_mday) +\
+                "{:0>2}:{:0>2}:{:0>2}".format(date.tm_hour,
+                                              date.tm_min,
+                                              date.tm_sec)
 
-        if sys.platform == 'darwin':
-            julia = 'julia'
-        if sys.platform == 'linux2' or sys.platform == 'linux':
-            julia = 'julia'
-        if sys.platform == 'win32':
-            julia = os.path.expanduser('~') + '\\AppData\\Local\\Julia-1.1.1\\bin\\julia.exe'
+            print(date)
 
-        command = [julia, path_juliaScript , tmp_dir, str(tol), str(maxiter), str(step_factor)]
-        self.JuliaSolver = sub.Popen(command, stdout=sub.PIPE, stderr=sub.PIPE)
-        print('Launching Julia....')
-        line = ''
-        len_lin = len(line)
-        fname = tmp_dir + 'log.log'
-        print('Temp file can be found in: {}'.format(fname))
-        conv_err = False
+        def LaunchJulia():
 
-        def Pbar(perc, pgrs, tb_up):
+            if sys.platform == 'darwin':
+                julia = 'julia'
+            if sys.platform == 'linux2' or sys.platform == 'linux':
+                julia = 'julia'
+            if sys.platform == 'win32':
+                julia = os.path.expanduser('~') + '\\AppData\\Local\\Julia-1.1.1\\bin\\julia.exe'
+
+            command = [julia, path_juliaScript , self.tmp_dir, str(tol), str(maxiter), str(step_factor)]
+            self.JuliaSolver = sub.Popen(command, stdout=sub.PIPE, stderr=sub.PIPE)
+            fname = self.tmp_dir + 'log.log'
+            if verbose:
+                print('Launching Julia....')
+                print('Temp file can be found in: {}'.format(fname))
+
+            start = time.time()
+            return fname, start
+
+        def Pbar(perc, pgrs, tb_up, conv_err):
             bar_width = 50
             pgrs = '*'*int(np.floor(perc/2))
             width = ' '* (bar_width - len(pgrs))
@@ -586,64 +756,77 @@ class LLEsolver(object):
             length = len(line)
             return line, length, pgrs, tb_up
 
-
-        tb_up = 2
-        pgrs = ''
-        perc_old = -1
-        perc = -1
-
-        line = ''
-        timenow = time.time()
-        # wait for the solver to actually start
-        while not perc == 0 and self.JuliaSolver.poll() == None:
-            try:
-                perc = int(open(fname).readlines()[-1].strip())
-            except Exception as e:
-                pass
-
-        #fetch if any errors:
-        err = False
-        if not self.JuliaSolver.poll() == None:
-            _, err = self.JuliaSolver.communicate()
-            if not err.decode() == '':
-                print('!!! JULIA ERROR !!!')
-                print(err.decode())
-                err = True
-            print("Error: {}".format(err))
-
-        if not err:
-            print('Launching Julia: Done')
+        def ProbeProgress(fname, start):
+            tb_up = 2
+            pgrs = ''
+            perc_old = -1
             perc = -1
-            while not perc == 100 and self.JuliaSolver.poll() == None:
+            conv_err = False
+            line = ''
+            timenow = time.time()
+            # wait for the solver to actually start
+            while not perc == 0 and self.JuliaSolver.poll() == None:
                 try:
-                    ll = open(fname).readlines()[-1].strip()
-                    try:
-                        perc = int(ll)
-                        if not perc_old == perc:
-                            line, length, pgrs, tb_up= Pbar(perc, pgrs, tb_up)
-                            print('\r' + line, end = '')
-                            perc_old = perc
-
-                    except Exception as e:
-                        if ll.split()[0] == 'Failed':
-                            conv_err = True
+                    perc = int(open(fname).readlines()[-1].strip())
                 except Exception as e:
                     pass
+                    # print('line 654')
+                    # print(e)
 
-            time_taken = time.time() - start
-            end = time.time()
-            hours, rem = divmod(end-start, 3600)
-            minutes, seconds = divmod(rem, 60)
-            time_taken = "Simulation Time " + \
-                "{:0>2}h:{:0>2}min:{:0>4.1f}s".format(int(hours),
-                                                      int(minutes),
-                                                      seconds)
-            print('\n')
-            print(time_taken)
-            print('-'*70)
-            if self._debug:
-                self._logger.info('LLEsovler.SolveTemporal', time_taken)
+            #fetch if any errors:
+            err = False
+            if not self.JuliaSolver.poll() == None:
+                _, err = self.JuliaSolver.communicate()
+                if not err.decode() == '':
+                    print('!!! JULIA ERROR !!!')
+                    print(err.decode())
+                    err = True
+                print("Error: {}".format(err))
 
+            if not err:
+                if verbose:
+                    print('Launching Julia: Done')
+                perc = -1
+                while not perc == 100 and self.JuliaSolver.poll() == None:
+                    try:
+                        ll = open(fname).readlines()[-1].strip()
+                        try:
+                            perc = int(ll)
+                            if not perc_old == perc:
+                                line, length, pgrs, tb_up= Pbar(perc, pgrs, tb_up, conv_err)
+                                print('\r' + line, end = '')
+                                perc_old = perc
+
+                        except Exception as e:
+                            print('line 681')
+                            print(e)
+                            if ll.split()[0] == 'Failed':
+                                conv_err = True
+
+                    except Exception as e:
+                        print('line 686')
+                        print(e)
+                        pass
+                    time.sleep(1)
+                line, length, pgrs, tb_up= Pbar(100, pgrs, tb_up, conv_err)
+                time_taken = time.time() - start
+                end = time.time()
+                hours, rem = divmod(end-start, 3600)
+                minutes, seconds = divmod(rem, 60)
+                time_taken = "Simulation Time " + \
+                    "{:0>2}h:{:0>2}min:{:0>4.1f}s".format(int(hours),
+                                                          int(minutes),
+                                                          seconds)
+                print('\n')
+                print(time_taken)
+                print('-'*70)
+                if self._debug:
+                    self._logger.info('LLEsovler.SolveTemporal', time_taken)
+
+        DisplaySim()
+        time.sleep(2)
+        JuliaLog, start_time = LaunchJulia()
+        ProbeProgress(JuliaLog, start_time)
 
     def SolveSteadyState(self, do_plot = True):
         '''
@@ -665,7 +848,7 @@ class LLEsolver(object):
         print(date)
 
         # -- CHeck Parity of the µ --
-        μ_sim = copy(self.sim['mu_sim'])
+        μ_sim = copy(self._sim['mu_sim'])
         ind = 0
         if not μ_sim[0] == -μ_sim[1]:
             μ_sim = [-np.max(np.abs(μ_sim)), np.max(np.abs(μ_sim))]
@@ -683,16 +866,16 @@ class LLEsolver(object):
 
         # -- setting up parameters --
         β2 = self._analyze.β2
-        Pin = self.sim['Pin']
-        γ = self.res['gamma']
-        L = 2*np.pi*self.res['R']
-        ω0 = self.sim['f_pmp'][0]*2*np.pi
-        Q0 = self.res['Qi']
-        Qc = self.res['Qc']
-        tR = L*self.res['ng']/self._c0
+        Pin = self._sim['Pin']
+        γ = self._res['gamma']
+        L = 2*np.pi*self._res['R']
+        ω0 = self._sim['f_pmp'][0]*2*np.pi
+        Q0 = self._res['Qi']
+        Qc = self._res['Qc']
+        tR = L*self._res['ng']/self._c0
         α = 1/2 * (ω0/Q0 + ω0/Qc) * tR
         θ = ω0/Qc*tR
-        δω = -self.sim['domega']* tR
+        δω = -self._sim['domega']* tR
 
         nlc = -1j*γ*L
         μ = np.arange(μ_sim[0], μ_sim[1]+1)
@@ -717,7 +900,7 @@ class LLEsolver(object):
         x_init = np.concatenate((Em0.real, -Em0.imag))
 
         # -- Define the Steady State LLE Equation --
-        φ = -α + 1j*δω - 1j*self.sim["dphi"]
+        φ = -α + 1j*δω - 1j*self._sim["dphi"]
         Em= lambda xx:  xx[0:int(xx.shape[0]/2)] + 1j*xx[int(xx.shape[0]/2)]
         Ut=  lambda xx:  fft.ifft(Em(xx));
         fm= lambda xx: φ*Em(xx) + nlc*fft.fft(np.abs(Ut(xx))**2*Ut(xx)) + Ein_couple;
@@ -757,277 +940,232 @@ class LLEsolver(object):
         Load the output hdf5 saved by julia and transform it in a user-friendly dictionary to be more pythonistic
         '''
 
-        time.sleep(0.5)
-        drct = tmp_dir
-        S = h5py.File(tmp_dir + 'ResultsJulia.h5', 'r')
-        if self._debug:
-            self._logger.info('LLEsovler.RetrieveData','Retrieving results from Julia in {}'.format(tmp_dir + 'ResultsJulia.h5'))
-        sol = {}
-        keys = ['u_probe','Em_probe', 'Ewg']
-        for k in keys:
-            rl = 'Results/{}Real'.format(k)
-            im = 'Results/{}Imag'.format(k)
-            sol[k] = S[rl][:] + 1j*S[im][:]
-        sol['ω'] = S['Results/ωReal'][:]
-        sol['comb_power'] = S['Results/comb_powerReal'][:]
-        sol['detuning'] = S["Results/detuningReal"][:]
-        S.close()
-        os.remove(tmp_dir + 'ParamLLEJulia.h5')
-        os.remove(tmp_dir + 'ResultsJulia.h5')
-        sol['freq'] = sol['ω']/(2*np.pi)
-        sol['theta'] = np.linspace(-np.pi,np.pi, sol['u_probe'].shape[0])
-        self.sol = sol
+        time.sleep(2)
+        drct = self.tmp_dir
+        with h5py.File(self.tmp_dir + 'ResultsJulia.h5', 'r') as S:
+            if self._debug:
+                self._logger.info('LLEsovler.RetrieveData','Retrieving results from Julia in {}'.format(self.tmp_dir + 'ResultsJulia.h5'))
+            self._sol = {}
+            keys = ['u_probe', 'driving_force']
+            for k in keys:
+                rl = 'Results/{}Real'.format(k)
+                im = 'Results/{}Imag'.format(k)
+                self._sol[k] = S[rl][:] + 1j*S[im][:]
 
-    def PlotCombPower(self, do_matplotlib = False):
-        '''
-        Plot a figure with 3 subplots.
+            self._sol['detuning'] = S["Results/detuningReal"][:]
+            self._sol['time'] = S["Results/t_simReal"][:]
+            self._sol['kappa_ext'] = S["Results/kappa_extReal"][:]
+            self._sol['kappa0'] = S["Results/kappa_0Real"][:]
 
-        - Top subplot = map of the spectra for the steps taken by the LLE (step sub-sampled to be 1000)
-        - middle subplot = temporal map of the intensity inside the resonator for the steps of the LLE
-        - bottom subplot = normalized comb power
-
-        **Output**
-
-            - f, ax:  handle of figure and axes of the matplotlib figure displayed
-        '''
+        
+        os.remove(self.tmp_dir + 'ParamLLEJulia.h5')
+        os.remove(self.tmp_dir + 'ResultsJulia.h5')
 
 
-        freq = self.sol['freq']*1e-12
-        Epb = self.sol['Ewg']
-        Epb[Epb==0] = 1e-20
-        Epb = 30 + 10*np.log10(np.abs(Epb)**2)
 
-        E2 = (np.abs(self.sol['u_probe'])**2)
-        E2 = E2/E2.max()
-        tR = 2*np.pi*self.res['R']*self.res['ng']/self._c0
-        t = np.linspace(-0.5, 0.5, freq.size) * tR
-
-        CmbPow = self.sol['comb_power'] /self.sol['comb_power'].max()
-        det = self.sol['detuning']*1e-9/(2*np.pi)
-
-        step = np.arange(0, 1000)
-        self._plotPower = True
-        if not pyType == 'jupyter' or do_matplotlib:
-            # --  Create the Figure --
-            f = plt.figure()
-            gs = gridspec.GridSpec(3,2, width_ratios=[1,0.015],wspace=0.05)
-            ax = [None]*6
-            ax[0] = plt.subplot(gs[0])
-            ax[1] = plt.subplot(gs[1])
-            ax[2] = plt.subplot(gs[2],sharex=ax[0])
-            ax[3] = plt.subplot(gs[3])
-            ax[4] = plt.subplot(gs[4],sharex=ax[0])
-            cmap = plt.get_cmap("tab10")
-
-            # -- Plot Everything --
-            aa = ax[0].pcolormesh(step, freq,Epb,
-                             rasterized=True,
-                             vmin = Epb.max()-120,
-                             vmax = Epb.max())
-
-            bb = ax[2].imshow(E2,aspect='auto',
-                    origin = 'lower',
-                    interpolation='bessel')
-            tr_12 = 1e-12*np.floor(1e12*tR)/2
-            # print(np.argmin(np.abs(tr_12- t)))
-            ind = [np.argmin(np.abs(-tr_12- t)),
-                   np.argmin(np.abs(t)),
-                   np.argmin(np.abs(tr_12- t))]
-            ax[2].set_yticks(ind)
-            ax[2].set_yticklabels([-tr_12*1e12,
-                                     0,
-                                    tr_12*1e12])
+        # Now Compute the uselfull parameters
+        # ---------------------------------------------
+        ind_pump_sweep = self._sim['ind_pump_sweep']
+        μcent = -self._sim['mu_sim_center'][0]
+        # ind_pmp = [self._sim['ind_pmp'][ii] for ii in ind_pump_sweep]
+        det = 1e-9*self._sol['detuning']/(2*np.pi)
 
 
-            ax[4].plot(step, CmbPow)
-            ax.append(ax[4].twinx())
-            ax[6].plot(step,det,
-                        c = cmap.colors[1])
+        L = self._res['R']
+        ng = self._res['ng']
+        Qc = self._res['Qc']
+        Q0 = self._res['Qi']
+        tR = L*ng/cts.c
+        FSR = cts.c/(ng*L)
+        μlength =  self._sim['mu_sim_center'][1]*2+1
 
-            # -- Make it Pretty --
-            ax[0].set_ylabel('Frequency (THz)')
-            ax[2].set_ylabel('Time (ps)')
-            ax[4].set_xlabel('LLE Step (sub-sampled)')
-            ax[4].set_ylabel('Norm. Comb Pwr')
-            ax[6].set_ylabel('Detuning (GHz)')
-            ax[0].set_xlim([0,1000])
-            [label.set_visible(False) for label in ax[0].get_xticklabels()]
-            [label.set_visible(False) for label in ax[2].get_xticklabels()]
+        κext = self._sol['kappa_ext']
+        κ0 = self._sol['kappa0']
+        α = κext+κ0
 
+        u_probe = self._sol['u_probe']
+        driving_force = self._sol['driving_force']
+        D1 = self._sim['D1_center']
 
-            bar_spec = f.colorbar(aa,cax = ax[1],orientation="vertical")
-            bar_temp = f.colorbar(bb,cax = ax[3],orientation="vertical")
-            bar_spec.set_label('Spec. P (dB)')
-            bar_temp.set_label('|E|²')
-            tick_locator1 = ticker.MaxNLocator(nbins=4)
-            tick_locator2 = ticker.MaxNLocator(nbins=2)
-            bar_spec.locator = tick_locator1
-            bar_temp.locator = tick_locator2
-            bar_spec.update_ticks()
-            bar_temp.update_ticks()
+        ωcenter = self._sim['f_center']*2*np.pi
+        μcenter = np.linspace(self._sim['mu_sim_center'][0],
+                              self._sim['mu_sim_center'][1],
+                              μlength)
 
-            if not pyType == 'jupyter':
-                f.show()
-            self.fPcomb = f
-            self.axPcomb = ax
+        u_probe = self._sol['u_probe']
+        Awg = 1j*np.zeros(u_probe.shape)
+        Ewg = 1j*np.zeros(u_probe.shape)
+        Ecav = 1j*np.zeros(u_probe.shape)
+        Acav = 1j*np.zeros(u_probe.shape)
+        Pcomb = np.zeros(u_probe.shape[1])
+        for ii in range(u_probe.shape[1]):
+            wg = driving_force[:,ii]*np.sqrt(1-κext)
+            cav = np.sqrt(κext)*u_probe[:,ii]*np.exp(1j*np.pi)
+            Awg[:, ii] = (wg + cav)/np.sqrt(μlength)
+            Acav[:, ii] = np.sqrt(α[0]/2)*u_probe[:,ii]*np.exp(1j*np.pi)/np.sqrt(μlength)
+            Ewg[:, ii] = np.fft.fftshift(np.fft.fft(Awg[:, ii]))/np.sqrt(μlength)+1e-12
+            Ecav[:, ii] = np.fft.fftshift(np.fft.fft(Acav[:, ii]))/np.sqrt(μlength)
+            Pcomb[ii] = np.sum(np.abs(Ecav[:,ii])**2,0) - np.sum([np.abs(Ecav[μcent+jj,ii])**2 for  jj in np.unique(self._sim['ind_pmp'])])
+        Pwg = np.sum(np.abs(Awg)**2,0)
+        Pcav = np.sum(np.abs(Acav)**2,0)
 
-            return f, ax
+        # -- Comb Frequency --
+        μ = self._sim['mu_sim']
+        μ = np.arange(μ[0], μ[1]+1)
+        FSR = self._sim['FSR']
+        self._sol['freq'] = self._sim['f_pmp'][0]+μ*FSR[0]
 
-        else:
+        sol = {'δfreq': self._sol['detuning']/(2*np.pi),
+               'time': self._sol['time'],
+               'Awg': Awg,
+               'Acav': Acav,
+               'Ewg': Ewg,
+               'Ecav': Ecav,
+               'Pcomb': Pcomb,
+               'Pwg': Pwg,
+               'Pcav': Pcav,
+               'μ':μ,
+               'freq': self._sol['freq']
+               }
 
-            Sspec = go.Heatmap(x=step, y=freq, z=Epb,
-                  colorbar=dict(len=0.37, y=0.83, title='Power (dBm)'),
-                  yaxis='y3',
-                  colorscale='Viridis',
-                  zmax = 0,
-                  zmin = -120,
-                  )
+        did_translate = not(self._did_translate)
+        if not self._did_translate:
+            sol = self._Translator(sol)
+        self.sol = _dic2struct(sol, which = 'sol', do_tr = did_translate)
 
-            Stime = go.Heatmap(x = step, y = t*1e12, z = E2,
-                  colorbar=dict(len=0.34, y=0.47, title = '|E|^2'),
-                   yaxis='y2',
-                   colorscale='Viridis')
+    def PlotSpectraMap(self, do_matplotlib = False):
 
-            Cpwr = go.Scatter(x=step, y=CmbPow,
-                              yaxis='y1',
-                              name='Comb Power')
+        tr = [go.Heatmap(z = 10*np.log10(np.abs(self.sol.Ewg)**2)+30,
+                 zmax = 0,
+                 zmin = -90,
+                colorbar = dict(title = 'In-wg Power (dBm)'))]
+        # tr = [ go.Scatter(y = np.abs(wg)**2)]
+        fig = go.FigureWidget(data = tr)
+        _ = fig.update_xaxes(title = 'LLE step')
+        _ = fig.update_yaxes(title = 'Frequency (THz)')
+        # fig.show()
 
-            Detuning = go.Scatter(x=step, y=det,
-                                  yaxis='y4',
-                                  name='Detuning')
+        return fig
 
-            data = [Cpwr, Detuning, Stime, Sspec]
-            layout = go.Layout(
-                    xaxis=dict(domain=[0, 1],anchor='y1',title= 'LLE Step'),
-                    xaxis2=dict(domain=[0, 1],anchor='y1',title= 'couocu', ),
-                    xaxis3=dict(domain=[0, 1],anchor='y1'),
-                    xaxis4=dict(domain=[0, 1],anchor='y1'),
-                    yaxis1=dict(domain=[0, 0.29],title = 'Comb Power',),
-                    yaxis2=dict(domain=[0.33, 0.62],anchor='x1',title = 'Fast Time',),
-                    yaxis3=dict(domain=[0.66, 1],anchor='x1',title = 'Frequency (THz)',),
-                    yaxis4=dict(domain=[0.66, 1],anchor='x1',overlaying='y1',title = 'Detuning (GHz)',side='right'),
-                    showlegend=False,)
-            fig = go.Figure(data=data, layout=layout)
-            iplot(fig)
+    def PlotTimeMap(self, do_matplotlib = False):
+        pass
 
-            return fig
-
-    def PlotCombSpectra(self, ind, f=None, ax=None, label=None, pwr='both', do_matplotlib = False, plot = True, style = 'line'):
-        '''
-        Plot the spectra for a given index in the 1000 sub-sampled LLE steps
-
-        **Input**
-
-            - ind <ind>: index in the LLE step to plot the spectra
-            - f <obj>:  matplotlib figure handle (if None, new figure)
-            - ax <obj>: matplotlib axe handle
-            - label <str>: label for the legend
-            - pwr <str>: 'both', 'ring', 'wg' depending on the spectra wanted (inside the ring, the waveguide or both)
-
-        **Output**
-
-            - freq <numpy.array>: frequency in Hz
-            - Sout <numpy.array>: spectral density of power in the waveguide (dBm)
-            - Sring <numpy.array>: spectral density of power in the ring (dBm)
-            - f <obj>:  matplotlib figure handle
-            - ax <obj>: matplotlib axes handle
+    def PlotCombPower(self, do_matplotlib = False, which = 'all', xaxis = 'steps' ):
         '''
 
-        freq = self.sol['freq']*1e-12
-        Sring = 30 + 10*np.log10(np.abs(self.sol['Em_probe'][:, ind])**2)
-        Sout = 30 + 10*np.log10(np.abs(self.sol['Ewg'][:, ind])**2)
-        self.spectra = {'Sout': Sout,
-                        'Sres': Sring,
-                        'freq': freq*1e-12}
-
+        '''
+        tr = []
+        if xaxis.lower() == 'steps':
+            x = np.linspace(0,999,1000)
+            xlabel = 'LLE steps'
+        elif xaxis.lower() == 'detuning':
+            x = 1e-9*self._sol['detuning']/(2*np.pi)
+            xlabel = 'Detuning (GHz)'
 
         if not pyType == 'jupyter' or do_matplotlib:
-            if f is None and ax is None:
-                f, ax = plt.subplots(dpi=120)
-            elif f is None and not(ax is None):
-                if not type(ax) is list:
-                    f = ax.figure
-                else:
-                    f, ax = plt.subplots(dpi=120)
-                    print('Only 1 subplots supported, created a new figure')
-            elif not(f is None) and ax is None:
-                ax = f.axes[0]
-            else:
-                if type(ax) is list:
-                    f, ax = plt.subplots(dpi=120)
+            fig, ax = plt.subplots()
+            if which.lower() == 'all':
+                ax.plot(x, self.sol.Pcav)
+                ax.plot(x, self.sol.Pwg)
+                ax.plot(x, self.sol.Pcomb)
 
+            if which.lower() == 'comb':
+                ax.plot(x, self.sol.Pcomb)
+            if which.lower() == 'waveguide':
+                ax.plot(x, self.sol.Pwg)
+            if which.lower() == 'cavity':
+                ax.plot(x, self.sol.Pcav)
 
-
-            if pwr.lower() == 'both':
-                ax.plot(freq, Sout, label='Output P')
-                ax.plot(freq, Sring, '.', ms=4, label='In ring P')
-            if pwr.lower() == 'ring':
-                ax.plot(freq, Sring, ms=4, label=label)
-            if pwr.lower() == 'wg':
-                ax.plot(freq, Sout, label=label)
-
+            ax.legend()
+            ax.set_xlabel(xlabel)
             ax.set_ylabel('Power (dBm)')
-            ax.set_xlabel('Frequency (THz)')
-            if not(label is None):
-                ax.legend()
-            if not pyType == 'jupyter':
-                f.canvas.draw()
-                f.show()
-                plt.pause(0.25)
 
-            self.fSpectra = f
-            self.axSpectra = ax
-
-            return f, ax
         else:
-            trace0 = go.Scatter(x = freq,y = Sring,
-                            mode = 'lines',name = 'Res. Power')
-            trace1 = go.Scatter(x = freq,y = Sout,
-                 mode = 'lines',name = 'Wg. Power')
+            if which.lower() == 'all':
+                tr += [go.Scatter(x = x, y = self.sol.Pcav, name = 'Pcav')]
+                tr += [go.Scatter(x = x, y = self.sol.Pwg, name = 'Pwg')]
+                tr += [go.Scatter(x = x, y = self.sol.Pcomb, name = 'Pcomb')]
 
-            if pwr.lower() == 'both':
-                data = [trace1, trace0]
-            if pwr.lower() == 'ring':
-                if style == 'stem':
-                    clr  = "#1f77b4"
-                    data = [go.Scatter(x = freq,y = Sring,
-                                    mode = 'markers' ,name = 'Res. Power',
-                                    legendgroup = 'Res. Power',
-                                    marker = {'color': clr})]
-                    mini = Sring.min()
-                    for xx, yy in zip(freq, Sring):
-                        data += [go.Scatter(x = [xx, xx],y = [mini, yy],
-                                        mode = 'lines' ,name = 'Res. Power',
-                                        showlegend = False,
-                                        legendgroup = 'Res. Power',
-                                        marker = {'color': clr})]
-                else:
-                    data = [trace0]
-            if pwr.lower() == 'wg':
+            if which.lower() == 'comb':
+                tr += [go.Scatter(x = x, y = self.sol.Pcomb, name = 'Pcomb')]
+            if which.lower() == 'waveguide':
+                tr += [go.Scatter(x = x, y = self.sol.Pwg, name = 'Pwg')]
+            if which.lower() == 'cavity':
+                tr += [go.Scatter(x = x, y = self.sol.Pcav, name = 'Pcav')]
 
-                if style == 'stem':
-                    clr  = "#1f77b4"
-                    data = [go.Scatter(x = freq,y = Sout,
-                                    mode = 'markers' ,name = 'Res. Power',
-                                    legendgroup = 'Res. Power',
-                                    marker = {'color': clr})]
-                    mini = Sout.min()
-                    for xx, yy in zip(freq, Sout):
-                        data += [go.Scatter(x = [xx, xx],y = [mini, yy],
-                                        mode = 'lines' ,name = 'Res. Power',
-                                        showlegend = False,
-                                        legendgroup = 'Res. Power',
-                                        marker = {'color': clr})]
-                else:
-                    data = [trace1]
 
-            layout = dict(xaxis = dict(title = 'Frequency (THz)'),
-                        yaxis = dict(title = 'Power (dBm)'),
-                        hovermode="closest",
-                    )
-            fig = go.Figure(data=data, layout=layout)
-            if plot:
-                iplot(fig)
+            fig = go.FigureWidget(data = tr)
+            _ = fig.update_xaxes(title = xlabel)
+            _ = fig.update_yaxes(title = 'Power (W)')
+
+
+        return fig
+
+    def PlotCombSpectra(self, ind, do_matplotlib = False, plot = True, style = 'comb', xaxis = 'freq', where = 'waveguide', floor = -100):
+        # freq = self.sol['freq']*1e-12
+        # Sring = 30 + 10*np.log10(np.abs(self.sol['Em_probe'][:, ind])**2)
+        # Sout = 30 + 10*np.log10(np.abs(self.sol['Ewg'][:, ind])**2)
+        # self.spectra = {'Sout': Sout,
+        #                 'Sres': Sring,
+        #                 'freq': freq*1e-12}
+        if xaxis.lower() == 'frequencies' or xaxis.lower() == 'freq':
+            x = self.sol.freq*1e-12
+            xlabel = 'Frequency (THz)'
+        elif xaxis.lower() == 'modes':
+            x = np.arange(self._sim['mu_sim'][0],self._sim['mu_sim'][-1])  - self._sim['ind_pmp'][0]
+            xlabel = 'Mode Numbers'
+
+        if where == 'waveguide' or where =='wg':
+            y = 10*np.log10(np.abs(self.sol.Ewg[:,ind])**2)+30
+            name = ['Waveguide']
+        if where == 'cavity' or where =='cav':
+            y = 10*np.log10(np.abs(self.sol.Ecav[:,ind])**2)+30
+            name = ['Cavity']
+        if where == 'both':
+            y = 10*np.log10(np.abs(self.sol.Ecav[:,ind])**2)+30
+            y2 = 10*np.log10(np.abs(self.sol.Ewg[:,ind])**2)+30
+            name = ['Cavity', 'Waveguide']
+
+        if style == 'comb':
+            x_ = np.zeros(x.size*3)
+            x_[::3] = x
+            x_[1::3] = x
+            x_[2::3] = x
+            x = x_
+
+            y_ = np.zeros(y.size*3)
+            y_[::3] = floor
+            y_[1::3] = y
+            y_[2::3] = floor
+            y = y_
+
+            if where == 'both':
+                y2_ = np.zeros(y2.size*3)
+                y2_[::3] = floor
+                y2_[1::3] = y2
+                y2_[2::3] = floor
+                y2 = y2_
+
+
+        if not pyType == 'jupyter' or do_matplotlib:
+            fig, ax = plt.subplots()
+            ax.plot(x, y, label = name[0])
+            if where == 'both':
+                ax.plot(x, y2, label = name[1])
+            ax.set_xlabel(xlabel)
+            ax.set_ylabel('Power (dBm)')
+        else:
+
+            tr = [go.Scatter(x=x, y = y,
+                            name = name[0])]
+            if where == 'both':
+                tr += [go.Scatter(x=x, y = y2,
+                                name = name[1])]
+
+            fig = go.FigureWidget(data = tr)
+
+            _ = fig.update_xaxes(title = xlabel)
+            _ = fig.update_yaxes(title = 'Power (dBm)')
 
         self._plotSpecta = True
         self._indSpectra = ind
@@ -1056,11 +1194,11 @@ class LLEsolver(object):
         '''
 
 
-        tR = 2*np.pi*self.res['R']*self.res['ng']/self._c0
+        tR = 2*np.pi*self._res['R']*self._res['ng']/self._c0
         freq = self.sol['freq']
 
         τ = np.linspace(-0.5, 0.5, freq.size) * tR
-        U = np.abs(self.sol['u_probe'][:,ind])**2
+        U = np.abs(self.sol['Acav'][:,ind])**2
 
         self.fasttime ={'U': U,
                         'tau': τ}
@@ -1071,7 +1209,7 @@ class LLEsolver(object):
             ax.set_ylabel('Soliton Energy (a.u)')
             if not pyType == 'jupyter':
                 f.show()
-            return f, ax
+            fig = f
         else:
             trace0 = go.Scatter(x = τ*1e12,y = U,
                             mode = 'lines')
@@ -1079,11 +1217,12 @@ class LLEsolver(object):
             layout = dict(xaxis = dict(title = 'Time (ps)'),
                   yaxis = dict(title = '|E|^2 (norm)'),
                   )
-            fig = go.Figure(data=data, layout=layout)
-            iplot(fig)
+            fig = go.FigureWidget(data=data, layout=layout)
+
 
         self._plotTime = True
         self._indTime = ind
+        return fig
 
     def SaveResults(self, fname, path='./'):
         '''
@@ -1095,8 +1234,8 @@ class LLEsolver(object):
             - path <str>: path to save the results (defaults './')
         '''
         to_save = copy(self)
-        to_save.sim.pop('domega_disp', None)
-        to_save.sim.pop('domega_disp', None)
+        # to_save._sim.pop('domega_disp', None)
+        # to_save.sim.pop('domega_disp', None)
         del to_save.JuliaSolver
         fname = path + fname + '.pkl'
         print(fname)
@@ -1115,35 +1254,250 @@ class LLEsolver(object):
 
     def __repr__(self):
         to_print = ''
-        to_print = 'Dispersion load from:\t{}\n\n'.format(self.res['dispfile'])
+        to_print = 'Dispersion from: {}\n\n'.format(self._res['dispfile'])
         to_print += 'Resonator Parameters:\n'
         res_table = PrettyTable(['Parameters', 'Value', 'Units'])
-        res_table.add_row(['R', "{:.3f}".format(self.res['R']*1e6),'µm'])
-        res_table.add_row(['Qi', "{:.3f}".format(self.res['Qi']*1e-6),'x1e6'])
-        res_table.add_row(['Qc', "{:.3f}".format(self.res['Qc']*1e-6),'x1e6'])
-        if 'gamma' in self.res:
-            res_table.add_row(['γ', "{:.3f}".format(self.res['gamma']),''])
-        if 'n2' in self.res:
-            res_table.add_row(['n2', "{:.3f}".format(self.res['n2']*1e19),'x1e-19 m2/W'])
+        res_table.add_row(['R', "{:.3f}".format(self._res['R']*1e6),'µm'])
+        res_table.add_row(['Qi', "{:.3f}".format(self._res['Qi']*1e-6),'x1e6'])
+        res_table.add_row(['Qc', "{:.3f}".format(self._res['Qc']*1e-6),'x1e6'])
+        if 'gamma' in self._res:
+            res_table.add_row(['γ', "{:.3f}".format(self._res['gamma']),''])
+        if 'n2' in self._res:
+            res_table.add_row(['n2', "{:.3f}".format(self._res['n2']*1e19),'x1e-19 m2/W'])
         to_print += res_table.get_string()
+        to_print += '\n'
         to_print += '\n'
 
         to_print += 'Simulation Parameters:\n'
         sim_table = PrettyTable(['Parameters', 'Value', 'Units'])
-
-        if 'Pin' in self.sim:
-            sim_table.add_row(['Pin',"{:.3f}".format(self.sim['Pin']*1e3),'mW'])
-        if 'f_pmp' in self.sim:
-            sim_table.add_row(['f_pmp',"{:.3f}".format(self.sim['f_pmp']*1e-12),'THz'])
-        if 'μ_sim' in self.sim:
-            sim_table.add_row(['μ_sim',"{}".format(self.sim['mu_sim']),''])
-        if 'Tscan' in self.sim:
-            sim_table.add_row(['Tscan',"{:.3f}".format(self.sim['Tscan']*1e-5),'x1e5 tR'])
-        if 'domega_init' in self.sim:
-            sim_table.add_row(['δω_init',"{:.3f}".format(self.sim['domega_init']*1e-9),'GHz'])
-        if 'domega_end' in self.sim:
-            sim_table.add_row(['δω_end',"{:.3f}".format(self.sim['domega_end']*1e-9),'GHz'])
+        if 'Pin' in self._sim:
+            for pp in self._sim['Pin']:
+                sim_table.add_row(['Pin',"{:.3f}".format(pp*1e3),'mW'])
+        if 'f_pmp' in self._sim:
+            for ff in self._sim['f_pmp']:
+                sim_table.add_row(['f_pmp',"{:.3f}".format(ff*1e-12),'THz'])
+        if 'μ_sim' in self._sim:
+            sim_table.add_row(['μ_sim',"{}".format(self._sim['mu_sim']),''])
+        if 'Tscan' in self._sim:
+            sim_table.add_row(['Tscan',"{:.3f}".format(self._sim['Tscan']*1e-5),'x1e5 tR'])
+        if 'domega_init' in self._sim:
+            sim_table.add_row(['δω_init',"{:.3f}".format(self._sim['domega_init']*1e-9),'GHz'])
+        if 'domega_end' in self._sim:
+            sim_table.add_row(['δω_end',"{:.3f}".format(self._sim['domega_end']*1e-9),'GHz'])
         to_print += sim_table.get_string()
         to_print += '\n'
 
         return to_print
+
+
+
+
+class _dic2struct():
+    def __init__(self, d, which='sim', do_tr=True):
+        self._dic = d
+        self._which = which
+        self._do_tr= do_tr
+        self._test  = LLEsolver
+        for a, b in d.items():
+           setattr(self, a, _dic2struct(b) if isinstance(b, dict) else b)
+
+    def reprRes(self):
+        greek ={'α': 'alpha', 'β':'beta','γ': 'gamma',
+                    'ω': 'omega','δ': 'd', 'Δ': 'D', 'μ': 'mu',
+                    'λ': 'lambda','ε': 'epsilon','φ': 'phi'}
+        table = PrettyTable(['Parameter', 'Description', 'Values', 'Units'])
+        table.add_row(['R', self._dic['R']*1e6, 'Ring radius', 'µm'])
+        Qi = self._dic['Qi']
+        exp = np.floor(np.log10(Qi))
+        arg = Qi*10**(-1*exp)
+        Qi = '{:.3f} x10^{:.0f}'.format(arg, exp)
+        table.add_row(['Qi', Qi, 'Intrinsic quality factor', ''])
+
+        Qc = self._dic['Qc']
+        exp = np.floor(np.log10(Qc))
+        arg = Qc*10**(-1*exp)
+        Qc = '{:.3f} x10^{:.0f}'.format(arg, exp)
+        table.add_row(['Qc', Qc, 'Coupling quality factor', ''])
+        try:
+            table.add_row(['γ',self._dic['gamma'],  'Non-linear coefficient', 'W^-1 m^-1'])
+        except:
+            table.add_row(['γ',self._dic['γ'],  'Non-linear coefficient', 'W^-1 m^-1'])
+        table.add_row(['dispfile', self._dic['dispfile'], 'mode/resonance frequency file', ''])
+        table.vrules = False
+        table.header = True
+        table.align = "l"
+        table.padding_width = 2
+        table.padding_height = 25
+
+        str_table = table.get_string()
+        if self._do_tr:
+            for ii in greek.items():
+                str_table = str_table.replace(ii[0], ii[1] )
+        return str_table
+
+    def reprSim(self):
+        greek ={'α': 'alpha', 'β':'beta','γ': 'gamma',
+                'ω': 'omega','δ': 'd', 'Δ': 'D', 'μ': 'mu',
+                'λ': 'lambda','ε': 'epsilon','φ': 'phi'}
+
+        table = PrettyTable(['Parameter', 'Description', 'Values', 'Units'])
+        Pin = ['{:.3f}'.format(ii*1e3) for ii in self._dic['Pin']]
+        Pin = '[' + ', '.join(Pin) + ']'
+        table.add_row(["Pin",Pin + ' (mW)', "Pump power", "W"])
+        table.add_row(["Tscan",self._dic['Tscan'], "Simulation time length", "unit of round trip"])
+
+        f_pmp = ['{:.3f}'.format(ii*1e-12) for ii in self._dic['f_pmp']]
+        f_pmp = '[' + ', '.join(f_pmp) + ']'
+        table.add_row(["f_pmp",f_pmp + ' (THz)',  "Pump frequencies", "Hz"])
+        table.add_row(["φ_pmp",self._dic['phi_pmp'], "Pump phase ", "rad"])
+
+        f_center = '{:.3f}'.format(self._dic['f_center']*1e-12)
+        table.add_row(["f_center",f_center + ' (THz)', "Center of the sim domain", "Hz"])
+
+        try:
+            δω_init = '{:.3f}'.format(self._dic['δω_init']*1e-9/(2*np.pi))
+            δω_end = '{:.3f}'.format(self._dic['δω_end']*1e-9/(2*np.pi))
+        except:
+            δω_init = '{:.3f}'.format(self._dic['domega_init']*1e-9/(2*np.pi))
+            δω_end = '{:.3f}'.format(self._dic['domega_end']*1e-9/(2*np.pi))
+        δω =[]
+        try:
+            for ii in self._dic['δω']:
+                if ii:
+                    δω += ['{:.3f}'.format(ii*1e-9/(2*np.pi))]
+                else:
+                    δω += ['None']
+        except:
+            for ii in self._dic['domega']:
+                if ii:
+                    δω += ['{:.3f}'.format(ii*1e-9/(2*np.pi))]
+                else:
+                    δω += ['None']
+        δω = '[' + ', '.join(δω) + ']'
+        table.add_row(["δω_init",δω_init + ' (GHz)', "Start of the frequency sweep", "x2π Hz"])
+        table.add_row(["δω_end",δω_end + ' (GHz)', "End of the frequency sweep", "x2π Hz"])
+        table.add_row(["δω",δω + ' (GHz)', "Fixed detuning", "x2π Hz"])
+
+
+        try:
+            table.add_row(["μ_sim",self._dic['μ_sim'], "Simulation mode domain", ""])
+            table.add_row(["μ_fit",self._dic['μ_fit'], "Fit mode domain", ""])
+            table.add_row(["μcenter",self._dic['μcenter'], "Index of the center of the sim domain", ""])
+        except:
+            table.add_row(["μ_sim",self._dic['mu_sim'], "Simulation mode domain", ""])
+            table.add_row(["μ_fit",self._dic['mu_fit'], "Fit mode domain", ""])
+            table.add_row(["μcenter",self._dic['mucenter'], "Index of the center of the sim domain", ""])
+        table.add_row(["ind_pmp",self._dic['ind_pmp'], "Pump index relative to center of domain", ""])
+        table.add_row(["ind_pump_sweep",self._dic['ind_pump_sweep'][0], "Pump index to sweep", ""])
+        table.vrules = False
+        table.header = True
+        table.align = "l"
+        table.padding_width = 2
+        table.padding_height = 25
+        str_table = table.get_string()
+        if self._do_tr:
+            for ii in greek.items():
+                str_table = str_table.replace(ii[0], ii[1] )
+        return str_table
+
+    def reprSol(self):
+        greek ={'α': 'alpha', 'β':'beta','γ': 'gamma',
+                    'ω': 'omega','δ': 'd', 'Δ': 'D', 'μ': 'mu',
+                    'λ': 'lambda','ε': 'epsilon','φ': 'phi'}
+        table = PrettyTable(['Parameter', 'Description', 'Values', 'Units'])
+
+        try:
+            δfreq  = '[{:.3f} ... {:.3f}]'.format(self._dic['δfreq'][0]*1e-9, self._dic['δfreq'][-1]*1e-9)
+        except:
+            δfreq  = '[{:.3f} ... {:.3f}]'.format(self._dic['dfreq'][0]*1e-9, self._dic['dfreq'][-1]*1e-9)
+
+        table.add_row(["δfreq", δfreq + ' (GHz)',  "Pump detuning", "Hz"])
+
+        time = '[{:.3f} ... {:.3f}]'.format(self._dic['time'][0]*1e6, self._dic['time'][-1]*1e6)
+        table.add_row(["time", time + ' (μs)', "Simualtion time", "s"])
+
+        N = self._dic['Awg'].shape
+        N = '[{} fast time x {} slow time]'.format(N[0], N[1])
+        table.add_row(["Awg", N ,"E. field in time domain in wg,", "V/m"])
+        table.add_row(["Acav", N, "E. field in time domain in cav.", "V/m"])
+        N = self._dic['Ewg'].shape
+        N = '[{} spectra x {} slow time]'.format(N[0], N[1])
+        table.add_row(["Ewg",N, "E. field in freq. domain in wg.", "V/m"])
+        table.add_row(["Ecav",N, "E. field in freq. domain in cav.", "V/m"])
+
+        Pcomb = '[{:.3f} ... {:.3f}]'.format(self._dic['Pcomb'][0]*1e3, self._dic['Pcomb'][-1]*1e3)
+        table.add_row(["Pcomb", Pcomb + ' (mW)', "Intra-cavity comb power", "W"])
+
+        Pwg = '[{:.3f} ... {:.3f}]'.format(self._dic['Pwg'][0]*1e3, self._dic['Pwg'][-1]*1e3)
+        table.add_row(["Pwg", Pwg + ' (mW)', "In-waveguide power", "W"])
+
+        Pcav = '[{:.3f} ... {:.3f}]'.format(self._dic['Pcav'][0]*1e3, self._dic['Pcav'][-1]*1e3)
+        table.add_row(["Pcav", Pcav + ' (mW)', "Intracavity power", "W"])
+
+        try:
+            μ = '[{:.0f} ... {:.0f}]'.format(self._dic['μ'][0], self._dic['μ'][-1])
+        except:
+            μ = '[{:.0f} ... {:.0f}]'.format(self._dic['mu'][0], self._dic['mu'][-1])
+        table.add_row(["μ", μ, "Frequency comb modes index", ""])
+
+        freq = '[{:.3f} ... {:.3f}]'.format(self._dic['freq'][0]*1e-12, self._dic['freq'][-1]*1e-12)
+        table.add_row(["freq", freq + ' (THz)', "Frequency comb frequencies", "Hz"])
+        table.vrules = False
+        table.header = True
+        table.align = "l"
+        table.padding_width = 2
+        table.padding_height = 25
+        str_table = table.get_string()
+        if self._do_tr:
+            for ii in greek.items():
+                str_table = str_table.replace(ii[0], ii[1] )
+        return str_table
+
+    def reprDisp(self):
+        greek ={'α': 'alpha', 'β':'beta','γ': 'gamma',
+                    'ω': 'omega','δ': 'd', 'Δ': 'D', 'μ': 'mu',
+                    'λ': 'lambda','ε': 'epsilon','φ': 'phi'}
+        table = PrettyTable(['Parameter', 'Description', 'Values', 'Units'])
+        ng = '[{:.3f} ... {:.3f}]'.format(self._dic['ng'][0], self._dic['ng'][-1])
+        table.add_row(['ng', ng, 'Group Index', ''])
+        D  = '[{:.3f} ... {:.3f}]'.format(self._dic['D'][2], self._dic['D'][-3])
+        table.add_row(['D', D, 'Dispersion', '(ps/nm/km)'])
+
+        neff  = '[{:.3f} ... {:.3f}]'.format(self._dic['neff'][1], self._dic['neff'][-2])
+        table.add_row(['neff', neff, 'Effctive Index', ''])
+        freq  = '[{:.3f} ... {:.3f}]'.format(self._dic['freq'][1]*1e-12,  self._dic['freq'][-2]*1e-12)
+        table.add_row(['freq', freq + ' (THz)', 'Mode frequency', 'Hz'])
+        freq_sim  = '[{:.3f} ... {:.3f}]'.format(self._dic['freq_sim'][1]*1e-12,  self._dic['freq_sim'][-2]*1e-12)
+        table.add_row(['freq_sim', freq_sim + ' (THz)', 'Mode frequency to match the sim domain', 'Hz'])
+
+        table.add_row(['Dint', '[array for each pump]', 'Integrated Dispersion at the pumps from file', 'Hz'])
+        table.add_row(['Dint_sim', '[array for each pump]', 'Integrated Dispersion at the pumps from fit', 'Hz'])
+        Dint0 = '[{:.3f} ... {:.3f}]'.format(self._dic['Dint0'][1]*1e-9, self._dic['Dint0'][-2]*1e-9)
+        table.add_row(['Dint0', Dint0 + ' (GHz)', 'Dint at the center of sim domain', 'Hz'])
+        D1 = f'{self._dic["D1"]*1e-12 :.3f}'
+        table.add_row(['D1', D1, 'angular repetition rate', '(x1e12  THz)'])
+        FSR = ['{:.3f}'.format(ii*1e-9) for ii in self._dic['FSR']]
+        FSR = '[' + ', '.join(FSR)+ ']'
+        table.add_row(['FSR', FSR + ' (GHz)', 'Free Spectra Range at the pumps', 'Hz'])
+        FSR_center = '{:.3f}'.format(self._dic['FSR_center']*1e-9)
+        table.add_row(['FSR_center', FSR_center + ' (GHz)', 'Free Spectra Range at the center of the domain', 'Hz'])
+        table.vrules = False
+        table.header = True
+        table.align = "l"
+        table.padding_width = 2
+        table.padding_height = 25
+        str_table = table.get_string()
+        if self._do_tr:
+            for ii in greek.items():
+                str_table = str_table.replace(ii[0], ii[1] )
+        return str_table
+
+    def __repr__(self):
+        if self._which == 'res':
+            return self.reprRes()
+        elif self._which == 'sim':
+            return self.reprSim()
+        elif self._which == 'sol':
+            return self.reprSol()
+        elif self._which == 'disp':
+            return self.reprDisp()

@@ -1,0 +1,6 @@
+plotly 
+numpy 
+scipy 
+matplotlib
+pandas
+h5py
