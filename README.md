@@ -30,7 +30,7 @@ You can cite our paper published in the Journal of Research of National Institut
      }
 ```
 
-## Example [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/gregmoille/pyLLE/HEAD?labpath=example%2FTemporalDualPump.ipynb)
+## How to install
 
 As pyLLE relies on a Julia back-end, please prior to installing this package be sure that Julia is installed on your machine or visit the julia [package download page](https://julialang.org/downloads/) to install it. The code should now work with any recent version of Julia.
 
@@ -65,7 +65,6 @@ using FFTW
 using LinearAlgebra
 ```
 
-
 if any of the previous command throw an issue, mostly it is because it is not installed. One way to fix it is to remove the installed packaged to remove the cache
 
 - for linux and mac os user: remove everything in ~/.julia/
@@ -83,10 +82,10 @@ then
 (v1.1) pkg>add FFTW
 ```
 
-## Example [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/gregmoille/pyLLE/HEAD?labpath=example%2FTemporalDualPump.ipynb)
+## Example [![NBviewer](https://custom-icon-badges.demolab.com/badge/jupyter-notebook-blue.svg?logo=eye&logoColor=white)](https://mybinder.org/v2/gh/gregmoille/pyLLE/HEAD?labpath=example%2FTemporalDualPump.ipynb)
 
 A complete example is available in the example directory [notebook](https://github.com/gregmoille/pyLLE/blob/master/example/TemporalDualPump.ipynb) with the corresponding file needed in the folder. 
-You can also access the [interactive binder](https://mybinder.org/v2/gh/gregmoille/pyLLE/HEAD?labpath=example%2FTemporalDualPump.ipynb) example to have a better idea of what's going on: 
+You can also access the [nbviewer](https://nbviewer.org/github/gregmoille/pyLLE/blob/master/example/TemporalDualPump.ipynb) example to have a better idea of what's going on: 
 
 ## Works Using pyLLE 
 
