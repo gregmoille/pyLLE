@@ -9,12 +9,12 @@ Quite of a new version, v4.0.0 introduce a lot of new stuff including:
 - Complete recoding of the core with better codding and commenting which hopefully makes it easier to implement custom features 
 - Modification of interfacing with parameters and results through method attributes instead of bulky dictionaries
 - Stability of the half step Fourier method, allowing to use a soliton solution as an original state for the LLE 
-- Allowing arbitrary number of driving pump, according to Taheri et al. and our paper on Nature Communication (Moille et al. )
+- Allowing arbitrary number of driving pump, according to Taheri et al The European Physical Journal D 2017. and our paper on Nature Communication (Moille et al. Nature Communication 2021)
 - Julia compatibility with version 1.1 and above 
 
 ## How to Cite Us?
 
-Please, if you use this package and it helps you with your research adn publication, cite us in your paper.Not only it allows us to have a better idea of new things people are interested in and how to keep improving the solver, but it also help us building a community where every body could help maintaining the solver to suit better the needs of everybody.
+Please, if you use this package and it helps you with your research and publication, cite us in your paper. Not only it allows us to have a better idea of new things people are interested in and how to keep improving the solver, but it also help us building a community where every body could help maintaining the solver to suit better the needs of everybody.
 You can cite our paper published in the Journal of Research of National Institute of Standards and Technology available [here](https://doi.org/10.6028/jres.124.012), with the following bibtex entry:
 
 ```latex
