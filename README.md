@@ -19,9 +19,6 @@ Interactvive example can be found [here](https://mybinder.org/v2/gh/gregmoille/p
 
 
 
-> Moille G, Li Q, Lu X, Srinivasan K (2019) pyLLE: A Fast and User Friendly Lugiato-Lefever Equation Solver. J Res Natl Inst Stan 124:124012. https://doi.org/10.6028/jres.124.012
-
-You can also use the bibtex entry: 
 ```latex
 @article{moille_pyLLE,
       author = {Gregory Moille and Qing Li and Xiyuan Lu and Kartik Srinivasan},
