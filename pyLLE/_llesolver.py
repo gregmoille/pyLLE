@@ -431,6 +431,7 @@ class LLEsolver(object):
                                      rM_fit = self._sim['mu_fit'],
                                      rM_sim = self._sim['mu_sim'],
                                      R = self._res['R'],
+                                     D1_manual = self._sim.get("D1_manual", None),
                                      fig = fig,
                                      plottype = plottype,
                                      logger = self._logger,

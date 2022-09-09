@@ -30,18 +30,16 @@ function SaveResultsToFile(dir, S)
         for ii in S
             print(ii[1])
             print("\n")
-            g[ii[1]*"Real"] = real(ii[2])              # create a scalar dataset inside the group
+
             g[ii[1]*"Imag"] = imag(ii[2])
         end
-        attrs(g)["Description"] = "This group contains only a single dataset" # an attribute
+        attrs(g)["Description"] = "This group contains only a single dataset"
     end
-        # attrs(g)["Description"] = "This group contains only a single dataset" # an attribute
 end
 
 # ----------------------------------------------------
 # -- STARTING MAIN SCRIPT --
 # ----------------------------------------------------
-
 tmp_dir = ARGS[1]
 tol = parse(Float64,ARGS[2])
 maxiter = parse(Int,ARGS[3])
@@ -123,7 +121,6 @@ t1 = 0
 # -- Angle through the resonator --
 # ----------------------------------------------------
 θ = Array(range(0,stop=2π,length=length(μ)))
-
 # -- Time scale ---
 # Here the normaizatiton of time is such that
 # t=0 when the pump is align with the cold cavity
@@ -284,13 +281,16 @@ function SSFM(u0, it, param)
     # increment for each δt
     #
     # A(t + δt, ω) = FFT-1(^A^(t + δt, ω)) + Fdrive x δt
+    #
+    #
+    # However this direct SSF is not the best stable and implementing a 1/2 SSF is much better 
+    # for more information, please checkout G. Agrawal's book (there is litterally the algorithm 
+    # in it)
+
+
     # ----------------------------------------------------------------------------------------
-    # G. Moille - 04/23/2020 - NIST/UMD - gmoille@umd.edu
+    # G. Moille - 09/08/2022 - NIST/UMD - gmoille@umd.edu
     # ----------------------------------------------------------------------------------------
-
-
-
-
     # -- Define the Linear, Non-Linear and drive Force ---
     # Purpose is for easy modification to ad NL or other terms
     function FFT_Lin(it)
@@ -306,7 +306,6 @@ function SSFM(u0, it, param)
     An = exp.(Nlin(u0, Int(it))*dt).* u0
     Atild = fft_plan*(An).* exp.(FFT_Lin(Int(it))*dt)
     u0 = ifft_plan*(Atild) .+ Fdrive(Int(it))*sqrt(κext)*dt
-
     return u0
 end
 
@@ -349,10 +348,8 @@ function MainSolver(Nt, S, u0)
 
 end
 
-
 # -- Start the solver
 # ----------------------------------------------------
-
 logfile =  open(tmp_dir * "log.log" ,"a")
 write(logfile,string(Int(round(0))) * "\n")
 close(logfile)

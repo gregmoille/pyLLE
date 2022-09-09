@@ -33,6 +33,7 @@ class AnalyzeDisp(object):
         self.R = kwargs.get('R', 23e-6)
         self.f_center = kwargs.get('f_center', None)
         self.fpmp = kwargs.get('fpmp', None)
+        self.D1_maunal = kwargs.get('D1_maunal', None)
         self.rM_fit = kwargs.get('rM_fit', [])
         self.rM_sim = kwargs.get('rM_sim', [])
         self.debug = kwargs.get('debug', False)
@@ -96,7 +97,10 @@ class AnalyzeDisp(object):
             Dfit = np.polyfit(dm, drf[ind_pmp+dm], 2)
             self.FSR = Dfit[1]
             self.D2 = Dfit[0]*2*np.pi
-            D1 = self.FSR * 2*np.pi
+            if self.D1_maunal:
+                D1 = self.FSR * 2*np.pi
+            else:
+                D1 = self.D1_manual
             μ = self.rM - self.rM[ind_pmp]
             ω = 2*np.pi*self.rf
             Dint = ω - (ω[ind_pmp] + D1 * μ)
