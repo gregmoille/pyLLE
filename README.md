@@ -6,7 +6,7 @@ New version for mutlipled pumps!! Readme and example in progress
 
 ## Example 
 
-Interactvive example can be found [here](https://mybinder.org/v2/gh/gregmoille/pyLLE/4.0.0?labpath=%2Fexample%2F)
+Interactvive example can be found [here](https://mybinder.org/v2/gh/gregmoille/pyLLE/4.0.0?labpath=example%2FTemporalDualPump.ipynb)
 
 
 ## How to Cite Us?
