@@ -1,1 +1,6 @@
-pip install pyLLE
+plotly 
+numpy 
+scipy 
+pickle
+pandas
+scipy
