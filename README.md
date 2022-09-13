@@ -5,12 +5,12 @@
 
 ## What's new
 
-Quite of a new version, v4.0.0 introduce a lot of new stuff including: 
-- Complete recoding of the core with better codding and commenting which hopefully makes it easier to implement custom features 
+A major revision, v4.0.0 introduces a lot of new stuff including:
+- Complete recoding of the core with better coding and commenting which hopefully makes it easier to implement custom features
 - Modification of interfacing with parameters and results through method attributes instead of bulky dictionaries
-- Stability of the half step Fourier method, allowing to use a soliton solution as an original state for the LLE 
+- Stability of the half step Fourier method, allowing to use a soliton solution as an original state for the LLE
 - Allowing arbitrary number of driving pump, according to Taheri et al The European Physical Journal D 2017. and our paper on Nature Communication (Moille et al. Nature Communication 2021)
-- Julia compatibility with version 1.1 and above 
+- Julia compatibility with version 1.1 and above
 
 ## How to Cite Us?
 
@@ -35,9 +35,9 @@ You can cite our paper published in the Journal of Research of National Institut
 As pyLLE relies on a Julia back-end, please prior to installing this package be sure that Julia is installed on your machine or visit the julia [package download page](https://julialang.org/downloads/) to install it. The code should now work with any recent version of Julia.
 
 
-**Windows users**: Please, keep julia in the default directory during the installation (i.e. ~\AppData\Local\Julia-1.1.1\ for windows).
+**Windows users**: During installation, check the option to **add julia to the path**.
 
-**Mac Os User**: You would need to add the julia binary to the path. The easiest way to do it is to create a simlink in the terminal
+**Mac Os User**: You need to add the julia binary to the path. The easiest way to do it is to create a simlink in the terminal
 
 ```bash
 ln -s /Applications/Julia-<version>.app/Contents/Resources/julia/bin/julia /usr/local/bin/julia
@@ -49,10 +49,7 @@ For a automatic install, just pip it :
 ```bash
 pip install pyLLE
 ```
-For a manual install, download the .zip of the repository or clone it and install with the setup.py script
-
-
-If the julia location is custom, please before installing change in the setup.py, line 18 to the correct location, as in pyLLE/llesolver.py line 430 to point to the correct location. Thanks
+For a manual install, download the .zip of the repository or clone it and install with the setup.py script. 
 
 
 ## Checking that everything works correctly
@@ -84,10 +81,10 @@ then
 
 ## Example [![NBviewer](https://custom-icon-badges.demolab.com/badge/jupyter-notebook-blue.svg?logo=eye&logoColor=white)](https://nbviewer.org/github/gregmoille/pyLLE/blob/master/example/TemporalDualPump.ipynb)
 
-A complete example is available in the example directory [notebook](https://github.com/gregmoille/pyLLE/blob/master/example/TemporalDualPump.ipynb) with the corresponding file needed in the folder. 
-You can also access the [nbviewer](https://nbviewer.org/github/gregmoille/pyLLE/blob/master/example/TemporalDualPump.ipynb) example to have a better idea of what's going on: 
+A complete example is available in the example directory [notebook](https://github.com/gregmoille/pyLLE/blob/master/example/TemporalDualPump.ipynb) with the corresponding file needed in the folder.
+You can also access the [nbviewer](https://nbviewer.org/github/gregmoille/pyLLE/blob/master/example/TemporalDualPump.ipynb) example to have a better idea of what's going on:
 
-## Works Using pyLLE 
+## Works Using pyLLE
 
 If you want to be featured here, shoot me an email! I try to keep it up to date but this is not a priority, yet I would love to hear anybody who uses it!
 

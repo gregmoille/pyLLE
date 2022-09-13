@@ -6,3 +6,6 @@ Icon^M
 .DS_Store
 Stable
 pipDeploy
+*.pyc
+*example*
+*.ipynb

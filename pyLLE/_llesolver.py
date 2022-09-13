@@ -463,7 +463,7 @@ class LLEsolver(object):
         self._sim['FSR_center'] = self._analyze.D1[-1]/(2*np.pi)
 
 
-        
+
         if not "DKS_init" in self._sim.keys():
             self._sim['DKS_init']= np.zeros(self._analyze.Dint_sim[0].size)
 
@@ -669,7 +669,7 @@ class LLEsolver(object):
 
 
 
-                    
+
             for key, it in self._res.items():
                 if not key == 'domega_disp':
                     if type(it) is str:
@@ -726,12 +726,14 @@ class LLEsolver(object):
 
         def LaunchJulia():
 
-            if sys.platform == 'darwin':
-                julia = 'julia'
-            if sys.platform == 'linux2' or sys.platform == 'linux':
-                julia = 'julia'
-            if sys.platform == 'win32':
-                julia = os.path.expanduser('~') + '\\AppData\\Local\\Julia-1.1.1\\bin\\julia.exe'
+            julia = 'julia'
+
+            try:
+                self.JuliaSolver = sub.Popen(julia, stdout=sub.PIPE, stderr=sub.PIPE)
+            except:
+                raise ValueError('julia is not installed on the system path. ',
+                                 'Please add julia to the path or re-install ',
+                                 'and check the option to add to path.')
 
             command = [julia, path_juliaScript , self.tmp_dir, str(tol), str(maxiter), str(step_factor)]
             self.JuliaSolver = sub.Popen(command, stdout=sub.PIPE, stderr=sub.PIPE)
@@ -957,7 +959,7 @@ class LLEsolver(object):
             self._sol['kappa_ext'] = S["Results/kappa_extReal"][:]
             self._sol['kappa0'] = S["Results/kappa_0Real"][:]
 
-        
+
         os.remove(self.tmp_dir + 'ParamLLEJulia.h5')
         os.remove(self.tmp_dir + 'ResultsJulia.h5')
 
