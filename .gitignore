@@ -7,5 +7,4 @@ Icon^M
 Stable
 pipDeploy
 *.pyc
-*example*
-*.ipynb
+.ipynb_checkpoints
