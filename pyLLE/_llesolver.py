@@ -62,11 +62,11 @@ try:
         pyType = 'jupyter'
     elif className == 'TerminalInteractiveShell':
         pyType = 'ipython'
+    else:
+        pyType = 'normal'
 except:
     # launching trhough a normal python
     pyType = 'normal'
-
-# print(pyType)
 
 
 class MyLogger():
