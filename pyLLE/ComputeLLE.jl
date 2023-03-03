@@ -8,7 +8,7 @@ function Loadh5Param(dir)
     res = Dict()
     sim = Dict()
     sim_name = ["res", "sim"]
-    par = [["Qc", "R", "ng", "Qi", "gamma","dispfile"], ["Pin", "Tscan", "domega_init", "domega_end", "domega", "f_pmp", "mu_sim_center", "ind_pmp", "Dint", "ind_pump_sweep","f_center", "phi_pmp", "D1", "DKSinit_imag","DKSinit_real" ]]
+    par = [["Qc", "R", "ng", "Qi", "gamma","dispfile"], ["Pin", "Tscan", "domega_init", "domega_end", "domega_stop", "domega", "f_pmp", "mu_sim_center", "ind_pmp", "Dint", "ind_pump_sweep","f_center", "phi_pmp", "D1", "DKSinit_imag","DKSinit_real", "num_probe"]]
     cnt = 1
     for sim_par = [res, sim]
         for it = par[cnt]
@@ -23,8 +23,10 @@ end
 
 function SaveResultsToFile(dir, S)
     h5file = dir * "ResultsJulia.h5"
-    print(h5file)
-    print("\n")
+    println(h5file)
+    println("\n")
+    sleep(1)
+
     h5open(h5file, "w") do file
         g = create_group(file, "Results") # create a group
         for ii in S
@@ -66,6 +68,7 @@ Qc = res["Qc"][1]
 fpmp = sim["f_pmp"]
 Ppmp = sim["Pin"]
 φpmp = sim["phi_pmp"]
+num_probe = sim["num_probe"][1]
 fcenter= sim["f_center"][1]
 
 DKSinit_real = sim["DKSinit_real"]
@@ -90,6 +93,7 @@ T = 1*tR
 # debug = Bool(sim["debug"][1])
 δω_init = sim["domega_init"][1]
 δω_end = sim["domega_end"][1]
+δω_stop = sim["domega_stop"][1]
 ind_sweep = sim["ind_pump_sweep"] .+ 1 #because of 0 and 1 index start difference between Julia nd pyhton
 t_end = sim["Tscan"][1]
 Dint = sim["Dint"]
@@ -151,7 +155,11 @@ xx = collect(1:Nt)
 # define which thing we are actually sweeping
 for ii in ind_sweep
     δω_all[ii][:] = δω_init.+ xx/Nt * (δω_end - δω_init)
+    # δω_all[2][δω_all[ii] .< δω_stop] .= 1 .* δω_all[2][δω_all[ii] .< δω_stop]
+    # δω_all[ii][δω_all[ii] .< δω_stop] .= δω_stop
 end
+
+
 
 # -- Seting up Simulation --
 # ----------------------------------------------------
@@ -188,7 +196,7 @@ u0[:, 1] = DKSinit
 # -- Output Dict --
 # ---------------------------------------------------------------
 S = Dict()
-num_probe=5000
+# num_probe= 5000
 S["u_probe"] = 1im*zeros(num_probe, length(u0))
 S["driving_force"] = 1im*zeros(num_probe,length(u0))
 S["detuning"] = zeros(num_probe,)
@@ -257,11 +265,10 @@ function Fdrive(it)
         # Ain (due to noise, it needs to be initilized throug FFT)
         # ---------------------------------------------------------------------
         if ii > 1  
-            σ = (δω_all[ii][it] .+ Dint[μ0+ind_pmp[ii]-1] .-  2 .* δω_all[ind_sweep[1]][it] ) .* t_sim[it]
+            σ = (2 .* δω_all[ii][it] .+ Dint[μ0+ind_pmp[ii]] .- 0.5.*δω_all[1][it] ) .* t_sim[it]
         else
             σ = 0
         end
-        # σ = (δω_all[ii][it] .+ Dint[μ0+ind_pmp[ii]-1]) .* t_sim[it]
         Force .= Force .- 1im .* Ain[ii] .*exp(1im .*σ)
     end
     return Force #.- 1im*Noise()
@@ -329,7 +336,7 @@ function SSFM½step(A0, it, param)
     # -- Define the Linear, Non-Linear and drive Force ---
     # Purpose is for easy modification to ad NL or other terms
     function FFT_Lin(it) 
-        return -α/2 .+ 1im .* (Dint_shift .- δω_all[ind_sweep[1]][it] .* 2 )*tR
+        return -α/2 .+ 1im .* (Dint_shift .- δω_all[1][it]  )*tR
     end
 
     function NL(uu, it)

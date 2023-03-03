@@ -62,11 +62,11 @@ try:
         pyType = 'jupyter'
     elif className == 'TerminalInteractiveShell':
         pyType = 'ipython'
-    else:
-        pyType = 'normal'
 except:
     # launching trhough a normal python
     pyType = 'normal'
+
+# print(pyType)
 
 
 class MyLogger():
@@ -333,7 +333,9 @@ class LLEsolver(object):
                 self._sim['δω_stop'] = self._sim['δω_end']
 
 
-
+        if not "num_probe" in self._sim.keys():
+            self._sim['domega_stop'] = 5000
+            
         if not np.diff(self._sim['mu_sim'])[0] % 2 == 0:
             print(r"/!\ Simulation modes length need to be odd")
             print('Modification of the simulation modes suchat that:')
@@ -726,11 +728,12 @@ class LLEsolver(object):
 
         def LaunchJulia():
 
-            julia = 'julia'
+            julia = '/opt/bin/julia'
 
             try:
                 self.JuliaSolver = sub.Popen(julia, stdout=sub.PIPE, stderr=sub.PIPE)
-            except:
+            except Exception as err:
+                print(err)
                 raise ValueError('julia is not installed on the system path. ',
                                  'Please add julia to the path or re-install ',
                                  'and check the option to add to path.')
