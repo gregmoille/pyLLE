@@ -305,6 +305,9 @@ class LLEsolver(object):
             self._sim['f_pmp'] = self._c0/self._sim['lbd_pmp']
         if not('mu_fit' in self._sim.keys()):
             self._sim['mu_fit'] = [None, None]
+            
+        if not('num_probe' in self._sim.keys()):
+            self._sim['num_probe'] = 1000
 
 
         # -- Make sur than each pump has a power --
