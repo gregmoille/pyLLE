@@ -700,7 +700,7 @@ class LLEsolver(object):
             PrintLogger(dic_sim, dic_res)
         SetupHDF5()
 
-    def SolveTemporal(self, verbose = False, tol = 1e-3, maxiter = 6, step_factor = 0.1):
+    def SolveTemporal(self, verbose = False, tol = 1e-3, maxiter = 6, step_factor = 0.1, bin = None):
         '''
         Call Julia to solve the LLE
         '''
@@ -729,9 +729,11 @@ class LLEsolver(object):
 
             print(date)
 
-        def LaunchJulia():
-
-            julia = '/opt/bin/julia'
+        def LaunchJulia(bin):
+            if bin is None:
+                julia = '/opt/bin/julia'
+            else:
+                julia = bin
 
             try:
                 self.JuliaSolver = sub.Popen(julia, stdout=sub.PIPE, stderr=sub.PIPE)
@@ -833,7 +835,7 @@ class LLEsolver(object):
 
         DisplaySim()
         time.sleep(2)
-        JuliaLog, start_time = LaunchJulia()
+        JuliaLog, start_time = LaunchJulia(bin)
         ProbeProgress(JuliaLog, start_time)
 
     def SolveSteadyState(self, do_plot = True):
