@@ -1,6 +1,6 @@
 # pyLLE ![NIST logo](images/NISTlogo32x32.jpg)
 [![](https://img.shields.io/static/v1.svg?label=docs&message=passing&color=green&style=flat)](https://gregmoille.github.io/pyLLE/)
-![](https://img.shields.io/static/v1.svg?label=version&message=4.1.0&color=9cf&style=flat)
+![](https://img.shields.io/static/v1.svg?label=version&message=4.1&color=9cf&style=flat)
 [![](https://img.shields.io/static/v1.svg?label=DOI&message=10.6028/jres.124.012&color=blue&style=flat)](https://doi.org/10.6028/jres.124.012)
 
 ## What's new
