@@ -34,17 +34,26 @@ You can cite our paper published in the Journal of Research of National Institut
 
 As pyLLE relies on a Julia back-end, please prior to installing this package be sure that Julia is installed on your machine or visit the julia [package download page](https://julialang.org/downloads/) to install it. The code should now work with any recent version of Julia.
 
+Once Julia installed, the different packages needed to run pyLLE, either python or julia related, will be automatically downloaded and installed. Just a heads up, the installation of the package can vary in time, especially because of Julia that might rebuild the cache.
 
-**Windows users**: During installation, check the option to **add julia to the path**.
-
-**Mac Os User**: You need to add the julia binary to the path. The easiest way to do it is to create a simlink in the terminal
+pyLLE will look by default to find the Julia binary in the `/opt/bin/julia`, which you can make it happen either in MacOS
 
 ```bash
-ln -s /Applications/Julia-<version>.app/Contents/Resources/julia/bin/julia /usr/local/bin/julia
+ln -s /Applications/Julia-<version>.app/Contents/Resources/julia/bin/julia /opt/bin/julia
+```
+ 
+ or Linux
+
+```bash
+ln -s <julia_path>/bin/julia /opt/bin/julia
 ```
 
-Once Julia installed, the different packages needed to run pyLLE, either python or julia related, will be automatically downloaded and installed. Just a heads up, the installation of the package can vary in time, especially because of Julia that might rebuild the cache.
-For a automatic install, just pip it :
+Note that if this step is skipped it is alright as an update of the pyLLE package provide a way to specify the julia binary you would like to use specifyin ``solver.SolveTemporal(bin = <where julia bin is>)``
+
+
+
+
+Now, one can simply  automatic install, just pip it :
 
 ```bash
 pip install pyLLE
