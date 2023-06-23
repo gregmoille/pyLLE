@@ -337,7 +337,7 @@ class LLEsolver(object):
 
 
         if not "num_probe" in self._sim.keys():
-            self._sim['domega_stop'] = 5000
+            self._sim['num_probe'] = 5000
             
         if not np.diff(self._sim['mu_sim'])[0] % 2 == 0:
             print(r"/!\ Simulation modes length need to be odd")
@@ -1399,6 +1399,7 @@ class _dic2struct():
             table.add_row(["μcenter",self._dic['mucenter'], "Index of the center of the sim domain", ""])
         table.add_row(["ind_pmp",self._dic['ind_pmp'], "Pump index relative to center of domain", ""])
         table.add_row(["ind_pump_sweep",self._dic['ind_pump_sweep'][0], "Pump index to sweep", ""])
+        table.add_row(["num_probe",self._dic['num_probe'], "Sampling numbers", ""])
         table.vrules = False
         table.header = True
         table.align = "l"
