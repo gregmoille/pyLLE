@@ -10,7 +10,7 @@ A major revision, v4.0.0 introduces a lot of new stuff including:
 - Modification of interfacing with parameters and results through method attributes instead of bulky dictionaries
 - Stability of the half step Fourier method, allowing to use a soliton solution as an original state for the LLE
 - Allowing arbitrary number of driving pump, according to Taheri et al The European Physical Journal D 2017. and our paper on Nature Communication (Moille et al. Nature Communication 2021)
-- Julia compatibility with version 1.8 (current as of 05/01/2023) and above
+- **Julia compatibility with version 1.8 (current as of 05/01/2023) and above**. Previous version are no longer supported
 
 ## How to Cite Us?
 
