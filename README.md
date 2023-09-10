@@ -95,15 +95,29 @@ You can also access the [nbviewer](https://nbviewer.org/github/gregmoille/pyLLE/
 
 ## Works Using pyLLE
 
-If you want to be featured here, shoot me an email! I try to keep it up to date but this is not a priority, yet I would love to hear anybody who uses it!
+If you want to be featured here, shoot me an email! I try to keep it up to date but this is not a priority. I would love to hear anybody who uses it!
+- 2023:
+  - Moille, G., Stone, J., Chojnacky, M., Menyuk, C., & Srinivasan, K. (2023). Kerr-Induced Synchronization of a Cavity Soliton to an Optical Reference for Integrated Frequency Comb Clockworks. arXiv preprint arXiv:2305.02825.
+  - Moille, G., Lu, X., Stone, J., Westly, D., & Srinivasan, K. (2023). Fourier synthesis dispersion engineering of photonic crystal microrings for broadband frequency combs. Communications Physics, 6(1), 144.
+  - Ji, H., Geng, Z., Cheng, W., Wu, P., Yu, Z., Liu, Y., ... & Zhao, Q. (2023). High-power two-color Kerr frequency comb generation on the gallium phosphide-on-insulator platform at SWIR and MIR spectra. JOSA B, 40(8), 1976-1985.
+  - Geng, Z., Ji, H., Yu, Z., Cheng, W., Wu, P., Li, Y., & Zhao, Q. (2023). Dispersion-flattened concentric structure for microcomb bandwidth broadening in GaP-OI resonators. JOSA B, 40(3), 673-681.
+  - Ren, D., Dong, C., & Burghoff, D. (2023). Integrated nonlinear photonics in the longwave-infrared: A roadmap. MRS Communications, 1-15.
+  - Moille, G., Li, C., Stone, J., Chojnacky, M., Shandilya, P., Chembo, Y. K., Dutt, A., ... & Srinivasan, K. (2023). Two-Dimensional Nonlinear Mixing Between a Dissipative Kerr Soliton and Continuous Waves for a Higher-Dimension Frequency Comb. arXiv preprint arXiv:2303.10026.
+- 2022:
+  - Afridi, A. A., Weng, H., Li, J., Liu, J., McDermott, M., Lu, Q., ... & Donegan, J. F. (2022). Breather solitons in AlN microresonators. Optics Continuum, 1(1), 42-50.
+  - Lu, S., Liu, X., Shi, Y., Yang, H., Long, Z., Li, Y., ... & Liang, H. (2022). Mid-infrared ultra-broadband optical Kerr frequency comb based on a CdTe ring microresonator: a theoretical investigation. Optics express, 30(19), 33969-33979.
+- 2021:
+      - Weng, H., Liu, J., Afridi, A. A., Li, J., Dai, J., Ma, X. _et al._ "_Octave-spanning Kerr frequency comb generation with stimulated Raman scattering in an AlN microresonator_". Optics Letters, 46(3), 540-543. (2021)
+      - Weng, H., Liu, J., Afridi, A. A., Li, J., Dai, J., Ma, X. _et al._ "_Directly accessing octave-spanning dissipative Kerr soliton frequency combs in an AlN microring resonator_" Photonics Research (2021)
+      - Moille, G., Westly, D., Orji, N. G., & Srinivasan, K. "_Tailoring broadband Kerr soliton microcombs via post-fabrication tuning of the geometric dispersion_". Applied Physics Letters, 119(12), 121103 (2021)
+      - Weng, H., Liu, J., Afridi, A. A., Li, J., Dai, J., Zhang, Y., _et al._ "_Perfect soliton crystal in an AlN microresonator"_. In CLEO: QELS_Fundamental Science (pp. JTh3A-31). Optical Society of America. (2021)
+      - Moille, G., Westly, D., Simelgor, G., & Srinivasan, K. "_Impact of the precursor gas ratio on dispersion engineering of broadband silicon nitride microresonator frequency combs_". Optics 
+- 2020:
+      - Schuttrups, B. (2020). "_Modelling nonlinear optical pulse propagation using pseudo-spectral methods_" (Master's thesis, University of Twente).
+      - Moille, G., Chang, L., Xie, W., Rao, A., Lu, X., Davanco, M. _et al._  "_Dissipative Kerr Solitons in a III‐V Microresonator_". Laser & Photonics Reviews, 14(8), 2000022 (2020)
+-2019:
+      - Gregory Moille, Xiyuan Lu, Ashutosh Rao, Qing Li, Daron A. Westly, Leonardo Ranzani, Scott B. Papp, Mohammad Soltani, and Kartik Srinivasan "_Kerr-Microresonator Soliton Frequency Combs at Cryogenic Temperatures_," Phys. Rev. Applied 12, 034057 (2019)
+      - Gregory Moille, Qing Li, Travis C. Briles, Su-Peng Yu, Tara Drake, Xiyuan Lu, Ashutosh Rao, Daron Westly, Scott B. Papp, and Kartik Srinivasan "_Broadband resonator-waveguide coupling for efficient extraction of octave-spanning microcombs_," Optics Letters Vol. 44, Issue 19, pp. 4737-4740 (2019)
+      - Lin Chang, Weiqiang Xie, Haowen Shu, Qifan Yang, Boqiang Shen, Andreas Boes, Jon D. Peters, Warren Jin, Songtao Liu, Gregory Moille, Su-Peng Yu, Xingjun Wang, Kartik Srinivasan, Scott B. Papp, Kerry Vahala, John E. Bowers "_Ultra-efficient frequency comb generation in AlGaAs-on-insulator microresonators_," arXiv:1909.09778 (2019)
 
-- Gregory Moille, Xiyuan Lu, Ashutosh Rao, Qing Li, Daron A. Westly, Leonardo Ranzani, Scott B. Papp, Mohammad Soltani, and Kartik Srinivasan "_Kerr-Microresonator Soliton Frequency Combs at Cryogenic Temperatures_," Phys. Rev. Applied 12, 034057 (2019)
-- Gregory Moille, Qing Li, Travis C. Briles, Su-Peng Yu, Tara Drake, Xiyuan Lu, Ashutosh Rao, Daron Westly, Scott B. Papp, and Kartik Srinivasan "_Broadband resonator-waveguide coupling for efficient extraction of octave-spanning microcombs_," Optics Letters Vol. 44, Issue 19, pp. 4737-4740 (2019)
-- Lin Chang, Weiqiang Xie, Haowen Shu, Qifan Yang, Boqiang Shen, Andreas Boes, Jon D. Peters, Warren Jin, Songtao Liu, Gregory Moille, Su-Peng Yu, Xingjun Wang, Kartik Srinivasan, Scott B. Papp, Kerry Vahala, John E. Bowers "_Ultra-efficient frequency comb generation in AlGaAs-on-insulator microresonators_," arXiv:1909.09778 (2019)
-- Schuttrups, B. (2020). "_Modelling nonlinear optical pulse propagation using pseudo-spectral methods_" (Master's thesis, University of Twente).
-- Moille, G., Chang, L., Xie, W., Rao, A., Lu, X., Davanco, M. _et al._  "_Dissipative Kerr Solitons in a III‐V Microresonator_". Laser & Photonics Reviews, 14(8), 2000022 (2020)
-- Weng, H., Liu, J., Afridi, A. A., Li, J., Dai, J., Ma, X. _et al._ "_Octave-spanning Kerr frequency comb generation with stimulated Raman scattering in an AlN microresonator_". Optics Letters, 46(3), 540-543. (2021)
-- Weng, H., Liu, J., Afridi, A. A., Li, J., Dai, J., Ma, X. _et al._ "_Directly accessing octave-spanning dissipative Kerr soliton frequency combs in an AlN microring resonator_" Photonics Research (2021)
-- Moille, G., Westly, D., Orji, N. G., & Srinivasan, K. "_Tailoring broadband Kerr soliton microcombs via post-fabrication tuning of the geometric dispersion_". Applied Physics Letters, 119(12), 121103 (2021)
-- Weng, H., Liu, J., Afridi, A. A., Li, J., Dai, J., Zhang, Y., _et al._ "_Perfect soliton crystal in an AlN microresonator"_. In CLEO: QELS_Fundamental Science (pp. JTh3A-31). Optical Society of America. (2021)
-- Moille, G., Westly, D., Simelgor, G., & Srinivasan, K. "_Impact of the precursor gas ratio on dispersion engineering of broadband silicon nitride microresonator frequency combs_". Optics Letters, 46(23), 5970-5973 (2021).
+Letters, 46(23), 5970-5973 (2021).
