@@ -8,3 +8,4 @@ Stable
 pipDeploy
 *.pyc
 .ipynb_checkpoints
+dist
