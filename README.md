@@ -1,6 +1,6 @@
 # pyLLE ![NIST logo](images/NISTlogo32x32.jpg)
 [![](https://img.shields.io/static/v1.svg?label=docs&message=passing&color=green&style=flat)](https://gregmoille.github.io/pyLLE/)
-![](https://img.shields.io/static/v1.svg?label=version&message=4.0.0&color=9cf&style=flat)
+![](https://img.shields.io/static/v1.svg?label=version&message=4.1&color=9cf&style=flat)
 [![](https://img.shields.io/static/v1.svg?label=DOI&message=10.6028/jres.124.012&color=blue&style=flat)](https://doi.org/10.6028/jres.124.012)
 
 ## What's new
@@ -10,7 +10,7 @@ A major revision, v4.0.0 introduces a lot of new stuff including:
 - Modification of interfacing with parameters and results through method attributes instead of bulky dictionaries
 - Stability of the half step Fourier method, allowing to use a soliton solution as an original state for the LLE
 - Allowing arbitrary number of driving pump, according to Taheri et al The European Physical Journal D 2017. and our paper on Nature Communication (Moille et al. Nature Communication 2021)
-- Julia compatibility with version 1.1 and above
+- **Julia compatibility with version 1.8 (current as of 05/01/2023) and above**. Previous version are no longer supported
 
 ## How to Cite Us?
 
@@ -34,17 +34,26 @@ You can cite our paper published in the Journal of Research of National Institut
 
 As pyLLE relies on a Julia back-end, please prior to installing this package be sure that Julia is installed on your machine or visit the julia [package download page](https://julialang.org/downloads/) to install it. The code should now work with any recent version of Julia.
 
+Once Julia installed, the different packages needed to run pyLLE, either python or julia related, will be automatically downloaded and installed. Just a heads up, the installation of the package can vary in time, especially because of Julia that might rebuild the cache.
 
-**Windows users**: During installation, check the option to **add julia to the path**.
-
-**Mac Os User**: You need to add the julia binary to the path. The easiest way to do it is to create a simlink in the terminal
+pyLLE will look by default to find the Julia binary in the `/opt/bin/julia`, which you can make it happen either in MacOS
 
 ```bash
-ln -s /Applications/Julia-<version>.app/Contents/Resources/julia/bin/julia /usr/local/bin/julia
+ln -s /Applications/Julia-<version>.app/Contents/Resources/julia/bin/julia /opt/bin/julia
+```
+ 
+ or Linux
+
+```bash
+ln -s <julia_path>/bin/julia /opt/bin/julia
 ```
 
-Once Julia installed, the different packages needed to run pyLLE, either python or julia related, will be automatically downloaded and installed. Just a heads up, the installation of the package can vary in time, especially because of Julia that might rebuild the cache.
-For a automatic install, just pip it :
+Note that if this step is skipped it is alright as an update of the pyLLE package provide a way to specify the julia binary you would like to use specifyin ``solver.SolveTemporal(bin = <where julia bin is>)``
+
+
+
+
+Now, one can simply  automatic install, just pip it :
 
 ```bash
 pip install pyLLE
@@ -86,15 +95,28 @@ You can also access the [nbviewer](https://nbviewer.org/github/gregmoille/pyLLE/
 
 ## Works Using pyLLE
 
-If you want to be featured here, shoot me an email! I try to keep it up to date but this is not a priority, yet I would love to hear anybody who uses it!
-
-- Gregory Moille, Xiyuan Lu, Ashutosh Rao, Qing Li, Daron A. Westly, Leonardo Ranzani, Scott B. Papp, Mohammad Soltani, and Kartik Srinivasan "_Kerr-Microresonator Soliton Frequency Combs at Cryogenic Temperatures_," Phys. Rev. Applied 12, 034057 (2019)
-- Gregory Moille, Qing Li, Travis C. Briles, Su-Peng Yu, Tara Drake, Xiyuan Lu, Ashutosh Rao, Daron Westly, Scott B. Papp, and Kartik Srinivasan "_Broadband resonator-waveguide coupling for efficient extraction of octave-spanning microcombs_," Optics Letters Vol. 44, Issue 19, pp. 4737-4740 (2019)
-- Lin Chang, Weiqiang Xie, Haowen Shu, Qifan Yang, Boqiang Shen, Andreas Boes, Jon D. Peters, Warren Jin, Songtao Liu, Gregory Moille, Su-Peng Yu, Xingjun Wang, Kartik Srinivasan, Scott B. Papp, Kerry Vahala, John E. Bowers "_Ultra-efficient frequency comb generation in AlGaAs-on-insulator microresonators_," arXiv:1909.09778 (2019)
-- Schuttrups, B. (2020). "_Modelling nonlinear optical pulse propagation using pseudo-spectral methods_" (Master's thesis, University of Twente).
-- Moille, G., Chang, L., Xie, W., Rao, A., Lu, X., Davanco, M. _et al._  "_Dissipative Kerr Solitons in a III‐V Microresonator_". Laser & Photonics Reviews, 14(8), 2000022 (2020)
-- Weng, H., Liu, J., Afridi, A. A., Li, J., Dai, J., Ma, X. _et al._ "_Octave-spanning Kerr frequency comb generation with stimulated Raman scattering in an AlN microresonator_". Optics Letters, 46(3), 540-543. (2021)
-- Weng, H., Liu, J., Afridi, A. A., Li, J., Dai, J., Ma, X. _et al._ "_Directly accessing octave-spanning dissipative Kerr soliton frequency combs in an AlN microring resonator_" Photonics Research (2021)
-- Moille, G., Westly, D., Orji, N. G., & Srinivasan, K. "_Tailoring broadband Kerr soliton microcombs via post-fabrication tuning of the geometric dispersion_". Applied Physics Letters, 119(12), 121103 (2021)
-- Weng, H., Liu, J., Afridi, A. A., Li, J., Dai, J., Zhang, Y., _et al._ "_Perfect soliton crystal in an AlN microresonator"_. In CLEO: QELS_Fundamental Science (pp. JTh3A-31). Optical Society of America. (2021)
-- Moille, G., Westly, D., Simelgor, G., & Srinivasan, K. "_Impact of the precursor gas ratio on dispersion engineering of broadband silicon nitride microresonator frequency combs_". Optics Letters, 46(23), 5970-5973 (2021).
+If you want to be featured here, shoot me an email! I try to keep it up to date but this is not a priority. I would love to hear anybody who uses it!
+- 2023:
+  - Moille, G., Stone, J., Chojnacky, M., Menyuk, C., & Srinivasan, K. (2023). Kerr-Induced Synchronization of a Cavity Soliton to an Optical Reference for Integrated Frequency Comb Clockworks. arXiv preprint arXiv:2305.02825.
+  - Moille, G., Lu, X., Stone, J., Westly, D., & Srinivasan, K. (2023). Fourier synthesis dispersion engineering of photonic crystal microrings for broadband frequency combs. Communications Physics, 6(1), 144.
+  - Ji, H., Geng, Z., Cheng, W., Wu, P., Yu, Z., Liu, Y., ... & Zhao, Q. (2023). High-power two-color Kerr frequency comb generation on the gallium phosphide-on-insulator platform at SWIR and MIR spectra. JOSA B, 40(8), 1976-1985.
+  - Geng, Z., Ji, H., Yu, Z., Cheng, W., Wu, P., Li, Y., & Zhao, Q. (2023). Dispersion-flattened concentric structure for microcomb bandwidth broadening in GaP-OI resonators. JOSA B, 40(3), 673-681.
+  - Ren, D., Dong, C., & Burghoff, D. (2023). Integrated nonlinear photonics in the longwave-infrared: A roadmap. MRS Communications, 1-15.
+  - Moille, G., Li, C., Stone, J., Chojnacky, M., Shandilya, P., Chembo, Y. K., Dutt, A., ... & Srinivasan, K. (2023). Two-Dimensional Nonlinear Mixing Between a Dissipative Kerr Soliton and Continuous Waves for a Higher-Dimension Frequency Comb. arXiv preprint arXiv:2303.10026.
+- 2022:
+  - Afridi, A. A., Weng, H., Li, J., Liu, J., McDermott, M., Lu, Q., ... & Donegan, J. F. (2022). Breather solitons in AlN microresonators. Optics Continuum, 1(1), 42-50.
+  - Lu, S., Liu, X., Shi, Y., Yang, H., Long, Z., Li, Y., ... & Liang, H. (2022). Mid-infrared ultra-broadband optical Kerr frequency comb based on a CdTe ring microresonator: a theoretical investigation. Optics express, 30(19), 33969-33979.
+- 2021:
+  - Weng, H., Liu, J., Afridi, A. A., Li, J., Dai, J., Ma, X. _et al._ "_Octave-spanning Kerr frequency comb generation with stimulated Raman scattering in an AlN microresonator_". Optics Letters, 46(3), 540-543. (2021)
+  - Weng, H., Liu, J., Afridi, A. A., Li, J., Dai, J., Ma, X. _et al._ "_Directly accessing octave-spanning dissipative Kerr soliton frequency combs in an AlN microring resonator_" Photonics Research (2021)
+  - Moille, G., Westly, D., Orji, N. G., & Srinivasan, K. "_Tailoring broadband Kerr soliton microcombs via post-fabrication tuning of the geometric dispersion_". Applied Physics Letters, 119(12), 121103 (2021)
+  - Weng, H., Liu, J., Afridi, A. A., Li, J., Dai, J., Zhang, Y., _et al._ "_Perfect soliton crystal in an AlN microresonator"_. In CLEO: QELS_Fundamental Science (pp. JTh3A-31). Optical Society of America. (2021)
+  - Moille, G., Westly, D., Simelgor, G., & Srinivasan, K. "_Impact of the precursor gas ratio on dispersion engineering of broadband silicon nitride microresonator frequency combs_". Optics 
+Letters, 46(23), 5970-5973 (2021).
+- 2020:
+  - Schuttrups, B. (2020). "_Modelling nonlinear optical pulse propagation using pseudo-spectral methods_" (Master's thesis, University of Twente).
+  - Moille, G., Chang, L., Xie, W., Rao, A., Lu, X., Davanco, M. _et al._  "_Dissipative Kerr Solitons in a III‐V Microresonator_". Laser & Photonics Reviews, 14(8), 2000022 (2020)
+-2019:
+  - Gregory Moille, Xiyuan Lu, Ashutosh Rao, Qing Li, Daron A. Westly, Leonardo Ranzani, Scott B. Papp, Mohammad Soltani, and Kartik Srinivasan "_Kerr-Microresonator Soliton Frequency Combs at Cryogenic Temperatures_," Phys. Rev. Applied 12, 034057 (2019)
+  - Gregory Moille, Qing Li, Travis C. Briles, Su-Peng Yu, Tara Drake, Xiyuan Lu, Ashutosh Rao, Daron Westly, Scott B. Papp, and Kartik Srinivasan "_Broadband resonator-waveguide coupling for efficient extraction of octave-spanning microcombs_," Optics Letters Vol. 44, Issue 19, pp. 4737-4740 (2019)
+  - Lin Chang, Weiqiang Xie, Haowen Shu, Qifan Yang, Boqiang Shen, Andreas Boes, Jon D. Peters, Warren Jin, Songtao Liu, Gregory Moille, Su-Peng Yu, Xingjun Wang, Kartik Srinivasan, Scott B. Papp, Kerry Vahala, John E. Bowers "_Ultra-efficient frequency comb generation in AlGaAs-on-insulator microresonators_," arXiv:1909.09778 (2019)
