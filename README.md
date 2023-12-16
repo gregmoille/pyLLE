@@ -104,7 +104,7 @@ You can also access the [nbviewer](https://nbviewer.org/github/gregmoille/pyLLE/
 If you want to be featured here, shoot me an email! I try to keep it up to date but this is not a priority. I would love to hear anybody who uses it!
 
 - 2023:
-  - Moille, G., Stone, J., Chojnacky, M., Menyuk, C., & Srinivasan, K. (2023). Kerr-Induced Synchronization of a Cavity Soliton to an Optical Reference for Integrated Frequency Comb Clockworks. arXiv preprint arXiv:2305.02825.
+  - Moille, G., Stone, J., Chojnacky, et al. Kerr-Induced Synchronization of a Cavity Soliton to an Optical Reference. Nature 624, 267–274 (2023). 
   - Moille, G., Lu, X., Stone, J., Westly, D., & Srinivasan, K. (2023). Fourier synthesis dispersion engineering of photonic crystal microrings for broadband frequency combs. Communications Physics, 6(1), 144.
   - Ji, H., Geng, Z., Cheng, W., Wu, P., Yu, Z., Liu, Y., ... & Zhao, Q. (2023). High-power two-color Kerr frequency comb generation on the gallium phosphide-on-insulator platform at SWIR and MIR spectra. JOSA B, 40(8), 1976-1985.
   - Geng, Z., Ji, H., Yu, Z., Cheng, W., Wu, P., Li, Y., & Zhao, Q. (2023). Dispersion-flattened concentric structure for microcomb bandwidth broadening in GaP-OI resonators. JOSA B, 40(3), 673-681.
