@@ -16,8 +16,8 @@ A major revision, v4.0.0 introduces a lot of new stuff including:
 
 ## How to Cite Us?
 
-Please, if you use this package and it helps you with your research and publication, cite us in your paper. Not only it allows us to have a better idea of new things people are interested in and how to keep improving the solver, but it also help us building a community where every body could help maintaining the solver to suit better the needs of everybody.
-You can cite our paper published in the Journal of Research of National Institute of Standards and Technology available [here](https://doi.org/10.6028/jres.124.012), with the following bibtex entry:
+Please, if you use this package and it helps you with your research and publication, cite us in your paper. Not only does it allow us to have a better idea of new things people are interested in and how to keep improving the solver, but it also helps us build a community where everybody can help maintain the solver to better suit the needs of everybody.
+You can cite our paper published in the Journal of Research of the National Institute of Standards and Technology, available [here](https://doi.org/10.6028/jres.124.012), with the following BibTeX entry.:
 
 ```latex
 @article{moille_pyLLE,
@@ -27,7 +27,7 @@ You can cite our paper published in the Journal of Research of National Institut
       volume = {124},
       pages = {124012},
       month = {2019-05-24},
-      journal = {Journal of Research of NIST},
+      journal = {Journal of Research of the NIST},
        doi = {https://doi.org/10.6028/jres.124.012},
      }
 ```
@@ -99,16 +99,16 @@ then
 A complete example is available in the example directory [notebook](https://github.com/gregmoille/pyLLE/blob/master/example/TemporalDualPump.ipynb) with the corresponding file needed in the folder.
 You can also access the [nbviewer](https://nbviewer.org/github/gregmoille/pyLLE/blob/master/example/TemporalDualPump.ipynb) example to have a better idea of what's going on:
 
-## Works Using pyLLE
+## Works Using/citing pyLLE
 
 If you want to be featured here, shoot me an email! I try to keep it up to date but this is not a priority. I would love to hear anybody who uses it!
 
 - 2023:
   - Moille, G., Stone, J., Chojnacky, et al. Kerr-Induced Synchronization of a Cavity Soliton to an Optical Reference. Nature 624, 267–274 (2023). 
   - Moille, G., Lu, X., Stone, J., Westly, D., & Srinivasan, K. (2023). Fourier synthesis dispersion engineering of photonic crystal microrings for broadband frequency combs. Communications Physics, 6(1), 144.
+  - Ren, D., Dong, C., & Burghoff, D. Integrated nonlinear photonics in the longwave-infrared: A roadmap. MRS Communications, 13(6), 942-956 (2023).
   - Ji, H., Geng, Z., Cheng, W., Wu, P., Yu, Z., Liu, Y., ... & Zhao, Q. (2023). High-power two-color Kerr frequency comb generation on the gallium phosphide-on-insulator platform at SWIR and MIR spectra. JOSA B, 40(8), 1976-1985.
   - Geng, Z., Ji, H., Yu, Z., Cheng, W., Wu, P., Li, Y., & Zhao, Q. (2023). Dispersion-flattened concentric structure for microcomb bandwidth broadening in GaP-OI resonators. JOSA B, 40(3), 673-681.
-  - Ren, D., Dong, C., & Burghoff, D. (2023). Integrated nonlinear photonics in the longwave-infrared: A roadmap. MRS Communications, 1-15.
   - Moille, G., Li, C., Stone, J., Chojnacky, M., Shandilya, P., Chembo, Y. K., Dutt, A., ... & Srinivasan, K. (2023). Two-Dimensional Nonlinear Mixing Between a Dissipative Kerr Soliton and Continuous Waves for a Higher-Dimension Frequency Comb. arXiv preprint arXiv:2303.10026.
 - 2022:
   - Afridi, A. A., Weng, H., Li, J., Liu, J., McDermott, M., Lu, Q., ... & Donegan, J. F. (2022). Breather solitons in AlN microresonators. Optics Continuum, 1(1), 42-50.
