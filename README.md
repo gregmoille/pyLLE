@@ -64,6 +64,24 @@ or pip the github
 pip install git+https://github.com/gregmoille/pyLLE.git
 ```
 
+
+**For windows** the julia package have to be installed manually, using a julia console and typing the following command:
+
+```julia
+using Pkg
+
+Pkg.add("HDF5")
+Pkg.update("HDF5")
+
+Pkg.add("FFTW")
+Pkg.update("FFTW")
+
+Pkg.add("LinearAlgebra")
+Pkg.update("LinearAlgebra")
+
+```
+
+
 For a manual install, download the .zip of the repository or clone it and install with the setup.py script.
 
 ## Checking that everything works correctly
