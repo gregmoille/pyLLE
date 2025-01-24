@@ -120,7 +120,12 @@ You can also access the [nbviewer](https://nbviewer.org/github/gregmoille/pyLLE/
 ## Works Using/citing pyLLE
 
 If you want to be featured here, shoot me an email! I try to keep it up to date but this is not a priority. I would love to hear anybody who uses it!
-
+- 2025:
+  - Moille, G. et al. Versatile optical frequency division with Kerr-induced synchronization at tunable microcomb synthetic dispersive waves. Nat. Photon. 19, 36–43 (2025).
+  - Shandilya, P. et al. All-optical azimuthal trapping of dissipative Kerr multi-solitons for relative noise suppression. APL Photonics 10, 016104 (2025).
+- 2024:
+  - Moille, G., Shandilya, P., Erkintalo, M., Menyuk, C. R. & Srinivasan, K. On-Chip Parametric Synchronization of a Dissipative Kerr Soliton Microcomb. Preprint at https://doi.org/10.48550/arXiv.2409.05388 (2024).
+  - Moille, G., Westly, D. & Srinivasan, K. Broadband Visible Wavelength Microcomb Generation In Silicon Nitride Microrings Through Air-Clad Dispersion Engineering. Preprint at https://doi.org/10.48550/arXiv.2404.01577 (2024).
 - 2023:
   - Moille, G., Stone, J., Chojnacky, et al. Kerr-Induced Synchronization of a Cavity Soliton to an Optical Reference. Nature 624, 267–274 (2023). 
   - Moille, G., Lu, X., Stone, J., Westly, D., & Srinivasan, K. (2023). Fourier synthesis dispersion engineering of photonic crystal microrings for broadband frequency combs. Communications Physics, 6(1), 144.
