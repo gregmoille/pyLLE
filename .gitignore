@@ -9,3 +9,22 @@ pipDeploy
 *.pyc
 .ipynb_checkpoints
 dist
+
+# Ignore VS Code settings
+.vscode/
+
+# Ignore Python virtual environment
+venv/
+
+# Ignore Python bytecode files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore environment variables file
+.env
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
